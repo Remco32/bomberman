@@ -11,25 +11,22 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         ArrayList<double[][]> weights = new ArrayList<>();
-        ArrayList<double[][]> threshold = new ArrayList<>();
         ArrayList<AIHandler> ai = new ArrayList<>();
 
-        weights.add(CreateRandomWeights(6,3));// there are 6 input values, we want two output columns
+        weights.add(CreateRandomWeights(7,3));// there are 6 input values,1 threshold value, we want two output columns
 
-        weights.add(CreateRandomWeights(3,1));
-
-        threshold.add(CreateRandomWeights(1,3)); // length of threshold array should be 1 shorter than the weights
-        // columuns equals amount of outputnodes, rows equal amount of input nodes
+        weights.add(CreateRandomWeights(4,1));
 
 
         // amount of columns defines the length of the output
-        // amount of rows should == the amount of columns from the last output in weights
+        // amount of rows should == the amount of columns +1(for the threshold) from the last output in weights
         // for threshold the amount of rows should equal the amount of output nodes
+
 
         GameWorld world = new GameWorld(9,4, false); // gridsize should be of 2*n +1
 
 
-        ai.add(new NeuralNetworkAISimpleFeatures(world,world.bomberManList.get(0),weights,threshold));// create neural network
+        ai.add(new NeuralNetworkAISimpleFeatures(world,world.bomberManList.get(0),weights));// create neural network
         for(int idx=1;idx<world.amountPlayers;idx++) ai.add(new RandomAI(world,world.bomberManList.get(idx)));
 
         world.SetAi(ai);

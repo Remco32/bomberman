@@ -116,7 +116,7 @@ public class GameWorld {
             amountOfRounds++;
             if(windowBool) try {
                 window.repaint();
-                Thread.sleep(200);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
