@@ -20,7 +20,7 @@ public class AIHandler {
     }
 
     void MakeMove(){
-       man.Move(moves.get(moves.size()-1).move);
+       man.Move(moves.get(moves.size()-1).getMove());
     }
 
     void CalculateBestMove() {

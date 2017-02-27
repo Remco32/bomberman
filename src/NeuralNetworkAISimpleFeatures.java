@@ -4,32 +4,40 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
 import java.util.Vector;
+
+import static org.apache.commons.math3.util.FastMath.pow;
 
 /**
  * Created by joseph on 15/02/2017.
  */
 public class NeuralNetworkAISimpleFeatures extends AIHandler {
-    ArrayList<RealMatrix> weightMatrixArray;
-    ArrayList<RealMatrix> thresholdMatrixArray;
-    double output;
-    double[] utility;
-    int inputSize = 6;
-    int hiddenLayerSize = 1;
-    double learningRate = 0.1;
-    double explorationChance;
+    private ArrayList<RealMatrix> weightMatrixArray;
+    private double output;
+    private MoveUtility[] utility;
+    private int inputSize = 7; // all basic features plus 1 for the bias
+    private int hiddenLayerSize = 1;
+    private double learningRate = 0.1;
+    private double explorationChance;
 
-    NeuralNetworkAISimpleFeatures(GameWorld world, BomberMan man, ArrayList<double[][]> weights, ArrayList<double[][]> thresholds) {
+    NeuralNetworkAISimpleFeatures(GameWorld world, BomberMan man, ArrayList<double[][]> weights) {
         super(world, man);
         weightMatrixArray = new ArrayList<>();
-        thresholdMatrixArray = new ArrayList<>();
+
         for (int idx = 0; idx < weights.size(); idx++)
             weightMatrixArray.add(MatrixUtils.createRealMatrix(weights.get(idx)));
-        for (int idx = 0; idx < thresholds.size(); idx++)
-            thresholdMatrixArray.add(MatrixUtils.createRealMatrix(thresholds.get(idx)));
-        utility = new double[6];
+
+        utility = new MoveUtility[6];
     }
+
+    public int getInputSize() {
+        return inputSize;
+    }
+
 
     // manhattan distance
     double FindClosestBomb(int x, int y) { // bfs
@@ -95,31 +103,31 @@ public class NeuralNetworkAISimpleFeatures extends AIHandler {
         int x = man.x_location;
         int y = man.y_location;
         for (Integer type : possibleMoves) {
-            if (type == 0) utility[0] = CalculateUtility(x, y, false);
-            if (type == 1) utility[1] = CalculateUtility(x - 1, y, false);//move left
-            if (type == 2) utility[2] = CalculateUtility(x, y - 1, false); //move up
-            if (type == 3) utility[3] = CalculateUtility(x, y + 1, false);//move down
-            if (type == 4) utility[4] = CalculateUtility(x + 1, y, false);//move right
-            if (type == 5) utility[5] = CalculateUtility(x, y, true);
+            if (type == 0) utility[0] = CalculateUtilityMatrix(x, y,0, false);
+            if (type == 1) utility[1] = CalculateUtilityMatrix(x - 1, y,1, false);//move left
+            if (type == 2) utility[2] = CalculateUtilityMatrix(x, y - 1,2, false); //move up
+            if (type == 3) utility[3] = CalculateUtilityMatrix(x, y + 1,3, false);//move down
+            if (type == 4) utility[4] = CalculateUtilityMatrix(x + 1, y,4, false);//move right
+            if (type == 5) utility[5] = CalculateUtilityMatrix(x, y,5, true);
         }
-        int maxIndex = 2;
+        int maxIndex = -1;
         for (Integer type : possibleMoves) {
-            double newNumber = utility[type];
+            double newNumber = utility[type].getUtility();
             //System.out.println(utility[type]);
-            if ((newNumber > utility[maxIndex])) {
+            if (maxIndex==-1 || (newNumber > utility[maxIndex].getUtility())) {
                 maxIndex = type;
             }
         }
         //TODO fix this to right move with respect to learning
 
         //System.out.println("best move: "+ maxIndex + "with util:" + utility[maxIndex]);
-        moves.add(new MoveUtility(maxIndex, utility[maxIndex]));
+        moves.add(utility[maxIndex]);
     }
 
-    double CalculateUtility(int x, int y, Boolean bombMove) { //calculate the utility of a given state
+    MoveUtility CalculateUtilityMatrix(int x, int y,int move, Boolean bombMove) { //calculate the utility of a given state
         Boolean removeBomb = false;
         Bomb bomb = null;
-        if (bombMove) {
+        if (bombMove) { // testcase for the placing a bomb move
             if (world.positions[x][y].bomb == null) {
                 removeBomb = true;
                 bomb = new Bomb(x, y, man, world);
@@ -127,48 +135,70 @@ public class NeuralNetworkAISimpleFeatures extends AIHandler {
                 world.positions[x][y].add_Bomb(bomb);
             }
         }
-        RealMatrix tempVector = MatrixUtils.createRealMatrix(new double[][]{{FindClosestBomb(x, y),
+        double[] featureValues = {FindClosestBomb(x, y),
                 FindClosestEnemy(x, y), PossibleSteps(x, y),
                 AliveBombermans(), AmountOfBombs(),
-                AmountOfBombsPlacedByYou()}});
+                AmountOfBombsPlacedByYou(),1};//for the threshold
+
+        RealMatrix tempVector = MatrixUtils.createRealMatrix(new double[][]{featureValues});
 
         if (removeBomb) {
             world.activeBombList.remove(bomb);
             world.positions[x][y].deleteBomb(); // if it has been placed for trial
         }
 
-        for (int idx = 0; idx < thresholdMatrixArray.size(); idx++) { // for continues output
-            // thresholdmatrix is 1 shorther than weightmatrix
+        for (int idx = 0; idx < weightMatrixArray.size(); idx++) { // for continues output
+            //  weightmatrix
+            // System.out.println("tempvector: " + tempVector);
+            // System.out.println("Weights: " + weightMatrixArray.get(idx));
 
             tempVector = tempVector.multiply(weightMatrixArray.get(idx));
-
-            tempVector = tempVector.subtract(thresholdMatrixArray.get(idx));
-            double[][] data = tempVector.getData();
-            for (int j = 0; j < data[0].length; j++) {
-                for (int i = 0; i < data.length; i++) {
-                    if (data[i][j] > 0) data[i][j] = 1;
-                    else data[i][j] = 0;
-                }
-            }
-
-            tempVector = MatrixUtils.createRealMatrix(data);
-
+            tempVector = MatrixUtils.createRealMatrix(SigmoidActivationFunction(tempVector));
         }
 
-        tempVector = tempVector.multiply(weightMatrixArray.get(weightMatrixArray.size() - 1));
-
-        if (tempVector.getRowDimension() + tempVector.getColumnDimension() - 1 == 1) return tempVector.getData()[0][0];
+        MoveUtility tempMoveUtility = new MoveUtility(move,tempVector.getData()[0][0],featureValues);
+        if (tempVector.getRowDimension() + tempVector.getColumnDimension() - 2 == 1) return tempMoveUtility;
+        //-2 because there will be a threshold vector in there
         else {
             System.out.println(" output of neural net not 1");
         }
-        return 0;
+        return new MoveUtility(move, Double.NEGATIVE_INFINITY); //  only the error case.
     }
 
-    double CalculateError(){
+    double[][] SigmoidActivationFunction(RealMatrix matrix){
+        double[][] returnData = new double[1][matrix.getData()[0].length + 1];
+
+        double[][] data = matrix.getData();
+
+        int j,i;
+        for ( j = 0; j < data[0].length; j++) {
+            for (i = 0; i < data.length; i++) {
+                returnData[i][j] = (1.0 / (1 + Math.exp(-data[i][j])));
+            }
+        }
+
+        returnData[0][j] = 1;
+        return returnData;
+    }
+
+    double CalculateTotalError(){
      MoveUtility  expectedOutcome = moves.get(moves.size()-1);
      double realOutcome = man.points.get(man.points.size()-1)-man.points.get(man.points.size()-2); // the difference in points because of the move
-     double error = realOutcome - expectedOutcome.utility;
+     double error = 0.5*pow((expectedOutcome.getUtility() - realOutcome),2);
      return error;
     }
+
+
+    void updateWeights(){
+        double totalError = CalculateTotalError();
+        for (int idx =weightMatrixArray.size(); idx >0; idx--){
+            double[][] data = weightMatrixArray.get(idx).getData();
+
+
+        }
+
+    }
+
+
 
 }
