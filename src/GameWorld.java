@@ -92,7 +92,7 @@ public class GameWorld {
     private void GameLoop() {
 
         //time execution time
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
         while (PlayerCheck()) {
             for(AIHandler temp:ai)temp.CalculateBestMove();
             for (AIHandler temp:ai) {
@@ -120,12 +120,12 @@ public class GameWorld {
                 e.printStackTrace();
             }
         }
-        if (bomberManList.get(0).alive) System.out.println("you Won");
+        if (bomberManList.get(0).alive) System.out.println("You won");
         else System.out.println("You lost");
 
         System.out.println(amountOfRounds);
-        long endTime = System.nanoTime();
-        System.out.println("time is in ms:" + (double) (endTime - startTime)/1000000);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Elapsed time: " + (double) (endTime - startTime)/1000 + " seconds");
     }
 
     Boolean PlayerCheck() {
