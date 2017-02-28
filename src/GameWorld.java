@@ -41,7 +41,7 @@ public class GameWorld {
         //init the grid
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
-                positions[x][y] = new WorldPosition(x, y, SOFTWALL);
+                positions[x][y] = new WorldPosition(x, y, SOFTWALL); // fills whole world with softwalls, will get overwritten later
                 if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, HARDWALL); //add hardwalls at uneven positions
                 //if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
                 //if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
@@ -128,7 +128,7 @@ public class GameWorld {
         System.out.println("Elapsed time: " + (double) (endTime - startTime)/1000 + " seconds");
     }
 
-    Boolean PlayerCheck() {
+    private Boolean PlayerCheck() {
         if (!bomberManList.get(0).alive) return false;
         for (int idx = 1; idx < bomberManList.size(); idx++) {
             if (bomberManList.get(idx).alive) return true;
