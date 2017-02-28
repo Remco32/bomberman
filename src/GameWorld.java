@@ -5,16 +5,16 @@ import java.util.ArrayList;
  * Created by joseph on 09/02/2017.
  */
 public class GameWorld {
-    int HARDWALL = 0;
-    int SOFTWALL = 1;
+    private int HARDWALL = 0;
+    private int SOFTWALL = 1;
     int gridSize; // in 1 dimension
     int amountPlayers;
-    int amountOfRounds=0;
-    Boolean windowBool;
-    ShowWindow window;
+    private int amountOfRounds=0;
+    private Boolean windowBool;
+    private ShowWindow window;
 
     WorldPosition[][] positions;
-    ArrayList<AIHandler> ai;
+    private ArrayList<AIHandler> ai;
     ArrayList<BomberMan> bomberManList;
     ArrayList<Bomb> activeBombList;
     ArrayList<Bomb> explodedBombList;
@@ -42,7 +42,7 @@ public class GameWorld {
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
                 positions[x][y] = new WorldPosition(x, y, SOFTWALL);
-                if (x % 2 == 1) positions[x][y] = new WorldPosition(x, y, (y + 1) % 2);
+                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, HARDWALL); //add hardwalls at uneven positions
                 if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL);
                 if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL);
             }
