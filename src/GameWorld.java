@@ -36,38 +36,37 @@ public class GameWorld {
     void SetAi(ArrayList<AIHandler> ai){
         this.ai=ai;
     }
-    void InitWorld() {
+    private void InitWorld() {
         positions = new WorldPosition[gridSize][gridSize];
         //init the grid
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
                 positions[x][y] = new WorldPosition(x, y, SOFTWALL);
                 if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, HARDWALL); //add hardwalls at uneven positions
-                if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL);
-                if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL);
+                //if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
+                //if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
             }
 
         }
         //TODO randomize the grid
 
         // init the players
-        // 4 is max amount of players
 
         int y = 0;
         int x = 0;
         int bomberManId = 1;
-        if (amountPlayers> 4) amountPlayers = 4;
-        if (amountPlayers < 1) amountPlayers = 1;
+        if (amountPlayers > 4) amountPlayers = 4; // 4 is max amount of players
+        if (amountPlayers < 1) amountPlayers = 1; // 1 is min amount of players
         for (int idx = 0; idx < amountPlayers && idx < 4; idx++) {
             for (int temp = x - 1; temp <= x + 1; temp++) {
                 if (temp >= 0 && temp < gridSize) {
-                    positions[temp][y].type = 2;
+                    positions[temp][y].type = 2; //remove walls around bomberman @ y-axis
                 }
             }
 
             for (int temp = y - 1; temp <= y + 1; temp++) {
                 if (temp >= 0 && temp < gridSize) {
-                    positions[x][temp].type = 2;
+                    positions[x][temp].type = 2; //remove walls around bomberman @ x-axis
                 }
             }
             bomberManList.add(new BomberMan(x, y, bomberManId++, this));
@@ -90,7 +89,7 @@ public class GameWorld {
         loop.start();
 
     }
-    void GameLoop() {
+    private void GameLoop() {
 
         //time execution time
         long startTime = System.nanoTime();
@@ -131,8 +130,8 @@ public class GameWorld {
 
     Boolean PlayerCheck() {
         if (!bomberManList.get(0).alive) return false;
-        for (int x = 1; x < bomberManList.size(); x++) {
-            if (bomberManList.get(x).alive) return true;
+        for (int idx = 1; idx < bomberManList.size(); idx++) {
+            if (bomberManList.get(idx).alive) return true;
         }
         return false;
     }
