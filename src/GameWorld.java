@@ -1,20 +1,19 @@
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
  * Created by joseph on 09/02/2017.
  */
 public class GameWorld {
-    int HARDWALL = 0;
-    int SOFTWALL = 1;
+    private int HARDWALL = 0;
+    private int SOFTWALL = 1;
     int gridSize; // in 1 dimension
     int amountPlayers;
-    int amountOfRounds=0;
-    Boolean windowBool;
-    ShowWindow window;
+    private int amountOfRounds=0;
+    private Boolean windowBool;
+    private ShowWindow window;
 
     WorldPosition[][] positions;
-    ArrayList<AIHandler> ai;
+    private ArrayList<AIHandler> ai;
     ArrayList<BomberMan> bomberManList;
     ArrayList<Bomb> activeBombList;
     ArrayList<Bomb> explodedBombList;
@@ -36,38 +35,37 @@ public class GameWorld {
     void SetAi(ArrayList<AIHandler> ai){
         this.ai=ai;
     }
-    void InitWorld() {
+    private void InitWorld() {
         positions = new WorldPosition[gridSize][gridSize];
         //init the grid
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
-                positions[x][y] = new WorldPosition(x, y, SOFTWALL);
-                if (x % 2 == 1) positions[x][y] = new WorldPosition(x, y, (y + 1) % 2);
-                if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL);
-                if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL);
+                positions[x][y] = new WorldPosition(x, y, SOFTWALL); // fills whole world with softwalls, will get overwritten later
+                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, HARDWALL); //add hardwalls at uneven positions
+                //if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
+                //if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
             }
 
         }
         //TODO randomize the grid
 
         // init the players
-        // 4 is max amount of players
 
         int y = 0;
         int x = 0;
         int bomberManId = 1;
-        if (amountPlayers> 4) amountPlayers = 4;
-        if (amountPlayers < 1) amountPlayers = 1;
+        if (amountPlayers > 4) amountPlayers = 4; // 4 is max amount of players
+        if (amountPlayers < 1) amountPlayers = 1; // 1 is min amount of players
         for (int idx = 0; idx < amountPlayers && idx < 4; idx++) {
             for (int temp = x - 1; temp <= x + 1; temp++) {
                 if (temp >= 0 && temp < gridSize) {
-                    positions[temp][y].type = 2;
+                    positions[temp][y].type = 2; //remove walls around bomberman @ y-axis
                 }
             }
 
             for (int temp = y - 1; temp <= y + 1; temp++) {
                 if (temp >= 0 && temp < gridSize) {
-                    positions[x][temp].type = 2;
+                    positions[x][temp].type = 2; //remove walls around bomberman @ x-axis
                 }
             }
             bomberManList.add(new BomberMan(x, y, bomberManId++, this));
@@ -90,10 +88,10 @@ public class GameWorld {
         loop.start();
 
     }
-    void GameLoop() {
+    private void GameLoop() {
 
         //time execution time
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
         while (PlayerCheck()) {
             for(AIHandler temp:ai)temp.CalculateBestMove();
             for (AIHandler temp:ai) {
@@ -101,7 +99,7 @@ public class GameWorld {
             }
             // update all bombs
             for (Bomb bomb : activeBombList) {
-                bomb.Round();
+                bomb.Countdown();
             }
             for (Bomb bomb : activeBombList) {
                 if(bomb.exploded){
@@ -121,18 +119,18 @@ public class GameWorld {
                 e.printStackTrace();
             }
         }
-        if (bomberManList.get(0).alive) System.out.println("you Won");
+        if (bomberManList.get(0).alive) System.out.println("You won");
         else System.out.println("You lost");
 
         System.out.println(amountOfRounds);
-        long endTime = System.nanoTime();
-        System.out.println("time is in ms:" + (double) (endTime - startTime)/1000000);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Elapsed time: " + (double) (endTime - startTime)/1000 + " seconds");
     }
 
-    Boolean PlayerCheck() {
+    private Boolean PlayerCheck() {
         if (!bomberManList.get(0).alive) return false;
-        for (int x = 1; x < bomberManList.size(); x++) {
-            if (bomberManList.get(x).alive) return true;
+        for (int idx = 1; idx < bomberManList.size(); idx++) {
+            if (bomberManList.get(idx).alive) return true;
         }
         return false;
     }

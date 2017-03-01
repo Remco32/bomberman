@@ -15,7 +15,7 @@ public class RandomAI extends AIHandler {
         if(man.alive) moves.add(MakeEducatedMove(man));
     }
 
-    MoveUtility MakeEducatedMove(BomberMan man) {
+    private MoveUtility MakeEducatedMove(BomberMan man) {
         ArrayList<Integer> moveList = man.AbleMoves();
         ArrayList<Bomb> bombList = findBombLocations(man.x_location, man.y_location, 2);//range can changed
         double[] utilityList = new double[moveList.size()];
@@ -39,7 +39,7 @@ public class RandomAI extends AIHandler {
 
     }
 
-    double CalcUtility(Bomb bomb, int move, BomberMan man) {
+    private double CalcUtility(Bomb bomb, int move, BomberMan man) {
         int x = man.x_location;
         int y = man.y_location;
         if (move == 1) x--;
@@ -53,7 +53,7 @@ public class RandomAI extends AIHandler {
 
     }
 
-    ArrayList<Bomb> findBombLocations(int x_location, int y_location, int range) {
+    private ArrayList<Bomb> findBombLocations(int x_location, int y_location, int range) {
         ArrayList<Bomb> bombList = new ArrayList<>();
         range++;
         for (int xIdx = x_location - range; xIdx <= x_location + range; xIdx++) {
@@ -68,7 +68,7 @@ public class RandomAI extends AIHandler {
     }
 
 
-    int SemiRandomMove(BomberMan man) {
+    private int SemiRandomMove(BomberMan man) {
         int y_location = man.y_location;
         int x_location = man.x_location;
 

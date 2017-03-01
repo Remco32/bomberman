@@ -1,14 +1,7 @@
-import com.sun.javaws.exceptions.ExitException;
-import javafx.geometry.Pos;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.DoubleSummaryStatistics;
-import java.util.Vector;
 
 import static org.apache.commons.math3.util.FastMath.pow;
 
@@ -132,7 +125,7 @@ public class NeuralNetworkAISimpleFeatures extends AIHandler {
                 removeBomb = true;
                 bomb = new Bomb(x, y, man, world);
                 world.activeBombList.add(bomb);
-                world.positions[x][y].add_Bomb(bomb);
+                world.positions[x][y].addBomb(bomb);
             }
         }
         double[] featureValues = {FindClosestBomb(x, y),
