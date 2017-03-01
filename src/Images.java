@@ -28,8 +28,6 @@ public class Images {
             wallHard = buffer.getScaledInstance(50, 50, wallSoft.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("bomb.png"));
             bomb = buffer.getScaledInstance(30, 30, wallSoft.SCALE_DEFAULT);
-            //buffer = ImageIO.read(getClass().getResource("green.png"));
-            //bomb = buffer.getScaledInstance(30, 30, wallSoft.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("grass.png"));
             grass = buffer.getScaledInstance(50, 50, wallSoft.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("bomberman1.png"));
