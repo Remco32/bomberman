@@ -2,7 +2,7 @@
  * Created by joseph on 09/02/2017.
  */
 public class Bomb {
-    private Boolean PRINT = true; // debugging
+    private Boolean DEBUGPRINT = true; // Activates debug prints for bomb
 
     private int timer;
     private int range;
@@ -78,7 +78,7 @@ public class Bomb {
                 ModifyPoints(placedBy,100); // 100 points for killing
                 ModifyPoints(man,-300);//-300 points for dying
                 man.Die();
-                if(PRINT)System.out.println("player " + man.id + " has been killed by player " + placedBy.id);
+                if(DEBUGPRINT)System.out.println("player " + man.id + " has been killed by player " + placedBy.id);
             }
             world.positions[xTemp][yTemp].bombermanList.clear();
         }
