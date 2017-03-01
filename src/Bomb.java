@@ -4,13 +4,13 @@ import java.lang.reflect.Executable;
  * Created by joseph on 09/02/2017.
  */
 public class Bomb {
-    Boolean PRINT = true; // debugging
+    private Boolean PRINT = true; // debugging
 
-    int timer;
-    int range;
+    private int timer;
+    private int range;
     int x_location;
     int y_location;
-    int id;
+    private int id;
     BomberMan placedBy;
     Boolean exploded;
     GameWorld world;
@@ -23,7 +23,7 @@ public class Bomb {
         this.placedBy = by;
         this.world = world;
         timer = 5;
-        range = 2;
+        range = 2; //TODO make variable: time + powerup
         exploded = false;
     }
 
@@ -34,15 +34,15 @@ public class Bomb {
     }
 
 
-    void add_SubtractPoints(BomberMan man,int amount){
+    private void add_SubtractPoints(BomberMan man, int amount){
         int points = man.points.get(man.points.size()-1)+amount;
         man.points.add(points);
     }
 
 
 
-    void Explode() {
-        if (exploded == true) return;
+    private void Explode() {
+        if (exploded) return;
 
         // check for exploding up
         for (int yTemp = y_location; yTemp <= y_location + range; yTemp++) {
