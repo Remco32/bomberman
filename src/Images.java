@@ -13,6 +13,7 @@ public class Images {
     Image wallSoft;
     Image wallHard;
     Image bomb;
+    Image grass;
     Image player1;
     Image player2;
     Image player3;
@@ -27,8 +28,10 @@ public class Images {
             wallHard = buffer.getScaledInstance(50, 50, wallSoft.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("bomb.png"));
             bomb = buffer.getScaledInstance(30, 30, wallSoft.SCALE_DEFAULT);
-            buffer = ImageIO.read(getClass().getResource("green.png"));
-            road = buffer.getScaledInstance(50, 50, wallSoft.SCALE_DEFAULT);
+            //buffer = ImageIO.read(getClass().getResource("green.png"));
+            //bomb = buffer.getScaledInstance(30, 30, wallSoft.SCALE_DEFAULT);
+            buffer = ImageIO.read(getClass().getResource("grass.png"));
+            grass = buffer.getScaledInstance(50, 50, wallSoft.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("bomberman1.png"));
             player1 = buffer.getScaledInstance(40, 40, wallSoft.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("bomberman2.png"));

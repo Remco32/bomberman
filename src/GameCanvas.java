@@ -6,7 +6,7 @@ import java.awt.*;
  */
 public class GameCanvas extends JPanel {
     GameWorld world;
-    Images image;
+    private Images image;
 
     GameCanvas(GameWorld world) {
         this.world = world;
@@ -23,6 +23,7 @@ public class GameCanvas extends JPanel {
                 if (position.type == 0) paintWallHard(g, x * 50, y * 50);
                 if (position.type == 1) paintWallSoft(g, x * 50, y * 50);
                 if (position.type == 2) paintRoad(g, x * 50, y * 50);
+                //if (position.type == 3) paintExplosion(g, x * 50, y * 50);
                 if (!position.bombermanList.isEmpty())
                     paintBomberMan(g, x * 50 + 5, y * 50 + 5, position.bombermanList.get(0));
                 if (position.bomb != null) paintBomb(g, x * 50 + 10, y * 50 + 10);
@@ -39,12 +40,17 @@ public class GameCanvas extends JPanel {
     }
 
     private void paintRoad(Graphics g, int x, int y) {
-        g.setColor(Color.gray);
-        g.fillRect(x, y, 50, 50);
+        //g.setColor(Color.gray);
+        //g.fillRect(x, y, 50, 50);
+        g.drawImage(image.grass, x, y, null);
     }
 
     private void paintBomb(Graphics g, int x, int y) {
         g.drawImage(image.bomb, x, y, null);
+    }
+
+    private void paintExplosion(Graphics g, int x, int y) {
+        //g.drawImage(image.explosion, x, y, null);
     }
 
     private void paintBomberMan(Graphics g, int x, int y, BomberMan man) {
