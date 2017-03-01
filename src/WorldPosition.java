@@ -10,8 +10,8 @@ import java.util.ArrayList;
 public class WorldPosition {
     ArrayList<BomberMan> bombermanList;
     Bomb bomb;
-    int x_location;
-    int y_location;
+    private int x_location;
+    private int y_location;
     int type; //0=hardwall,1=softwall,2=no wall
 
      WorldPosition(int x,int y,int type){
@@ -21,12 +21,12 @@ public class WorldPosition {
         bombermanList = new ArrayList<>();
     }
 
-    void add_Bomb(Bomb bomb){
+    void addBomb(Bomb bomb){
         this.bomb = bomb;
     }
     void deleteBomb(){this.bomb = null;}
 
-    void add_bomberman(BomberMan bomberman){
+    void addBomberman(BomberMan bomberman){
         bombermanList.add(bomberman);
     }
     void deleteBomberman(BomberMan bomberman){

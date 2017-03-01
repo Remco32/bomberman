@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by joseph on 09/02/2017.
@@ -39,7 +38,7 @@ public class BomberMan {
             if (world.positions[x_location][y_location].bomb == null) {
                 Bomb bomb = new Bomb(x_location, y_location, this, world);
                 world.activeBombList.add(bomb);
-                world.positions[x_location][y_location].add_Bomb(bomb);
+                world.positions[x_location][y_location].addBomb(bomb);
             } else if(DEBUGPRINT) System.out.println("Bomb has already been placed at this location");
         }
     }
@@ -63,7 +62,7 @@ public class BomberMan {
                 System.out.println("player " + this.id + "cannot go to: x" + (x_location + x) + "y:" + (y_location + y));
             }
         }
-        world.positions[x_location][y_location].add_bomberman(this); //move to new location
+        world.positions[x_location][y_location].addBomberman(this); //move to new location
     }
 
 
