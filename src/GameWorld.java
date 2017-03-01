@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -100,7 +99,7 @@ public class GameWorld {
             }
             // update all bombs
             for (Bomb bomb : activeBombList) {
-                bomb.Round();
+                bomb.Countdown();
             }
             for (Bomb bomb : activeBombList) {
                 if(bomb.exploded){

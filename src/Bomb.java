@@ -1,5 +1,3 @@
-import java.lang.reflect.Executable;
-
 /**
  * Created by joseph on 09/02/2017.
  */
@@ -27,20 +25,20 @@ public class Bomb {
         exploded = false;
     }
 
-    void Round() {
+    void Countdown() { //Counts down until the bomb explodes. Used by the gameloop.
         if (exploded) return;
         if (timer > 0) timer--;
         else Explode();
     }
 
 
-    private void add_SubtractPoints(BomberMan man, int amount){
+    private void ModifyPoints(BomberMan man, int amount){ //Method for adding or subtracting points from an agent
         int points = man.points.get(man.points.size()-1)+amount;
         man.points.add(points);
     }
 
 
-
+    //TODO add explosion graphic
     private void Explode() {
         if (exploded) return;
 
@@ -74,11 +72,11 @@ public class Bomb {
     }
 
 
-    Boolean ExplodeHit(int xTemp,int yTemp){
+    private Boolean ExplodeHit(int xTemp, int yTemp){
         if (!world.positions[xTemp][yTemp].bombermanList.isEmpty()) {
-            for (BomberMan man : world.positions[xTemp][yTemp].bombermanList) {
-                add_SubtractPoints(placedBy,100); // 100 points for killing
-                add_SubtractPoints(man,-300);//-300 points for dying
+            for (BomberMan man : world.positions[xTemp][yTemp].bombermanList) { //check if a bomberman is hit
+                ModifyPoints(placedBy,100); // 100 points for killing
+                ModifyPoints(man,-300);//-300 points for dying
                 man.Die();
                 if(PRINT)System.out.println("player " + man.id + " has been killed by player " + placedBy.id);
             }
@@ -87,9 +85,9 @@ public class Bomb {
 
         if (world.positions[xTemp][yTemp].type == 0) {
             return true;
-        } else if (world.positions[xTemp][yTemp].type == 1) {
-            world.positions[xTemp][yTemp].type = 2;
-            add_SubtractPoints(placedBy,20);//20 points for destroying a wall
+        } else if (world.positions[xTemp][yTemp].type == 1) { //type 1 is a softwall
+            world.positions[xTemp][yTemp].type = 2; // change the wall to an empty space
+            ModifyPoints(placedBy,20);//award 20 points to the agent for destroying a wall
             return true;
         }
         return false;

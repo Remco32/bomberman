@@ -48,4 +48,3 @@ public class Main {
     }
 }
 
-//TODO add explosion graphic
