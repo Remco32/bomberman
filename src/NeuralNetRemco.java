@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 import static java.lang.Integer.max;
+import static java.lang.Math.exp;
 
 public class NeuralNetRemco {
 
@@ -93,9 +94,9 @@ public class NeuralNetRemco {
     void forwardPass(){
 
         //TODO loop
-        netInputNode(1,0); //first hidden node
-        outputNode();
-        //TODO moet je de hidden layer waarden updaten of enkel de weights?
+        System.out.println("output " + outputNode(netInputNode(1,0)));
+        //update value
+        neuronValueArray[1][0] = outputNode(netInputNode(1,0));
 
 
     }
@@ -125,6 +126,7 @@ public class NeuralNetRemco {
         //add bias: weight multiplied by biasvalue
         value += weightValueArray[layerNumber-1][weightValueArray[layerNumber-1].length-1] * BIASVALUE;
         System.out.println(value);
+        return value;
 
 
         /**
@@ -146,7 +148,7 @@ public class NeuralNetRemco {
         //multiply all weights by the inputs + bias
 
 
-        return 0;
+
     }
 
     /** (a) =w=> (b)
@@ -187,11 +189,11 @@ public class NeuralNetRemco {
 
     }
 
-    double outputNode(){
-        //give actual output
-        //by means of an activation function, or other function
+    //give actual output
+    //by means of an activation function, or other function
+    double outputNode(double input){
+        return (1/(1+exp(-(input))));
 
-        return 0;
     }
 
     double activationFunction(){
