@@ -90,15 +90,21 @@ public class NeuralNetRemco {
         return output;
     }
 
-
-    void forwardPass(){
+    void forwardPass() {
 
         //TODO loop
-        System.out.println("output " + outputNode(netInputNode(1,0)));
-        //update value
-        neuronValueArray[1][0] = outputNode(netInputNode(1,0));
+        System.out.println("output " + outputNode(netInputNode(1, 0)));
 
+        //amount of layers
+        for (int layer = 1; layer < amountHiddenLayers + 2; layer++) //amountHiddenLayers+2 = total amount of layers
+            //amount of nodes
+            for (int node = 0; node < amountOfNodesPerLayer[layer]; node++) {
 
+                //Get the netInput, transform that into the output, and update the value
+                neuronValueArray[layer][node] = outputNode(netInputNode(layer, node));
+                //neuronValueArray[1][0] = outputNode(netInputNode(1,0)); // for layer 1, node 0 AKA hidden0
+
+            }
     }
 
 
