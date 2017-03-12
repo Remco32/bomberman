@@ -36,6 +36,7 @@ public class Main {
 
         NeuralNetRemco AI_Remco = new NeuralNetRemco(2,2,2,1);
         //AI_Remco.printMatrix(AI_Remco.getNeuronValueMatrix());
+        AI_Remco.forwardPass();
         System.out.println();
 
 
