@@ -35,7 +35,8 @@ public class Main {
 
 
         double[] targetOutput = {.01, .99};
-        NeuralNetRemco AI_Remco = new NeuralNetRemco(2,2,2,1,targetOutput);
+
+        NeuralNetRemco AI_Remco = new NeuralNetRemco(2,3,1,1,targetOutput);
         //AI_Remco.printMatrix(AI_Remco.getNeuronValueMatrix());
         AI_Remco.forwardPass();
         System.out.println();

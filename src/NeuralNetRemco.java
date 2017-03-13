@@ -12,13 +12,15 @@ import static java.lang.Math.exp;
 
 public class NeuralNetRemco {
 
-    boolean DEBUG = true;
+    boolean DEBUG_EXAMPLE_ARRAYS = false;
+    boolean DEBUG_RANDOM_INPUT = true;
+
     private int BIASVALUE = 1;
 
     private int amountHiddenLayers;
     private int[] amountOfNodesPerLayer;
-    double[] targetOutput;
-    List<Double> totalError = new ArrayList<>(); //list so we can keep the previous values
+    private double[] targetOutput;
+    private List<Double> totalError = new ArrayList<>(); //list so we can keep the previous values
 
 
 
@@ -45,15 +47,26 @@ public class NeuralNetRemco {
 
         this.neuronValueArray = new double[amountHiddenLayers + 2][max(max(amountInputNodes, amountHiddenNodes), amountOutputNodes)]; //+2 for input and output layer
 
-        // TODO generalize this so it works with multiple layers, currently only works if hidden > input >= output
-        this.weightValueArray = new double[amountHiddenLayers + 1][amountInputNodes * amountHiddenNodes + 1]; //+1 to add a slot for the biasweight
-        this.weightValueArray = initializeArrayRandomValues(amountHiddenLayers + 1, (amountInputNodes * amountHiddenNodes + 1), 0, 5);
+        for (int i = 0; i < amountHiddenLayers + 2; i++){
+            this.neuronValueArray[i] = new double[amountOfNodesPerLayer[i]];
+        }
 
-        //DEBUG INITIALIZATION
-        if (DEBUG) {
+
+                // TODO generalize this so it works with multiple layers, currently only works if hidden > input >= output
+        //TODO remove redundant rows
+        this.weightValueArray = new double[amountHiddenLayers + 1][(amountInputNodes * amountHiddenNodes) + 1]; //+1 to add a slot for the biasweight
+        this.weightValueArray = initializeArrayRandomValues(amountHiddenLayers + 1, (amountInputNodes * amountHiddenNodes + 1), 0, 1);
+
+        //DEBUG_EXAMPLE_ARRAYS INITIALIZATION
+        if (DEBUG_EXAMPLE_ARRAYS) {
             neuronValueArray[0] = new double[]{.05, .1};
             weightValueArray[0] = new double[]{.15, .25, .2, .30, .35};
             weightValueArray[1] = new double[]{.4, .5, .45, .55, .6};
+        }
+        if (DEBUG_RANDOM_INPUT){
+           for(int i = 0; i < amountInputNodes; i++){
+               neuronValueArray[0][i] = (double) ThreadLocalRandom.current().nextInt(1*1000, 2*1000)/1000;
+           }
         }
 
     }
@@ -91,8 +104,6 @@ public class NeuralNetRemco {
     }
 
     void forwardPass() {
-
-        //TODO loop
         //System.out.println("output " + outputNode(netInputNode(1, 0)));
 
         //update weights:
@@ -122,7 +133,7 @@ public class NeuralNetRemco {
     }
 
 
-    double netInputNode(int layerNumber, int nodeNumber){
+    private double netInputNode(int layerNumber, int nodeNumber){
 
         List<Integer> list = new ArrayList<>();
         //find weights connected to the node, add those to a list
@@ -139,6 +150,7 @@ public class NeuralNetRemco {
             //System.out.println("Waarde van input " + neuronValueArray[layerNumber - 1][i]);
 
 
+            //TODO fix out of bounds array
             value += weightValueArray[layerNumber - 1][list.get(i)] * neuronValueArray[layerNumber - 1][i];
         }
         //add bias: weight multiplied by biasvalue
