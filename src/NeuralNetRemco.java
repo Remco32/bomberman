@@ -170,22 +170,22 @@ public class NeuralNetRemco {
 
     }
 
-    double updateWeightsToOutputLayer(){
+    private void updateWeightsToOutputLayer() {
 
-        for (int layer = 0; layer < amountHiddenLayers + 1; layer++) { //amountHiddenLayers+1 == final layer index, -1 because we have a layer less because weights are between neuronlayers
-            for (int weight = 0; weight < weightValueArray[layer].length-1; weight++) {
-                //int nodeToWeight = findNodeToWeight(layer,weight);
-                //int nodeFromWeight = findNodeFromWeight(layer,weight);
-            }
-        }
+        /**
+         for (int layer = 0; layer < amountHiddenLayers + 1; layer++) { //amountHiddenLayers+1 == final layer index, -1 because we have a layer less because weights are between neuronlayers
+         for (int weight = 0; weight < weightValueArray[layer].length-1; weight++) {
+         //int nodeToWeight = findNodeToWeight(layer,weight);
+         //int nodeFromWeight = findNodeFromWeight(layer,weight);
+         }
+         }
+         **/
 
-        //test: werkt alleen met hiddenlayer <-> outputlayer, oftewel laatste layer
+        //werkt alleen met hiddenlayer <-> outputlayer, oftewel laatste layer
 
         int outputLayer = neuronValueArray.length - 1; //final layer, AKA outputlayer
 
-        for (int weight = 0; weight < weightValueArray[outputLayer-1].length-1; weight++) { //-1 because we skip the bias
-
-            //int weight = 0;
+        for (int weight = 0; weight < weightValueArray[outputLayer - 1].length - 1; weight++) { //-1 because we skip the bias
 
             double gradient = 0;
             int nodeToWeight = findNodeToWeight(outputLayer - 1, weight);
@@ -194,16 +194,16 @@ public class NeuralNetRemco {
             gradient = neuronValueArray[outputLayer][nodeToWeight] - targetOutput[nodeToWeight];
             gradient *= (neuronValueArray[outputLayer][nodeToWeight] * (1 - neuronValueArray[outputLayer][nodeToWeight]));
             gradient *= neuronValueArray[outputLayer - 1][nodeFromWeight];
-            System.out.println("Gradient van weight " + weight + " = " + gradient);
+            //System.out.println("Gradient van weight " + weight + " = " + gradient);
 
             //apply learning rate & update weight
             weightValueArray[outputLayer - 1][weight] = weightValueArray[outputLayer - 1][weight] - LEARNINGRATE * gradient;
-            System.out.println("Updated value van weight " + weight + " = " + weightValueArray[outputLayer - 1][weight]);
-            System.out.println();
+            //System.out.println("Updated value van weight " + weight + " = " + weightValueArray[outputLayer - 1][weight]);
+            //System.out.println();
 
         }
 
-        return 0;
+        return;
 
     }
 
