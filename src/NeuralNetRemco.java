@@ -13,10 +13,13 @@ import static java.lang.Math.exp;
 public class NeuralNetRemco {
 
     //DEBUG BOOLEANS
-    boolean DEBUG_EXAMPLE_ARRAYS = false;
-    boolean DEBUG_RANDOM_INPUT = true;
+    boolean DEBUG_EXAMPLE_ARRAYS = true;
+    boolean DEBUG_RANDOM_INPUT = false;
 
     private int BIASVALUE = 1;
+
+    //TODO set this in constructor
+    private double LEARNINGRATE = 0.5;
 
     private int amountHiddenLayers;
     private int[] amountOfNodesPerLayer;
@@ -135,7 +138,7 @@ public class NeuralNetRemco {
 
         //if(neuronValueArray weightValueArray[].length - 1
 
-        gradientWeight();
+        updateWeightsToOutputLayer();
 
 
     }
@@ -167,13 +170,37 @@ public class NeuralNetRemco {
 
     }
 
-    double gradientWeight(){
+    double updateWeightsToOutputLayer(){
 
         for (int layer = 0; layer < amountHiddenLayers + 1; layer++) { //amountHiddenLayers+1 == final layer index, -1 because we have a layer less because weights are between neuronlayers
             for (int weight = 0; weight < weightValueArray[layer].length-1; weight++) {
-                findNodeToWeight(layer,weight);
-                findNodeFromWeight(layer,weight);
+                //int nodeToWeight = findNodeToWeight(layer,weight);
+                //int nodeFromWeight = findNodeFromWeight(layer,weight);
             }
+        }
+
+        //test: werkt alleen met hiddenlayer <-> outputlayer, oftewel laatste layer
+
+        int outputLayer = neuronValueArray.length - 1; //final layer, AKA outputlayer
+
+        for (int weight = 0; weight < weightValueArray[outputLayer-1].length-1; weight++) { //-1 because we skip the bias
+
+            //int weight = 0;
+
+            double gradient = 0;
+            int nodeToWeight = findNodeToWeight(outputLayer - 1, weight);
+            int nodeFromWeight = findNodeFromWeight(outputLayer - 1, weight);
+
+            gradient = neuronValueArray[outputLayer][nodeToWeight] - targetOutput[nodeToWeight];
+            gradient *= (neuronValueArray[outputLayer][nodeToWeight] * (1 - neuronValueArray[outputLayer][nodeToWeight]));
+            gradient *= neuronValueArray[outputLayer - 1][nodeFromWeight];
+            System.out.println("Gradient van weight " + weight + " = " + gradient);
+
+            //apply learning rate & update weight
+            weightValueArray[outputLayer - 1][weight] = weightValueArray[outputLayer - 1][weight] - LEARNINGRATE * gradient;
+            System.out.println("Updated value van weight " + weight + " = " + weightValueArray[outputLayer - 1][weight]);
+            System.out.println();
+
         }
 
         return 0;
@@ -215,7 +242,7 @@ public class NeuralNetRemco {
     //i.e. situation (Node_a) =Weight_w=> (Node_b). Result will be b.
     int findNodeToWeight(int weightLayerNumber, int weightNumber) {
 
-        //System.out.println("Weight w " + weightNumber + " uit laag " + weightLayerNumber + " hoort bij volgende node nummer " + weightNumber%amountOfNodesPerLayer[weightLayerNumber+1]);
+        //System.out.println("Weight w " + weightNumber + " uit weightlaag " + weightLayerNumber + " hoort bij volgende node nummer " + weightNumber%amountOfNodesPerLayer[weightLayerNumber+1]);
 
         return weightNumber%amountOfNodesPerLayer[weightLayerNumber+1];
     }
@@ -224,7 +251,8 @@ public class NeuralNetRemco {
     //i.e. situation (Node_a) =Weight_w=> (Node_b). Result will be a.
     int findNodeFromWeight(int weightLayerNumber, int weightNumber) {
 
-        //System.out.println("Weight w " + weightNumber + " uit laag " + weightLayerNumber + " hoort bij vorige node nummer " + weightNumber/amountOfNodesPerLayer[weightLayerNumber+1]);
+        //System.out.println("Weight w " + weightNumber + " uit weightlaag " + weightLayerNumber + " hoort bij vorige node nummer " + weightNumber/amountOfNodesPerLayer[weightLayerNumber+1]);
+
         return weightNumber/amountOfNodesPerLayer[weightLayerNumber+1];
     }
 
