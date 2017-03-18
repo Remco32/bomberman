@@ -140,7 +140,6 @@ public class NeuralNetRemco {
 
         updateWeightsToOutputLayer();
 
-
     }
 
     private double netInputNode(int layerNumber, int nodeNumber) {
@@ -207,6 +206,8 @@ public class NeuralNetRemco {
 
     }
 
+
+
     private double calculateError(double output, double target) {
         return Math.pow((target - output), 2)/2;
     }
@@ -220,8 +221,18 @@ public class NeuralNetRemco {
      vanaf de node; naar de node
      **/
 
-    void findWeightsFromNode(){
+    //Returns list of numbers corresponding to the weights that are connecting FROM a node.
+    //i.e. situation (Node_a) =Weight_w=> (Node_b). findWeightsToNode(0,a) gives {w}
+    private List findWeightsFromNode(int layerNumber, int nodeNumber) {
+        List<Integer> list = new ArrayList<>();
 
+        //add all connected weights
+        //TODO check of het de laatste layer betreft, die heeft geen bias node.
+        for(int i = 0; i < neuronValueArray[layerNumber+1].length; i++) {
+            //System.out.println("Node " + nodeNumber + " heeft weight " + (nodeNumber*neuronValueArray[layerNumber+1].length+i) );
+            list.add(nodeNumber*neuronValueArray[layerNumber+1].length+i);
+        }
+        return list;
     }
 
     //Returns list of numbers corresponding to the weights that are connecting TO a node.
