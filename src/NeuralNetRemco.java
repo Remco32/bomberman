@@ -208,52 +208,54 @@ public class NeuralNetRemco {
         //TODO expand to multiple hidden layers
 
         //DEBUG
-        int weight = 0; //first weight
+        //int weight = 0; //first weight
         int weightLayer = 0;  //of first layer of weights
 
-        //get relevant nodes and weights, for this weight
-        int inputNodeNumber = findNodeFromWeight(weightLayer, weight); //i1
-        System.out.println("inputNodeNumber for " + weight + " at weightLayer " + weightLayer + " = " + inputNodeNumber);
+        for (int weight = 0; weight < weightValueArray[weightLayer].length - 1; weight++) { //-1 because we skip the bias
 
-        int outputNodeNumber = findNodeToWeight(weightLayer, weight); //h1
-        System.out.println("ownOutputNodeNumber for " + weight + " at weightLayer " + weightLayer + " = " + outputNodeNumber);
+            //get relevant nodes and weights, for this weight
+            int inputNodeNumber = findNodeFromWeight(weightLayer, weight); //i1
+            //System.out.println("inputNodeNumber for " + weight + " at weightLayer " + weightLayer + " = " + inputNodeNumber);
 
-        List<Integer> outputOutputWeights;
-        outputOutputWeights = findWeightsFromNode(weightLayer + 1, outputNodeNumber); //w5, w7
-        System.out.println("outputOutputWeights for " + outputNodeNumber + " at weightLayer " + (weightLayer + 1) + " = " + outputOutputWeights);
+            int outputNodeNumber = findNodeToWeight(weightLayer, weight); //h1
+            //System.out.println("ownOutputNodeNumber for " + weight + " at weightLayer " + weightLayer + " = " + outputNodeNumber);
 
-        ////////////////
+            List<Integer> outputOutputWeights;
+            outputOutputWeights = findWeightsFromNode(weightLayer + 1, outputNodeNumber); //w5, w7
+            //System.out.println("outputOutputWeights for " + outputNodeNumber + " at weightLayer " + (weightLayer + 1) + " = " + outputOutputWeights);
 
-        double gradientTotalErrorToOutputHid = 0;
+            ////////////////
 
-        for (int i = 0; i < outputOutputWeights.size(); i++) { //i is the outputNode
-            int outputWeight = outputOutputWeights.get(i);
+            double gradientTotalErrorToOutputHid = 0;
+            for (int i = 0; i < outputOutputWeights.size(); i++) { //i is the outputNode
+                int outputWeight = outputOutputWeights.get(i);
 
-            int outputNode = findNodeToWeight(weightLayer + 1, outputOutputWeights.get(i));
+                int outputNode = findNodeToWeight(weightLayer + 1, outputOutputWeights.get(i));
 
-            double out_i = neuronValueArray[weightLayer + 2][outputNode];
-            double target_i = targetOutput[outputNode];
+                double out_i = neuronValueArray[weightLayer + 2][outputNode];
+                double target_i = targetOutput[outputNode];
 
-            //the gradient of Error_i with respect to output_i
-            double gradientErrorOutToOutputOut = out_i - target_i;
-            //the gradient of output_i with respect to net_i
-            double gradientOutputOutToNetOut = out_i * (1 - out_i);
+                //the gradient of Error_i with respect to output_i
+                double gradientErrorOutToOutputOut = out_i - target_i;
+                //the gradient of output_i with respect to net_i
+                double gradientOutputOutToNetOut = out_i * (1 - out_i);
 
-            //the gradient of Error_i with respect to net_i
-            double gradientErrorOutToNetOut = gradientErrorOutToOutputOut * gradientOutputOutToNetOut;
+                //the gradient of Error_i with respect to net_i
+                double gradientErrorOutToNetOut = gradientErrorOutToOutputOut * gradientOutputOutToNetOut;
 
-            double gradientNetOutToOutputHid = weightValueArray[weightLayer + 1][outputWeight];
+                double gradientNetOutToOutputHid = weightValueArray[weightLayer + 1][outputWeight];
 
-            double gradientErrorOutToOutputHid = gradientErrorOutToNetOut * gradientNetOutToOutputHid;
-            gradientTotalErrorToOutputHid += gradientErrorOutToOutputHid;
+                double gradientErrorOutToOutputHid = gradientErrorOutToNetOut * gradientNetOutToOutputHid;
+                gradientTotalErrorToOutputHid += gradientErrorOutToOutputHid;
+            }
+
+            double gradientOutputHidToNetHid = neuronValueArray[weightLayer + 1][outputNodeNumber] * (1 - neuronValueArray[weightLayer + 1][outputNodeNumber]);
+            double gradientTotalErrorToWeight = gradientTotalErrorToOutputHid * gradientOutputHidToNetHid * neuronValueArray[weightLayer][inputNodeNumber];
+
+            //apply learning rate & update weight
+            weightValueArray[weightLayer][weight] = weightValueArray[weightLayer][weight] - LEARNINGRATE * gradientTotalErrorToWeight;
+
         }
-
-        double gradientOutputHidToNetHid = neuronValueArray[weightLayer+1][outputNodeNumber] * (1 - neuronValueArray[weightLayer+1][outputNodeNumber] );
-        double gradientTotalErrorToWeight = gradientTotalErrorToOutputHid * gradientOutputHidToNetHid * neuronValueArray[weightLayer][inputNodeNumber];
-
-        //apply learning rate & update weight
-        weightValueArray[weightLayer][weight] = weightValueArray[weightLayer][weight] - LEARNINGRATE * gradientTotalErrorToWeight;
-
     }
 
 
