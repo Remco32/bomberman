@@ -133,6 +133,7 @@ public class NeuralNetRemco {
     void backwardsPass() {
         //if(neuronValueArray weightValueArray[].length - 1
 
+        //UPDATE FROM INPUT TO OUTPUT (LEFT TO RIGHT)
         updateWeightsHiddenLayer();
         updateWeightsToOutputLayer();
         //TODO loop over alle weightarrays
@@ -245,13 +246,13 @@ public class NeuralNetRemco {
 
             double gradientErrorOutToOutputHid = gradientErrorOutToNetOut * gradientNetOutToOutputHid;
             gradientTotalErrorToOutputHid += gradientErrorOutToOutputHid;
-            System.out.println();
         }
 
         double gradientOutputHidToNetHid = neuronValueArray[weightLayer+1][outputNodeNumber] * (1 - neuronValueArray[weightLayer+1][outputNodeNumber] );
         double gradientTotalErrorToWeight = gradientTotalErrorToOutputHid * gradientOutputHidToNetHid * neuronValueArray[weightLayer][inputNodeNumber];
-        System.out.println();
 
+        //apply learning rate & update weight
+        weightValueArray[weightLayer][weight] = weightValueArray[weightLayer][weight] - LEARNINGRATE * gradientTotalErrorToWeight;
 
     }
 
