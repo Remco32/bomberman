@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static java.lang.Integer.max;
 import static java.lang.Math.exp;
 
-public class NeuralNetRemco {
+class NeuralNetRemco {
 
     //DEBUG BOOLEANS
     boolean DEBUG_EXAMPLE_ARRAYS = false;
@@ -18,25 +18,25 @@ public class NeuralNetRemco {
 
     private int BIASVALUE = 1;
 
-    //TODO set this in constructor
-    private double LEARNINGRATE = 0.5;
+    private double learningRate;
 
     private int amountHiddenLayers;
     private int[] amountOfNodesPerLayer;
     private double[] targetOutput;
     private List<Double> totalError = new ArrayList<>(); //list so we can keep the previous values
 
-    double[][] neuronValueArray;// = new Double[totalAmountOfLayers][max(max(amountInputNodes,amountHiddenNodes),amountOutputNodes)]; //create a 2D array to store the value of nodes. Breadth is amount of layers, height is maximum amount of nodes
-    double[][] weightValueArray;// = new Double[totalAmountOfLayers-1][amountHiddenNodes*(amountInputNodes-1)]; // Assuming hiddennodes are the largest
+    private double[][] neuronValueArray;
+    private double[][] weightValueArray;
 
     //Constructor
-    public NeuralNetRemco(double[] inputVector, int amountHiddenNodes, int amountHiddenLayers, double[] targetOutput) {
+    public NeuralNetRemco(double[] inputVector, int amountHiddenNodes, int amountHiddenLayers, double[] targetOutput, double learningRate) {
 
         //store values
         this.amountHiddenLayers = amountHiddenLayers;
         this.targetOutput = targetOutput;
+        this.learningRate = learningRate;
 
-        //Store amount of nodes per layer in array //TODO replace with array.length when initial sizes are correct
+        //Store amount of nodes per layer in array //TODO replace amountOfNodesPerLayer with array.length when initial sizes are correct
         this.amountOfNodesPerLayer = new int[amountHiddenLayers + 2];
         this.amountOfNodesPerLayer[0] = inputVector.length;
         for (int i = 1; i < amountHiddenLayers + 1; i++) {
@@ -46,9 +46,12 @@ public class NeuralNetRemco {
 
         this.neuronValueArray = new double[amountHiddenLayers + 2][max(max(inputVector.length, amountHiddenNodes), targetOutput.length)]; //+2 for input and output layer
 
+
         for (int i = 0; i < amountHiddenLayers + 2; i++) {
             this.neuronValueArray[i] = new double[amountOfNodesPerLayer[i]];
         }
+        neuronValueArray[0] = inputVector;
+
 
         // TODO generalize this so it works with multiple layers, currently only works if hidden > input >= output
         //TODO remove redundant rows
@@ -69,11 +72,6 @@ public class NeuralNetRemco {
 
     }
 
-    //Setters&Getters
-
-    public double[][] getNeuronValueArray() {
-        return neuronValueArray;
-    }
 
     //Methods
 
@@ -90,7 +88,7 @@ public class NeuralNetRemco {
         return outputArray;
     }
 
-    private double[] setInputs(int value) { //TODO verschillende waardes
+    private double[] setInputs(int value) {
         int rows = amountOfNodesPerLayer[0];
 
         double[] output = new double[rows];
@@ -100,7 +98,7 @@ public class NeuralNetRemco {
         return output;
     }
 
-
+    //TODO crashes when inputSize =/= outputSize
     void learn(int epochs){
         for (; epochs > 0 ; epochs--) {
             forwardPass();
@@ -201,7 +199,7 @@ public class NeuralNetRemco {
             //System.out.println("Gradient van weight " + weight + " = " + gradient);
 
             //apply learning rate & update weight
-            weightValueArray[outputLayer - 1][weight] = weightValueArray[outputLayer - 1][weight] - LEARNINGRATE * gradient;
+            weightValueArray[outputLayer - 1][weight] = weightValueArray[outputLayer - 1][weight] - learningRate * gradient;
             //System.out.println("Updated value van weight " + weight + " = " + weightValueArray[outputLayer - 1][weight]);
             //System.out.println();
 
@@ -259,7 +257,7 @@ public class NeuralNetRemco {
             double gradientTotalErrorToWeight = gradientTotalErrorToOutputHid * gradientOutputHidToNetHid * neuronValueArray[weightLayer][inputNodeNumber];
 
             //apply learning rate & update weight
-            weightValueArray[weightLayer][weight] = weightValueArray[weightLayer][weight] - LEARNINGRATE * gradientTotalErrorToWeight;
+            weightValueArray[weightLayer][weight] = weightValueArray[weightLayer][weight] - learningRate * gradientTotalErrorToWeight;
 
         }
     }
