@@ -34,10 +34,12 @@ public class Main {
 
 
 
-        double[] targetOutput = {.01, 0.5, .99};
         double[] input = {.05, 0.075, .10};
+        //double[] input = {.05, .10};
+        double[] targetOutput = {.01, 0.99};
+        //TODO leert niet goed bij >50 hidden nodes
         NeuralNetRemco AI_Remco = new NeuralNetRemco(input,4,1,targetOutput, 0.5);
-        AI_Remco.learn(1000);
+        AI_Remco.learn(10000);
         System.out.println();
 
 

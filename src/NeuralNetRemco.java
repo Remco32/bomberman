@@ -53,10 +53,16 @@ class NeuralNetRemco {
         neuronValueArray[0] = inputVector;
 
 
-        // TODO generalize this so it works with multiple layers, currently only works if hidden > input >= output
-        //TODO remove redundant rows
-        this.weightValueArray = new double[amountHiddenLayers + 1][(inputVector.length * amountHiddenNodes) + 1]; //+1 to add a slot for the biasweight
-        this.weightValueArray = initializeArrayRandomValues(amountHiddenLayers + 1, (inputVector.length * amountHiddenNodes + 1), 0, 1);
+        this.weightValueArray = new double[amountHiddenLayers + 1][max(max(inputVector.length, amountHiddenNodes), targetOutput.length)];
+
+        //set sizes of weightValueArray
+        for(int layer = 0; layer < (amountHiddenLayers +1); layer++){
+            this.weightValueArray[layer] = new double[(amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1];
+        }
+
+        for(int layer = 0; layer < (amountHiddenLayers +1); layer++) {
+            this.weightValueArray[layer] = initializeArrayRandomValues(((amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1), 0, 1);
+        }
 
         //DEBUG_EXAMPLE_ARRAYS INITIALIZATION
         if (DEBUG_EXAMPLE_ARRAYS) {
@@ -75,7 +81,7 @@ class NeuralNetRemco {
 
     //Methods
 
-    private double[][] initializeArrayRandomValues(int rows, int columns, int min, int max) {
+    private double[][] initialize2DArrayRandomValues(int rows, int columns, int min, int max) {
         double[][] outputArray = new double[rows][columns];
 
         //initialize all rows
@@ -83,6 +89,19 @@ class NeuralNetRemco {
             for (int c = 0; c <= columns - 1; c++) {
                 outputArray[r][c] = (double) ThreadLocalRandom.current().nextInt(min * 1000, max * 1000 + 1) / 1000;
             }
+        }
+
+
+
+        return outputArray;
+    }
+
+    private double[] initializeArrayRandomValues(int rows, int min, int max) {
+        double[] outputArray = new double[rows];
+
+        //initialize all rows
+        for (int r = 0; r <= rows - 1; r++) {
+            outputArray[r] = (double) ThreadLocalRandom.current().nextInt(min * 1000, max * 1000 + 1) / 1000;
         }
 
         return outputArray;
@@ -98,7 +117,6 @@ class NeuralNetRemco {
         return output;
     }
 
-    //TODO crashes when inputSize =/= outputSize
     void learn(int epochs){
         for (; epochs > 0 ; epochs--) {
             forwardPass();
