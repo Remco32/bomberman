@@ -13,8 +13,8 @@ import static java.lang.Math.exp;
 class NeuralNetRemco {
 
     //DEBUG BOOLEANS
-    boolean DEBUG_EXAMPLE_ARRAYS = false;
-    boolean DEBUG_RANDOM_INPUT = false;
+    private boolean DEBUG_EXAMPLE_ARRAYS = false;
+    private boolean DEBUG_RANDOM_INPUT = false;
 
     private int BIASVALUE = 1;
 
@@ -81,21 +81,6 @@ class NeuralNetRemco {
 
     //Methods
 
-    private double[][] initialize2DArrayRandomValues(int rows, int columns, int min, int max) {
-        double[][] outputArray = new double[rows][columns];
-
-        //initialize all rows
-        for (int r = 0; r <= rows - 1; r++) {
-            for (int c = 0; c <= columns - 1; c++) {
-                outputArray[r][c] = (double) ThreadLocalRandom.current().nextInt(min * 1000, max * 1000 + 1) / 1000;
-            }
-        }
-
-
-
-        return outputArray;
-    }
-
     private double[] initializeArrayRandomValues(int rows, int min, int max) {
         double[] outputArray = new double[rows];
 
@@ -107,15 +92,7 @@ class NeuralNetRemco {
         return outputArray;
     }
 
-    private double[] setInputs(int value) {
-        int rows = amountOfNodesPerLayer[0];
 
-        double[] output = new double[rows];
-        for (int r = 0; r <= rows - 1; r++) {
-            output[r] = value;
-        }
-        return output;
-    }
 
     void learn(int epochs){
         for (; epochs > 0 ; epochs--) {
@@ -127,7 +104,7 @@ class NeuralNetRemco {
 
     }
 
-    void forwardPass() {
+    private void forwardPass() {
         //System.out.println("output " + outputNode(netInputNode(1, 0)));
 
         //update values of nodes:
@@ -154,7 +131,7 @@ class NeuralNetRemco {
 
     }
 
-    void backwardsPass() {
+    private void backwardsPass() {
         //if(neuronValueArray weightValueArray[].length - 1
 
         //UPDATE FROM INPUT TO OUTPUT (LEFT TO RIGHT)
@@ -225,7 +202,7 @@ class NeuralNetRemco {
 
     }
 
-    void updateWeightsHiddenLayer() {
+    private void updateWeightsHiddenLayer() {
 
         //TODO expand to multiple hidden layers
 
@@ -342,13 +319,10 @@ class NeuralNetRemco {
         return weightNumber/amountOfNodesPerLayer[weightLayerNumber+1];
     }
 
-    void getBiasValue(int layerNumber) {
-
-    }
 
     //give actual output
     //by means of an activation function, or other function
-    double outputNode(double input){
+    private double outputNode(double input){
         return (1/(1+exp(-(input))));
 
     }
