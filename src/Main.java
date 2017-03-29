@@ -57,7 +57,7 @@ public class Main {
         double[] testInput3 =  {1, 0} ; // OR
         double[] testInput4 =  {1, 1} ; // OR
 **/
-        //TODO leert niet goed bij >50 hidden nodes
+        //TODO leert niet goed bij >40 hidden nodes
         NeuralNetRemco AI_Remco = new NeuralNetRemco(input,5,1,targetOutput, 0.5);
         AI_Remco.learn(10000);
         System.out.println();

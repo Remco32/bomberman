@@ -177,7 +177,9 @@ class NeuralNetRemco {
             //System.out.println("Waarde van weight " + weightValueArray[layerNumber - 1][list.get(i)]);
             //System.out.println("Waarde van input " + neuronValueArray[layerNumber - 1][i]);
 
-            value += weightValueArray[layerNumber - 1][list.get(i)] * neuronValueArray[layerNumber - 1][i];
+            if(neuronValueArray[layerNumber - 1][i] != 0) {
+                value += weightValueArray[layerNumber - 1][list.get(i)] * neuronValueArray[layerNumber - 1][i];
+            }
         }
         //add bias: weight multiplied by biasvalue
         value += weightValueArray[layerNumber - 1][weightValueArray[layerNumber - 1].length - 1] * BIASVALUE;
