@@ -180,6 +180,7 @@ class NeuralNetRemco {
             if(neuronValueArray[layerNumber - 1][i] != 0) {
                 value += weightValueArray[layerNumber - 1][list.get(i)] * neuronValueArray[layerNumber - 1][i];
             }
+            //No need for else statement, value will be 0 in that case. Adding 0 to the total value is useless.
         }
         //add bias: weight multiplied by biasvalue
         value += weightValueArray[layerNumber - 1][weightValueArray[layerNumber - 1].length - 1] * BIASVALUE;

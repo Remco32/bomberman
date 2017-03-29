@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class GameWorld {
     private int HARDWALL = 0;
     private int SOFTWALL = 1;
+    private int NOWALL = 2;
     int gridSize; // in 1 dimension
     int amountPlayers;
     private int amountOfRounds=0;
@@ -19,7 +20,7 @@ public class GameWorld {
     ArrayList<Bomb> explodedBombList;
 
 
-    GameWorld(int gridSize, int amountOfPlayers, Boolean windowBool) {
+    GameWorld(int gridSize, int amountOfPlayers, Boolean windowBool, int worldType) {
         this.gridSize = gridSize;
         this.amountPlayers = amountOfPlayers;
         bomberManList = new ArrayList<>();
@@ -27,7 +28,13 @@ public class GameWorld {
         explodedBombList = new ArrayList<>();
 
         this.windowBool = windowBool;
-        InitWorld();
+        if (worldType == 1) {
+            InitWorld(); //create default world
+        }
+        if (worldType == 2) {
+            InitEmptyWorld(); //create default world
+        }
+
         if (windowBool) window = new ShowWindow(this);
 
     }
@@ -77,6 +84,39 @@ public class GameWorld {
             }
         }
     }
+
+    private void InitEmptyWorld() {
+        positions = new WorldPosition[gridSize][gridSize];
+        //init the grid
+        for (int x = 0; x < gridSize; x++) {
+            for (int y = 0; y < gridSize; y++) {
+                positions[x][y] = new WorldPosition(x, y, NOWALL); // fills whole world with softwalls, will get overwritten later
+                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, HARDWALL); //add hardwalls at uneven positions
+                //if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
+                //if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
+            }
+
+        }
+
+        // init the players
+
+        int y = 0;
+        int x = 0;
+        int bomberManId = 1;
+        if (amountPlayers > 4) amountPlayers = 4; // 4 is max amount of players
+        if (amountPlayers < 1) amountPlayers = 1; // 1 is min amount of players
+        for (int idx = 0; idx < amountPlayers && idx < 4; idx++) {
+
+            bomberManList.add(new BomberMan(x, y, bomberManId++, this));
+            positions[x][y].bombermanList.add(bomberManList.get(bomberManId - 2)); // min 2 because of indexing start at 1 and ++
+            if (y == 0) y += gridSize - 1;
+            else if (x == 0) {
+                x += gridSize - 1;
+                y = 0;
+            }
+        }
+    }
+
     void RunGameLoop(){
 
         Thread loop = new Thread(){
