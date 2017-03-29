@@ -22,6 +22,8 @@ class NeuralNetRemco {
 
     private int amountHiddenLayers;
     private int[] amountOfNodesPerLayer;
+    private double[][] inputSet;
+    private double[][] targetOutputSet;
     private double[] targetOutput;
     private List<Double> totalError = new ArrayList<>(); //list so we can keep the previous values
 
@@ -29,20 +31,20 @@ class NeuralNetRemco {
     private double[][] weightValueArray;
 
     //Constructor
-    public NeuralNetRemco(double[] inputVector, int amountHiddenNodes, int amountHiddenLayers, double[] targetOutput, double learningRate) {
+    public NeuralNetRemco(double[][] inputVector, int amountHiddenNodes, int amountHiddenLayers, double[][] targetOutput, double learningRate) {
 
         //store values
         this.amountHiddenLayers = amountHiddenLayers;
-        this.targetOutput = targetOutput;
+        this.targetOutputSet = targetOutput;
         this.learningRate = learningRate;
 
         //Store amount of nodes per layer in array //TODO replace amountOfNodesPerLayer with array.length when initial sizes are correct
         this.amountOfNodesPerLayer = new int[amountHiddenLayers + 2];
-        this.amountOfNodesPerLayer[0] = inputVector.length;
+        this.amountOfNodesPerLayer[0] = inputVector[0].length;
         for (int i = 1; i < amountHiddenLayers + 1; i++) {
             this.amountOfNodesPerLayer[i] = amountHiddenNodes;
         }
-        this.amountOfNodesPerLayer[amountHiddenLayers + 1] = targetOutput.length;
+        this.amountOfNodesPerLayer[amountHiddenLayers + 1] = targetOutput[0].length;
 
         this.neuronValueArray = new double[amountHiddenLayers + 2][max(max(inputVector.length, amountHiddenNodes), targetOutput.length)]; //+2 for input and output layer
 
@@ -50,7 +52,7 @@ class NeuralNetRemco {
         for (int i = 0; i < amountHiddenLayers + 2; i++) {
             this.neuronValueArray[i] = new double[amountOfNodesPerLayer[i]];
         }
-        neuronValueArray[0] = inputVector;
+        this.inputSet = inputVector;
 
 
         this.weightValueArray = new double[amountHiddenLayers + 1][max(max(inputVector.length, amountHiddenNodes), targetOutput.length)];
@@ -60,6 +62,7 @@ class NeuralNetRemco {
             this.weightValueArray[layer] = new double[(amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1];
         }
 
+        //initialize weights
         for(int layer = 0; layer < (amountHiddenLayers +1); layer++) {
             this.weightValueArray[layer] = initializeArrayRandomValues(((amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1), 0, 1);
         }
@@ -95,13 +98,31 @@ class NeuralNetRemco {
 
 
     void learn(int epochs){
-        for (; epochs > 0 ; epochs--) {
-            forwardPass();
-            backwardsPass();
+        neuronValueArray[0] = inputSet[0];
+        targetOutput = targetOutputSet[0];
+            for (; epochs > 0 ; epochs--) {
+                for (int i = inputSet.length; i > 0 ; i--){
+                    neuronValueArray[0] = inputSet[i-1];
+                    targetOutput = targetOutputSet[i-1];
+                    forwardPass();
+                    backwardsPass();
 
-            System.out.println(totalError.get(totalError.size() - 1)); //pakt nieuwste element
+                System.out.println(totalError.get(totalError.size() - 1)); //pakt nieuwste element
+            }
         }
 
+
+    }
+
+    double[] getOutput(double[] input){
+        neuronValueArray[0] = input;
+        for (int layer = 1; layer < amountHiddenLayers + 2; layer++) //amountHiddenLayers+1 == final layer index
+            //amount of nodes
+            for (int node = 0; node < amountOfNodesPerLayer[layer]; node++) {
+                //Get the netInput, transform that into the output, and update the value
+                neuronValueArray[layer][node] = outputNode(netInputNode(layer, node));
+            }
+        return neuronValueArray[amountOfNodesPerLayer.length-1];
     }
 
     private void forwardPass() {
@@ -163,7 +184,7 @@ class NeuralNetRemco {
         //System.out.println(value);
         return value;
 
-        //multiply all weights by the inputs + bias
+        //multiply all weights by the inputSet + bias
 
     }
 
