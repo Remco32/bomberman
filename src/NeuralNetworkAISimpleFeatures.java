@@ -50,7 +50,7 @@ public class NeuralNetworkAISimpleFeatures extends AIHandler {
         double manhattanDistance = -1;
         for (BomberMan man : world.bomberManList) {
             if (man.alive && man != this.man) {  //Bomberman should be alive and different than the one we control
-                int tempDistance = Math.abs(x - man.x_location) + Math.abs(y - man.y_location);
+                int tempDistance = Math.abs(x - man.getX_location()) + Math.abs(y - man.getY_location());
 
                 if (manhattanDistance == -1 || tempDistance < manhattanDistance) {
                     manhattanDistance = tempDistance;
@@ -93,8 +93,8 @@ public class NeuralNetworkAISimpleFeatures extends AIHandler {
     @Override
     void CalculateBestMove() {
         ArrayList<Integer> possibleMoves = man.AbleMoves();
-        int x = man.x_location;
-        int y = man.y_location;
+        int x = man.getX_location();
+        int y = man.getY_location();
         for (Integer type : possibleMoves) {
             if (type == 0) utility[0] = CalculateUtilityMatrix(x, y,0, false);
             if (type == 1) utility[1] = CalculateUtilityMatrix(x - 1, y,1, false);//move left

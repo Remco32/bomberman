@@ -6,8 +6,8 @@ import java.util.ArrayList;
 public class BomberMan {
     private Boolean DEBUGPRINT = false; // Activates debug prints for bomb
 
-    int x_location;
-    int y_location;
+    private int x_location;
+    private int y_location;
     int id;
     ArrayList<Integer> points;
     Boolean alive;
@@ -50,7 +50,7 @@ public class BomberMan {
                     world.positions[x_location][y_location + y].type == 2) {
                 y_location += y;
             } else {
-                if(DEBUGPRINT) System.out.println("player " + this.id + "cannot go to: x" + (x_location + x) + "y:" + (y_location + y));
+                if(DEBUGPRINT) System.out.println("player " + this.id + " cannot go to: x: " + (x_location + x) + " y:" + (y_location + y));
             }
         }
 
@@ -59,7 +59,7 @@ public class BomberMan {
                     world.positions[x_location + x][y_location].type == 2) {
                 x_location += x;
             } else {
-                System.out.println("player " + this.id + "cannot go to: x" + (x_location + x) + "y:" + (y_location + y));
+                if(DEBUGPRINT) System.out.println("player " + this.id + " cannot go to: x: " + (x_location + x) + " y:" + (y_location + y));
             }
         }
         world.positions[x_location][y_location].addBomberman(this); //move to new location
@@ -71,7 +71,7 @@ public class BomberMan {
         moves.add(0);// always possible to do nothing
 
 
-        if (x_location - 1 >= 0 && world.positions[x_location - 1][y_location].type == 2) { //Type 2 measns empty space, so it's movable
+        if (x_location - 1 >= 0 && world.positions[x_location - 1][y_location].type == 2) { //Type 2 means empty space, so it's movable
             moves.add(1); // move left
         }
         if (y_location - 1 >= 0 && world.positions[x_location][y_location - 1].type == 2) {
@@ -91,6 +91,14 @@ public class BomberMan {
 
     void Die() {
         alive = false;
+    }
+
+    int getX_location(){
+        return x_location;
+    }
+
+    int getY_location(){
+        return y_location;
     }
 
 

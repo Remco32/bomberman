@@ -17,7 +17,7 @@ public class RandomAI extends AIHandler {
 
     private MoveUtility MakeEducatedMove(BomberMan man) {
         ArrayList<Integer> moveList = man.AbleMoves();
-        ArrayList<Bomb> bombList = findBombLocations(man.x_location, man.y_location, 2);//range can changed
+        ArrayList<Bomb> bombList = findBombLocations(man.getX_location(), man.getY_location(), 2);//range can changed
         double[] utilityList = new double[moveList.size()];
         if (!bombList.isEmpty()) {
             for (int x = 0; x < moveList.size(); x++) {
@@ -40,8 +40,8 @@ public class RandomAI extends AIHandler {
     }
 
     private double CalcUtility(Bomb bomb, int move, BomberMan man) {
-        int x = man.x_location;
-        int y = man.y_location;
+        int x = man.getX_location();
+        int y = man.getY_location();
         if (move == 1) x--;
         if (move == 2) y--;
         if (move == 3) y++;
@@ -69,8 +69,8 @@ public class RandomAI extends AIHandler {
 
 
     private int SemiRandomMove(BomberMan man) {
-        int y_location = man.y_location;
-        int x_location = man.x_location;
+        int y_location = man.getY_location();
+        int x_location = man.getX_location();
 
         int surround = 0;
         if (x_location + 1 < world.gridSize && world.positions[x_location + 1][y_location].type == 2) {

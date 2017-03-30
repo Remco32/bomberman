@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 
 /**
@@ -24,7 +25,7 @@ public class Main {
         // for threshold the amount of rows should equal the amount of output nodes
 
 
-        GameWorld world = new GameWorld(9,4, true, 2); // gridsize should be of 2*n +1
+        GameWorld world = new GameWorld(9,2, true, 2); // gridsize should be of 2*n +1
 
 
         //ai.add(new NeuralNetworkAISimpleFeatures(world,world.bomberManList.get(0),weights));// create neural network
@@ -32,7 +33,11 @@ public class Main {
 
         world.SetAi(ai);
         world.RunGameLoop();
+        RemcoAI AI_Remco = new RemcoAI(world,world.bomberManList.get(0)); //add player
 
+        while(world.bomberManList.get(0).alive){
+            AI_Remco.findClosestEnemy();
+        }
 
 /**
 
@@ -44,13 +49,13 @@ public class Main {
         double[] testInput4 =  {1, 1} ; // XOR
 
         //TODO leert niet goed bij >40 hidden nodes
-        NeuralNetRemco AI_Remco = new NeuralNetRemco(input,5,1,targetOutput, 0.5);
-        AI_Remco.learn(10000);
+        NeuralNetRemco NN_Remco = new NeuralNetRemco(input,5,1,targetOutput, 0.5);
+        NN_Remco.learn(10000);
         System.out.println();
-        System.out.println(Arrays.toString(AI_Remco.getOutput(testInput1)));
-        System.out.println(Arrays.toString(AI_Remco.getOutput(testInput2)));
-        System.out.println(Arrays.toString(AI_Remco.getOutput(testInput3)));
-        System.out.println(Arrays.toString(AI_Remco.getOutput(testInput4)));
+        System.out.println(Arrays.toString(NN_Remco.getOutput(testInput1)));
+        System.out.println(Arrays.toString(NN_Remco.getOutput(testInput2)));
+        System.out.println(Arrays.toString(NN_Remco.getOutput(testInput3)));
+        System.out.println(Arrays.toString(NN_Remco.getOutput(testInput4)));
 
 
         System.out.println();
