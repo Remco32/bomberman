@@ -36,7 +36,7 @@ public class Main {
         RemcoAI AI_Remco = new RemcoAI(world,world.bomberManList.get(0)); //add player
 
         while(world.bomberManList.get(0).alive){
-            AI_Remco.findClosestEnemy();
+            AI_Remco.moveTowardsEnemy();
         }
 
 /**

@@ -1,6 +1,8 @@
 import java.util.*;
 import java.util.ArrayList;
 
+import static java.lang.Math.abs;
+
 /**
  * Created by Remco on 29-3-2017.
  */
@@ -18,7 +20,15 @@ public class RemcoAI {
 
     void test(){
 
-        while(true) man.Move(3);
+        while(true) man.move(3);
+    }
+
+    void moveTowardsEnemy() {
+        if (!findClosestEnemy().isEmpty()) {
+            int enemyX = (int) findClosestEnemy().get(0);
+            int enemyY = (int) findClosestEnemy().get(1);
+            moveToArea(enemyX, enemyY, 5);
+        }
     }
 
     //find the closest enemy, and return its coordinates in a list (x-coordinate, then y-coordinate)
@@ -47,9 +57,34 @@ public class RemcoAI {
         return coordinates;
     }
 
+    //move towards a coordinate. Stops when it gets close.
+    //TODO move in same timescale as enemies
+    void moveToArea(int x, int y, int distanceToKeep){
+
+        while(distanceToKeep < manhattanDistance(x, man.getX_location(), y, man.getY_location())) {
+
+            if (abs(man.getX_location() - x) > abs(man.getY_location() - y)) { //x distance is bigger than y distance
+                if((man.getX_location() - x) > 0){ // enemy is to the left of us
+                    man.move(1);
+                }
+                else{ // enemy is to the right of us
+                    man.move(4);
+                }
+            } else {  //y distance is bigger than x distance
+                if((man.getY_location() - y) > 0) { // enemy is to above us
+                    man.move(2);
+                }
+                else{ // enemy is to below us
+                    man.move(3);
+                }
+
+            }
+        }
+    }
+
 
 
     int manhattanDistance(int x0, int x1, int y1, int y0){
-        return Math.abs(x1-x0) + Math.abs(y1-y0);
+        return abs(x1-x0) + abs(y1-y0);
     }
 }

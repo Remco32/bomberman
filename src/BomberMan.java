@@ -23,7 +23,7 @@ public class BomberMan {
         alive = true;
     }
 
-    void Move(int type) { //TODO: Change to enums, low-priority
+    void move(int type) { //TODO: Change to enums
         if (!alive) return;
         int moveCost = points.get(points.size()-1)-10;
         points.add(moveCost);
