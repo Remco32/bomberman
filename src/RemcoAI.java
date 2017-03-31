@@ -28,7 +28,7 @@ public class RemcoAI {
         if (!findClosestEnemy().isEmpty()) {
             int enemyX = (int) findClosestEnemy().get(0);
             int enemyY = (int) findClosestEnemy().get(1);
-            moveToArea(enemyX, enemyY, 5);
+            //moveToArea(enemyX, enemyY, 5);
         }
     }
 
@@ -37,10 +37,9 @@ public class RemcoAI {
         List<Integer> coordinates = new ArrayList<Integer>();
         int amountOfPlayers = world.bomberManList.size() - 1; //minus 1 for index
 
-        //search for enemy closest
-
         int distanceClosestEnemy = 0;
         //int closestEnemyID = 0;
+        //search for enemy closest
         for (int i = 1; i <= amountOfPlayers; i++) {
 
             int enemyX = world.bomberManList.get(i).getX_location();
@@ -58,6 +57,7 @@ public class RemcoAI {
         return coordinates;
     }
 
+    /**
     //move towards a coordinate. Stops when it gets close.
     //TODO move in same timescale as enemies
     void moveToArea(int x, int y, int distanceToKeep){
@@ -82,6 +82,13 @@ public class RemcoAI {
             }
         }
     }
+     **/
+
+    //Find shortest path using BFS with history list
+    void searchForPath(int targetX, int targetY){
+
+
+    }
 
 
 
@@ -89,11 +96,11 @@ public class RemcoAI {
         return abs(x1-x0) + abs(y1-y0);
     }
 
-    public enum Directions {
-        UP, DOWN, LEFT, RIGHT
-    }
 
-    boolean checkPossibleMove(){
+
+
+    boolean checkMovementPossible(int targetX, int targetY){
+        //if (world.positions[targetX][targetY] != 0 || world.positions[targetX][targetY] != 1)
         return true;
     }
 }

@@ -12,13 +12,19 @@ public class WorldPosition {
     Bomb bomb;
     private int x_location;
     private int y_location;
-    int type; //0=hardwall,1=softwall,2=no wall
+    Fieldtypes type; //0=hardwall,1=softwall,2=no wall
+    boolean dangerous;
 
-     WorldPosition(int x,int y,int type){
+     WorldPosition(int x,int y,Fieldtypes type){
         this.x_location=x;
         this.y_location=y;
         this.type=type;
         bombermanList = new ArrayList<>();
+    }
+
+    //TODO dangerzones maken in world
+    public enum Fieldtypes {
+        EMPTY, SOFTWALL, HARDWALL
     }
 
     void addBomb(Bomb bomb){
@@ -32,6 +38,7 @@ public class WorldPosition {
     void deleteBomberman(BomberMan bomberman){
         bombermanList.remove(bomberman);
     }
+
 
 
 }

@@ -73,18 +73,18 @@ public class RandomAI extends AIHandler {
         int x_location = man.getX_location();
 
         int surround = 0;
-        if (x_location + 1 < world.gridSize && world.positions[x_location + 1][y_location].type == 2) {
+        if (x_location + 1 < world.gridSize && world.positions[x_location + 1][y_location].type == WorldPosition.Fieldtypes.EMPTY) {
             surround++;
         }
 
-        if (x_location - 1 >= 0 && world.positions[x_location - 1][y_location].type == 2) {
+        if (x_location - 1 >= 0 && world.positions[x_location - 1][y_location].type == WorldPosition.Fieldtypes.EMPTY) {
             surround++;
         }
-        if (y_location + 1 < world.gridSize && world.positions[x_location][y_location + 1].type == 2) {
+        if (y_location + 1 < world.gridSize && world.positions[x_location][y_location + 1].type == WorldPosition.Fieldtypes.EMPTY) {
             surround++;
         }
 
-        if (y_location - 1 >= 0 && world.positions[x_location][y_location - 1].type == 2) {
+        if (y_location - 1 >= 0 && world.positions[x_location][y_location - 1].type == WorldPosition.Fieldtypes.EMPTY) {
             surround++;
         }
         if (surround < 2) {
@@ -93,18 +93,18 @@ public class RandomAI extends AIHandler {
 
         while (true) { // semi random move
             int random = rnd.nextInt() % 5;
-            if (x_location + 1 < world.gridSize && world.positions[x_location + 1][y_location].type == 2 && random == 0) {
+            if (x_location + 1 < world.gridSize && world.positions[x_location + 1][y_location].type == WorldPosition.Fieldtypes.EMPTY && random == 0) {
                 return MoveUtility.Actions.RIGHT; // move right
             }
 
-            if (x_location - 1 >= 0 && world.positions[x_location - 1][y_location].type == 2 && random == 1) {
+            if (x_location - 1 >= 0 && world.positions[x_location - 1][y_location].type == WorldPosition.Fieldtypes.EMPTY && random == 1) {
                 return MoveUtility.Actions.LEFT; // move left
             }
-            if (y_location + 1 < world.gridSize && world.positions[x_location][y_location + 1].type == 2 && random == 2) {
+            if (y_location + 1 < world.gridSize && world.positions[x_location][y_location + 1].type == WorldPosition.Fieldtypes.EMPTY && random == 2) {
                 return MoveUtility.Actions.DOWN; // move down
             }
 
-            if (y_location - 1 >= 0 && world.positions[x_location][y_location - 1].type == 2 && random == 3) {
+            if (y_location - 1 >= 0 && world.positions[x_location][y_location - 1].type == WorldPosition.Fieldtypes.EMPTY && random == 3) {
                 return MoveUtility.Actions.UP; // move up
             }
             if (random == 4 && world.positions[x_location][y_location].bomb == null) {

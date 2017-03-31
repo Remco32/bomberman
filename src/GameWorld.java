@@ -47,8 +47,8 @@ public class GameWorld {
         //init the grid
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
-                positions[x][y] = new WorldPosition(x, y, SOFTWALL); // fills whole world with softwalls, will get overwritten later
-                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, HARDWALL); //add hardwalls at uneven positions
+                positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.SOFTWALL); // fills whole world with softwalls, will get overwritten later
+                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.HARDWALL); //add hardwalls at uneven positions
                 //if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
                 //if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
             }
@@ -66,13 +66,13 @@ public class GameWorld {
         for (int idx = 0; idx < amountPlayers && idx < 4; idx++) {
             for (int temp = x - 1; temp <= x + 1; temp++) {
                 if (temp >= 0 && temp < gridSize) {
-                    positions[temp][y].type = 2; //remove walls around bomberman @ y-axis
+                    positions[temp][y].type = WorldPosition.Fieldtypes.EMPTY; //remove walls around bomberman @ y-axis
                 }
             }
 
             for (int temp = y - 1; temp <= y + 1; temp++) {
                 if (temp >= 0 && temp < gridSize) {
-                    positions[x][temp].type = 2; //remove walls around bomberman @ x-axis
+                    positions[x][temp].type = WorldPosition.Fieldtypes.EMPTY; //remove walls around bomberman @ x-axis
                 }
             }
             bomberManList.add(new BomberMan(x, y, bomberManId++, this));
@@ -90,8 +90,8 @@ public class GameWorld {
         //init the grid
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
-                positions[x][y] = new WorldPosition(x, y, NOWALL); // fills whole world with softwalls, will get overwritten later
-                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, HARDWALL); //add hardwalls at uneven positions
+                positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.EMPTY); // fills whole world with emptyness. How deep.
+                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.HARDWALL); //add hardwalls at uneven positions
                 //if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
                 //if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
             }

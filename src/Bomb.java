@@ -83,10 +83,10 @@ public class Bomb {
             world.positions[xTemp][yTemp].bombermanList.clear();
         }
 
-        if (world.positions[xTemp][yTemp].type == 0) {
+        if (world.positions[xTemp][yTemp].type == WorldPosition.Fieldtypes.HARDWALL) {
             return true;
-        } else if (world.positions[xTemp][yTemp].type == 1) { //type 1 is a softwall
-            world.positions[xTemp][yTemp].type = 2; // change the wall to an empty space
+        } else if (world.positions[xTemp][yTemp].type == WorldPosition.Fieldtypes.SOFTWALL) { //type 1 is a softwall
+            world.positions[xTemp][yTemp].type = WorldPosition.Fieldtypes.EMPTY; // change the wall to an empty space
             ModifyPoints(placedBy,20);//award 20 points to the agent for destroying a wall
             return true;
         }

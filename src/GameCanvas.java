@@ -20,9 +20,9 @@ public class GameCanvas extends JPanel {
         for (int x = 0; x < world.gridSize; x++) {
             for (int y = 0; y < world.gridSize; y++) {
                 position = world.positions[x][y];
-                if (position.type == 0) paintWallHard(g, x * 50, y * 50);
-                if (position.type == 1) paintWallSoft(g, x * 50, y * 50);
-                if (position.type == 2) paintRoad(g, x * 50, y * 50);
+                if (position.type == WorldPosition.Fieldtypes.HARDWALL) paintWallHard(g, x * 50, y * 50);
+                if (position.type == WorldPosition.Fieldtypes.SOFTWALL) paintWallSoft(g, x * 50, y * 50);
+                if (position.type == WorldPosition.Fieldtypes.EMPTY) paintRoad(g, x * 50, y * 50);
                 //if (position.type == 3) paintExplosion(g, x * 50, y * 50);
                 if (!position.bombermanList.isEmpty())
                     paintBomberMan(g, x * 50 + 5, y * 50 + 5, position.bombermanList.get(0));
