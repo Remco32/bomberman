@@ -16,7 +16,7 @@ public class RandomAI extends AIHandler {
     }
 
     private MoveUtility MakeEducatedMove(BomberMan man) {
-        ArrayList<Integer> moveList = man.AbleMoves();
+        ArrayList<MoveUtility.Actions> moveList = man.AbleMoves();
         ArrayList<Bomb> bombList = findBombLocations(man.getX_location(), man.getY_location(), 2);//range can changed
         double[] utilityList = new double[moveList.size()];
         if (!bombList.isEmpty()) {
@@ -39,13 +39,13 @@ public class RandomAI extends AIHandler {
 
     }
 
-    private double CalcUtility(Bomb bomb, int move, BomberMan man) {
+    private double CalcUtility(Bomb bomb, MoveUtility.Actions move, BomberMan man) {
         int x = man.getX_location();
         int y = man.getY_location();
-        if (move == 1) x--;
-        if (move == 2) y--;
-        if (move == 3) y++;
-        if (move == 4) x++;
+        if (move == MoveUtility.Actions.LEFT) x--;
+        if (move == MoveUtility.Actions.UP) y--;
+        if (move == MoveUtility.Actions.DOWN) y++;
+        if (move == MoveUtility.Actions.RIGHT) x++;
         int xUtility = Math.abs(x - bomb.x_location);
         int yUtility = Math.abs(y - bomb.y_location);
         return Math.sqrt(xUtility) + Math.sqrt(yUtility);
@@ -68,7 +68,7 @@ public class RandomAI extends AIHandler {
     }
 
 
-    private int SemiRandomMove(BomberMan man) {
+    private MoveUtility.Actions SemiRandomMove(BomberMan man) {
         int y_location = man.getY_location();
         int x_location = man.getX_location();
 
@@ -88,27 +88,27 @@ public class RandomAI extends AIHandler {
             surround++;
         }
         if (surround < 2) {
-            return 5; //place bomb because is surrounded
+            return MoveUtility.Actions.PLACEBOMB; //place bomb because is surrounded
         }
 
         while (true) { // semi random move
             int random = rnd.nextInt() % 5;
             if (x_location + 1 < world.gridSize && world.positions[x_location + 1][y_location].type == 2 && random == 0) {
-                return 4; // move right
+                return MoveUtility.Actions.RIGHT; // move right
             }
 
             if (x_location - 1 >= 0 && world.positions[x_location - 1][y_location].type == 2 && random == 1) {
-                return 1; // move left
+                return MoveUtility.Actions.LEFT; // move left
             }
             if (y_location + 1 < world.gridSize && world.positions[x_location][y_location + 1].type == 2 && random == 2) {
-                return 3; // move down
+                return MoveUtility.Actions.DOWN; // move down
             }
 
             if (y_location - 1 >= 0 && world.positions[x_location][y_location - 1].type == 2 && random == 3) {
-                return 2; // move up
+                return MoveUtility.Actions.UP; // move up
             }
             if (random == 4 && world.positions[x_location][y_location].bomb == null) {
-                return 5;
+                return MoveUtility.Actions.PLACEBOMB;
             }
         }
     }

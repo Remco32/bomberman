@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 
+
 /**
  * Created by joseph on 09/02/2017.
  */
@@ -23,15 +24,44 @@ public class BomberMan {
         alive = true;
     }
 
-    void move(int type) { //TODO: Change to enums
+
+
+
+
+    void move(MoveUtility.Actions action) { //TODO: Change to enums
         if (!alive) return;
         int moveCost = points.get(points.size()-1)-10;
         points.add(moveCost);
         //if (type == 0) ; // do nothing; redundant
+        switch (action){
+            case UP:
+                MakeMove(0, -1); //move up
+                break;
+            case DOWN:
+                MakeMove(0, 1);//move down
+                break;
+            case LEFT:
+                MakeMove(-1, 0);//move left
+                break;
+            case RIGHT:
+                MakeMove(1, 0);//move right
+                break;
+            case PLACEBOMB:
+                if(DEBUGPRINT) System.out.println("player " + this.id + " placed a bomb");
+                if (world.positions[x_location][y_location].bomb == null) {
+                    Bomb bomb = new Bomb(x_location, y_location, this, world);
+                    world.activeBombList.add(bomb);
+                    world.positions[x_location][y_location].addBomb(bomb);
+                } else if(DEBUGPRINT) System.out.println("Bomb has already been placed at this location");
+                break;
+        }
+
+        /**
         if (type == 1) MakeMove(-1, 0);//move left
         if (type == 2) MakeMove(0, -1); //move up
         if (type == 3) MakeMove(0, 1);//move down
         if (type == 4) MakeMove(1, 0);//move right
+
 
         if (type == 5) { //place bomb
             if(DEBUGPRINT) System.out.println("player " + this.id + " placed a bomb");
@@ -41,6 +71,7 @@ public class BomberMan {
                 world.positions[x_location][y_location].addBomb(bomb);
             } else if(DEBUGPRINT) System.out.println("Bomb has already been placed at this location");
         }
+         **/
     }
 
     private void MakeMove(int x, int y) {
@@ -66,25 +97,25 @@ public class BomberMan {
     }
 
 
-    ArrayList<Integer> AbleMoves() {
-        ArrayList<Integer> moves = new ArrayList<>();
-        moves.add(0);// always possible to do nothing
+    ArrayList<MoveUtility.Actions> AbleMoves() {
+        ArrayList<MoveUtility.Actions> moves = new ArrayList<>();
+        moves.add(MoveUtility.Actions.IDLE);// always possible to do nothing
 
 
         if (x_location - 1 >= 0 && world.positions[x_location - 1][y_location].type == 2) { //Type 2 means empty space, so it's movable
-            moves.add(1); // move left
+            moves.add(MoveUtility.Actions.LEFT); // move left
         }
         if (y_location - 1 >= 0 && world.positions[x_location][y_location - 1].type == 2) {
-            moves.add(2); // move up
+            moves.add(MoveUtility.Actions.UP); // move up
         }
         if (y_location + 1 < world.gridSize && world.positions[x_location][y_location + 1].type == 2) {
-            moves.add(3); // move down
+            moves.add(MoveUtility.Actions.DOWN); // move down
         }
         if (x_location + 1 < world.gridSize && world.positions[x_location + 1][y_location].type == 2) {
-            moves.add(4); // move right
+            moves.add(MoveUtility.Actions.RIGHT); // move right
         }
         if (world.positions[x_location][y_location].bomb == null) {
-            moves.add(5); // place bomb
+            moves.add(MoveUtility.Actions.PLACEBOMB); // place bomb
         }
         return moves;
     }

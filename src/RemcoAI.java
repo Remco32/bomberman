@@ -18,9 +18,10 @@ public class RemcoAI {
         this.man = man;
     }
 
+
     void test(){
 
-        while(true) man.move(3);
+        while(true) man.move(MoveUtility.Actions.RIGHT);
     }
 
     void moveTowardsEnemy() {
@@ -65,17 +66,17 @@ public class RemcoAI {
 
             if (abs(man.getX_location() - x) > abs(man.getY_location() - y)) { //x distance is bigger than y distance
                 if((man.getX_location() - x) > 0){ // enemy is to the left of us
-                    man.move(1);
+                    man.move(MoveUtility.Actions.LEFT);
                 }
                 else{ // enemy is to the right of us
-                    man.move(4);
+                    man.move(MoveUtility.Actions.RIGHT);
                 }
             } else {  //y distance is bigger than x distance
                 if((man.getY_location() - y) > 0) { // enemy is to above us
-                    man.move(2);
+                    man.move(MoveUtility.Actions.UP);
                 }
                 else{ // enemy is to below us
-                    man.move(3);
+                    man.move(MoveUtility.Actions.DOWN);
                 }
 
             }
@@ -87,4 +88,13 @@ public class RemcoAI {
     int manhattanDistance(int x0, int x1, int y1, int y0){
         return abs(x1-x0) + abs(y1-y0);
     }
+
+    public enum Directions {
+        UP, DOWN, LEFT, RIGHT
+    }
+
+    boolean checkPossibleMove(){
+        return true;
+    }
 }
+
