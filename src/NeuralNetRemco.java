@@ -2,6 +2,8 @@
  * Created by Remco on 5-3-2017.
  */
 
+//TODO list met tuples vervangen
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

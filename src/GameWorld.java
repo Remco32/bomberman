@@ -4,9 +4,6 @@ import java.util.ArrayList;
  * Created by joseph on 09/02/2017.
  */
 public class GameWorld {
-    private int HARDWALL = 0;
-    private int SOFTWALL = 1;
-    private int NOWALL = 2;
     int gridSize; // in 1 dimension
     int amountPlayers;
     private int amountOfRounds=0;
@@ -97,6 +94,10 @@ public class GameWorld {
             }
 
         }
+
+        //Set a specific block
+        positions[0][2] = new WorldPosition(0,2, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[2][2] = new WorldPosition(0,2, WorldPosition.Fieldtypes.SOFTWALL);
 
         // init the players
 

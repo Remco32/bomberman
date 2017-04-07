@@ -17,7 +17,7 @@ public class RandomAI extends AIHandler {
 
     private MoveUtility MakeEducatedMove(BomberMan man) {
         ArrayList<MoveUtility.Actions> moveList = man.AbleMoves();
-        ArrayList<Bomb> bombList = findBombLocations(man.getX_location(), man.getY_location(), 2);//range can changed
+        ArrayList<Bomb> bombList = findBombLocations(man.getX_location(), man.getY_location(), 2);//range can change
         double[] utilityList = new double[moveList.size()];
         if (!bombList.isEmpty()) {
             for (int x = 0; x < moveList.size(); x++) {

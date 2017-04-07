@@ -12,7 +12,7 @@ public class WorldPosition {
     Bomb bomb;
     private int x_location;
     private int y_location;
-    Fieldtypes type; //0=hardwall,1=softwall,2=no wall
+    Fieldtypes type;
     boolean dangerous;
 
      WorldPosition(int x,int y,Fieldtypes type){
@@ -37,6 +37,10 @@ public class WorldPosition {
     }
     void deleteBomberman(BomberMan bomberman){
         bombermanList.remove(bomberman);
+    }
+
+    Fieldtypes getType(){
+        return type;
     }
 
 
