@@ -95,9 +95,15 @@ public class GameWorld {
 
         }
 
-        //Set a specific block
-        positions[0][2] = new WorldPosition(0,2, WorldPosition.Fieldtypes.SOFTWALL);
-        positions[2][2] = new WorldPosition(0,2, WorldPosition.Fieldtypes.SOFTWALL);
+        //Set specific blocks
+        //positions[0][2] = new WorldPosition(0,2, WorldPosition.Fieldtypes.SOFTWALL);
+        //positions[2][2] = new WorldPosition(2,2, WorldPosition.Fieldtypes.SOFTWALL);
+        //positions[2][0] = new WorldPosition(2,0, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[4][0] = new WorldPosition(4,0, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[4][2] = new WorldPosition(4,2, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[4][4] = new WorldPosition(4,4, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[2][4] = new WorldPosition(2,4, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[0][4] = new WorldPosition(0,4, WorldPosition.Fieldtypes.SOFTWALL);
 
         // init the players
 

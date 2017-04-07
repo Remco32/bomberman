@@ -15,18 +15,9 @@ public class RemcoAI {
     ArrayList<MoveUtility> moves;
     Queue<Pair> queue = new LinkedList<>();
 
-
-
-
-
     RemcoAI(GameWorld world, BomberMan man) {
         this.world = world;
         this.man = man;
-    }
-
-
-    void test(){
-
     }
 
     void moveTowardsEnemy() {
@@ -36,23 +27,118 @@ public class RemcoAI {
 
             //add our initial position to queue
             queue.add(new Pair(man.getX_location(), man.getY_location()));
-            ArrayList<Pair> path = new ArrayList<>();
 
             ArrayList<Pair> consideredCoordinates = new ArrayList<>();
 
-            searchForPath(enemyX, enemyY, man.getX_location(), man.getY_location(), path, consideredCoordinates);
+            int agentX = man.getX_location();
+            int agentY = man.getY_location();
+
+            searchAndGoToLocation(enemyX, enemyY, agentX, agentY, consideredCoordinates);
             queue.clear();
+            consideredCoordinates.clear();
 
-            //consideredCoordinates.clear();
+            //check if our coordinates are the same: that means no path
+            if (agentX == man.getX_location() && agentY == man.getY_location()) {
+                //bomb the wall towards the enemy
+                System.out.println("No path!");
+                bombTowardsDirection(getEnemyDirection(enemyX,enemyY));
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                moveTowardsEnemy();
 
-            //for(int i = 0; i < path.size(); i++){
-            //    moveToArea((int)path.get(i).getFirst(), (int)path.get(i).getSecond(),0);
-            //}
-
-            //System.out.println("Visited all reachable locations.");
+            }
 
         }
     }
+
+    void bombTowardsDirection(MoveUtility.Actions direction){
+        switch (direction){
+            case UP:
+                //move towards wall in up direction
+                while(checkMovementPossible(man.getX_location(),man.getY_location()-1)){
+                    moveToArea(man.getX_location(),man.getY_location()-1,0);
+                }
+                //place bomb
+                man.move(MoveUtility.Actions.PLACEBOMB);
+                //TODO replace with avoidDanger()
+                //move back
+                for(int i = 0; i < 3; i++){
+                    moveToArea(man.getX_location(),man.getY_location()+1,0);
+                }
+                break;
+            case DOWN:
+                //move towards wall in up direction
+                while(checkMovementPossible(man.getX_location(),man.getY_location()+1)){
+                    moveToArea(man.getX_location(),man.getY_location()+1,0);
+                }
+                //place bomb
+                man.move(MoveUtility.Actions.PLACEBOMB);
+                //move back
+                for(int i = 0; i < 3; i++){
+                    moveToArea(man.getX_location(),man.getY_location()-1,0);
+                }
+                break;
+            case RIGHT:
+                //move towards wall in up direction
+                while(checkMovementPossible(man.getX_location()+1,man.getY_location())){
+                    moveToArea(man.getX_location()+1,man.getY_location(),0);
+                }
+                //place bomb
+                man.move(MoveUtility.Actions.PLACEBOMB);
+                //move back
+                for(int i = 0; i < 3; i++){
+                    moveToArea(man.getX_location()-1,man.getY_location(),0);
+                }
+                break;
+            case LEFT:
+                //move towards wall in up direction
+                while(checkMovementPossible(man.getX_location()-1,man.getY_location())){
+                    moveToArea(man.getX_location()-1,man.getY_location(),0);
+                }
+                //place bomb
+                man.move(MoveUtility.Actions.PLACEBOMB);
+                //move back
+                for(int i = 0; i < 3; i++){
+                    moveToArea(man.getX_location()+1,man.getY_location(),0);
+                }
+                break;
+
+
+        }
+
+
+    }
+
+    MoveUtility.Actions getEnemyDirection(int enemyX, int enemyY){
+        if (abs(man.getX_location() - enemyX) > abs(man.getY_location() - enemyY)) { //x distance is bigger than y distance
+            if((man.getX_location() - enemyX) > 0){ // enemy is to the left of us
+                return MoveUtility.Actions.LEFT;
+            }
+            else{ // enemy is to the right of us
+                return MoveUtility.Actions.RIGHT;
+            }
+        } else {  //y distance is bigger than x distance
+            if((man.getY_location() - enemyY) > 0) { // enemy is to above us
+                return MoveUtility.Actions.UP;
+            }
+            else{ // enemy is to below us
+                return MoveUtility.Actions.DOWN;
+            }
+
+        }
+
+
+    }
+
+    //Moves the agent out of harms way
+    void avoidDanger(){
+
+    }
+
+
 
     void pairCheck(){
         Pair testPair1 = new Pair(1,2);
@@ -102,6 +188,7 @@ public class RemcoAI {
 
         while(distanceToKeep < manhattanDistance(x, man.getX_location(), y, man.getY_location())) {
 
+            //TODO replace with enemy direction methodcall
             if (abs(man.getX_location() - x) > abs(man.getY_location() - y)) { //x distance is bigger than y distance
                 if((man.getX_location() - x) > 0){ // enemy is to the left of us
                     man.move(MoveUtility.Actions.LEFT);
@@ -142,15 +229,12 @@ public class RemcoAI {
     }
 
 
-//TODO IMPLEMENTEER EEN QUEUE DIT WERKT ZO NIET ANDERS
 
-    void searchForPath(int targetX, int targetY, int ownX, int ownY, ArrayList<Pair> path, ArrayList<Pair> consideredCoordinates) {
-
-        //we will never have to cross the same space again in a path.
+    void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY, ArrayList<Pair> consideredCoordinates) {
 
         //DEBUG
-        targetX = 6;
-        targetY = 4;
+        //targetX = 8;
+        //targetY = 8;
 
         //No answer
         if (queue.isEmpty()) {
@@ -170,32 +254,29 @@ public class RemcoAI {
 
         if (!(consideredCoordinates.contains(new Pair(ownX, ownY)))) {
             //add our current position to consideredCoordinates, so we don't visit them again.
-            path.add(new Pair(ownX, ownY));
             consideredCoordinates.add(new Pair(ownX, ownY));
 
         }
 
-
-
         //BASE CASE
         if (targetX == ownX && targetY == ownY) {
 
-            System.out.println("path = " + path.toString());
+            System.out.println("path = " + consideredCoordinates.toString());
 
             //Achterstevoren lijst af, checken of manhatten distance 1 is, daaruit nieuwe lijst maken wat uiteindelijk pad is
             ArrayList<Pair> finalPath = new ArrayList<>();
 
             //Put last element in a variable
-            currentPair = path.get(path.size() -1);
+            currentPair = consideredCoordinates.get(consideredCoordinates.size() - 1);
 
             //Add the last element to our final path
             finalPath.add(currentPair);
 
             //Go through all elements of list
-            for(int i = path.size() -1 ; i > 0 ; i--){
-                Pair comparingPair = path.get(i);
+            for (int i = consideredCoordinates.size() - 1; i > 0; i--) {
+                Pair comparingPair = consideredCoordinates.get(i);
                 //Check if it is possible to go to each other
-                if(manhattanDistance( ((int) currentPair.getFirst()),  (int) comparingPair.getFirst(), (int) currentPair.getSecond(), (int) comparingPair.getSecond()) == 1) {
+                if (manhattanDistance(((int) currentPair.getFirst()), (int) comparingPair.getFirst(), (int) currentPair.getSecond(), (int) comparingPair.getSecond()) == 1) {
                     finalPath.add(comparingPair);
                     currentPair = comparingPair;
                 }
@@ -203,12 +284,10 @@ public class RemcoAI {
             }
             System.out.println("FINAL path = " + finalPath.toString());
 
+            for (int i = finalPath.size() - 1; i >= 0; i--) {
+                moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), 2);
 
-             for (int i = finalPath.size() -1 ; i >= 0 ; i--) {
-             moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), 0);
-
-             }
-
+            }
 
             return;
         }
@@ -240,27 +319,27 @@ public class RemcoAI {
         //After adding all possible options, we make a move
         if ((checkMovementPossible(ownX + 1, ownY)) && !(consideredCoordinates.contains(new Pair((ownX + 1), ownY)))) {
 
-            searchForPath(targetX, targetY, ownX + 1, ownY, path, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates);
 
         }
         if (checkMovementPossible(ownX - 1, ownY) && !(consideredCoordinates.contains(new Pair((ownX - 1), ownY)))) {
 
-            searchForPath(targetX, targetY, ownX - 1, ownY, path, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX - 1, ownY, consideredCoordinates);
 
         }
         if (checkMovementPossible(ownX, ownY - 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY - 1))))) {
 
-            searchForPath(targetX, targetY, ownX, ownY - 1, path, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates);
 
         }
         if (checkMovementPossible(ownX, ownY + 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY + 1))))) {
 
-            searchForPath(targetX, targetY, ownX, ownY + 1, path, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
 
         }
 
         //Start again, since queue isn't empty yet
-        searchForPath(targetX, targetY, ownX, ownY, path, consideredCoordinates);
+        searchAndGoToLocation(targetX, targetY, ownX, ownY, consideredCoordinates);
     }
 
 
@@ -284,7 +363,7 @@ public class RemcoAI {
          }
          if(!consideredCoordinates.contains(new Pair(ownX-1, ownY))) {
          consideredCoordinates.add(new Pair(ownX-1, ownY));
-         searchForPath(targetX, targetY, ownX-1, ownY, consideredCoordinates);
+         searchAndGoToLocation(targetX, targetY, ownX-1, ownY, consideredCoordinates);
          }
          }
 
@@ -294,15 +373,15 @@ public class RemcoAI {
             //if (targetX == ownX+1 && targetY == ownY && !consideredCoordinates.contains(new Pair(ownX+1, ownY))) {
             //add final step to the list
             consideredCoordinates.add(new Pair(ownX + 1, ownY));
-            searchForPath(targetX, targetY, ownX + 1, ownY, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates);
             //return consideredCoordinates;
             //}
             //else{
-            //    searchForPath(targetX, targetY, ownX+1, ownY, consideredCoordinates);
+            //    searchAndGoToLocation(targetX, targetY, ownX+1, ownY, consideredCoordinates);
             //}
             //if(!consideredCoordinates.contains(new Pair(ownX+1, ownY))) {
             //  consideredCoordinates.add(new Pair(ownX+1, ownY));
-            //searchForPath(targetX, targetY, ownX+1, ownY, consideredCoordinates);
+            //searchAndGoToLocation(targetX, targetY, ownX+1, ownY, consideredCoordinates);
             //}
         }
         /**
@@ -320,7 +399,7 @@ public class RemcoAI {
          }
          if (!consideredCoordinates.contains(new Pair(ownX, ownY - 1))) {
          consideredCoordinates.add(new Pair(ownX, ownY - 1));
-         searchForPath(targetX, targetY, ownX, ownY - 1, consideredCoordinates);
+         searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates);
          }
          }
 
@@ -331,16 +410,16 @@ public class RemcoAI {
 
             //add final step to the list
             consideredCoordinates.add(new Pair(ownX, ownY + 1));
-            searchForPath(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
 
             //return consideredCoordinates;
             //}
             //else{
-            //    searchForPath(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
+            //    searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
             //}
             //if (!consideredCoordinates.contains(new Pair(ownX, ownY + 1))) {
             //  consideredCoordinates.add(new Pair(ownX, ownY + 1));
-            //searchForPath(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
+            //searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
             //}
         }
 
