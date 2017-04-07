@@ -149,8 +149,8 @@ public class RemcoAI {
         //we will never have to cross the same space again in a path.
 
         //DEBUG
-        targetX = 0;
-        targetY = 7;
+        targetX = 6;
+        targetY = 4;
 
         //No answer
         if (queue.isEmpty()) {
@@ -179,12 +179,7 @@ public class RemcoAI {
 
         //BASE CASE
         if (targetX == ownX && targetY == ownY) {
-            /**
-             consideredCoordinates.add(new Pair(ownX, ownY));
-             for (int i = 0; i < consideredCoordinates.size(); i++) {
-             moveToArea((int) consideredCoordinates.get(i).getFirst(), (int) consideredCoordinates.get(i).getSecond(), 0);
 
-             }**/
             System.out.println("path = " + path.toString());
 
             //Achterstevoren lijst af, checken of manhatten distance 1 is, daaruit nieuwe lijst maken wat uiteindelijk pad is
@@ -218,86 +213,54 @@ public class RemcoAI {
             return;
         }
 
-
-
         //look around to all possible moves
 
         //check if we can make a move to the RIGHT, and if we haven't visited this spot before
         if ((checkMovementPossible(ownX + 1, ownY)) && !(consideredCoordinates.contains(new Pair((ownX + 1), ownY))) && !(queue.contains(new Pair((ownX + 1), ownY)))) {
             //add this new location to the queue
             queue.add(new Pair(ownX + 1, ownY));
-            //searchForPath(targetX, targetY, ownX + 1, ownY, consideredCoordinates);
 
         }
         //check if we can make a move to the LEFT, and if we haven't visited this spot before
         if (checkMovementPossible(ownX - 1, ownY) && !(consideredCoordinates.contains(new Pair((ownX - 1), ownY))) && !(queue.contains(new Pair((ownX - 1), ownY)))) {
             //add this new location to the queue
             queue.add(new Pair(ownX - 1, ownY));
-            //searchForPath(targetX, targetY, ownX - 1, ownY, consideredCoordinates);
         }
         //check if we can make a move to the UP, and if we haven't visited this spot before
         if (checkMovementPossible(ownX, ownY - 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY - 1)))) && !(queue.contains(new Pair((ownX), ownY - 1)))) {
             //add this new location to the queue
             queue.add(new Pair(ownX, ownY - 1));
-            //searchForPath(targetX, targetY, ownX, ownY - 1, consideredCoordinates);
         }
         //check if we can make a move to the DOWN, and if we haven't visited this spot before
         if (checkMovementPossible(ownX, ownY + 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY + 1)))) && !(queue.contains(new Pair((ownX), ownY + 1)))) {
             //add this new location to the queue
             queue.add(new Pair(ownX, ownY + 1));
-            //searchForPath(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
         }
 
+        //After adding all possible options, we make a move
         if ((checkMovementPossible(ownX + 1, ownY)) && !(consideredCoordinates.contains(new Pair((ownX + 1), ownY)))) {
-            //path.add(new Pair(ownX + 1, ownY));
-
-            //Maybe gives every individual split in the BFS its own path
-            ArrayList<Pair> newPath = new ArrayList<>();
-            newPath.addAll(path);
-            path = newPath;
 
             searchForPath(targetX, targetY, ownX + 1, ownY, path, consideredCoordinates);
-            //return;
+
         }
         if (checkMovementPossible(ownX - 1, ownY) && !(consideredCoordinates.contains(new Pair((ownX - 1), ownY)))) {
-            //.add(new Pair(ownX - 1, ownY));
-
-            //Maybe gives every individual split in the BFS its own path
-            ArrayList<Pair> newPath = new ArrayList<>();
-            newPath.addAll(path);
-            path = newPath;
 
             searchForPath(targetX, targetY, ownX - 1, ownY, path, consideredCoordinates);
-            //return;
 
         }
         if (checkMovementPossible(ownX, ownY - 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY - 1))))) {
-            //path.add(new Pair(ownX , ownY -1));
 
-            //Maybe gives every individual split in the BFS its own path
-            ArrayList<Pair> newPath = new ArrayList<>();
-            newPath.addAll(path);
-            path = newPath;
-
-            searchForPath(targetX, targetY, ownX, ownY - 1, path,consideredCoordinates);
-            //return;
+            searchForPath(targetX, targetY, ownX, ownY - 1, path, consideredCoordinates);
 
         }
         if (checkMovementPossible(ownX, ownY + 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY + 1))))) {
-            //path.add(new Pair(ownX , ownY +1));
 
-            //Maybe gives every individual split in the BFS its own path
-            ArrayList<Pair> newPath = new ArrayList<>();
-            newPath.addAll(path);
-            path = newPath;
-
-            searchForPath(targetX, targetY, ownX, ownY + 1, path,consideredCoordinates);
-            //return;
+            searchForPath(targetX, targetY, ownX, ownY + 1, path, consideredCoordinates);
 
         }
 
         //Start again, since queue isn't empty yet
-        searchForPath(targetX, targetY, ownX, ownY, path,consideredCoordinates);
+        searchForPath(targetX, targetY, ownX, ownY, path, consideredCoordinates);
     }
 
 
