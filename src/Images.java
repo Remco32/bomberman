@@ -13,6 +13,7 @@ public class Images {
     Image wallHard;
     Image bomb;
     Image grass;
+    Image explosion;
     Image player1;
     Image player2;
     Image player3;
@@ -29,6 +30,8 @@ public class Images {
             bomb = buffer.getScaledInstance(30, 30, Image.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("grass.png"));
             grass = buffer.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+            buffer = ImageIO.read(getClass().getResource("explosion.png"));
+            explosion = buffer.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("bomberman1.png"));
             player1 = buffer.getScaledInstance(40, 40, Image.SCALE_DEFAULT);
             buffer = ImageIO.read(getClass().getResource("bomberman2.png"));

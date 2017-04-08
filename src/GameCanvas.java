@@ -23,7 +23,7 @@ public class GameCanvas extends JPanel {
                 if (position.type == WorldPosition.Fieldtypes.HARDWALL) paintWallHard(g, x * 50, y * 50);
                 if (position.type == WorldPosition.Fieldtypes.SOFTWALL) paintWallSoft(g, x * 50, y * 50);
                 if (position.type == WorldPosition.Fieldtypes.EMPTY) paintRoad(g, x * 50, y * 50);
-                //if (position.type == 3) paintExplosion(g, x * 50, y * 50);
+                if (position.type == WorldPosition.Fieldtypes.EXPLOSION) paintExplosion(g, x * 50, y * 50);
                 if (!position.bombermanList.isEmpty())
                     paintBomberMan(g, x * 50 + 5, y * 50 + 5, position.bombermanList.get(0));
                 if (position.bomb != null) paintBomb(g, x * 50 + 10, y * 50 + 10);
@@ -50,7 +50,7 @@ public class GameCanvas extends JPanel {
     }
 
     private void paintExplosion(Graphics g, int x, int y) {
-        //g.drawImage(image.explosion, x, y, null);
+        g.drawImage(image.explosion, x, y, null);
     }
 
     private void paintBomberMan(Graphics g, int x, int y, BomberMan man) {

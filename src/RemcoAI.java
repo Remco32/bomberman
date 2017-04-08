@@ -20,6 +20,12 @@ public class RemcoAI {
         this.man = man;
     }
 
+    void play() {
+        while (world.bomberManList.get(0).alive) {
+            moveTowardsEnemy();
+        }
+    }
+
     void moveTowardsEnemy() {
         if (!findClosestEnemy().isEmpty()) {
             int enemyX = (int) findClosestEnemy().get(0);
@@ -33,25 +39,23 @@ public class RemcoAI {
             int agentX = man.getX_location();
             int agentY = man.getY_location();
 
-            searchAndGoToLocation(enemyX, enemyY, agentX, agentY, consideredCoordinates);
+            searchAndGoToLocation(enemyX, enemyY, agentX, agentY, consideredCoordinates, 1);
             queue.clear();
             consideredCoordinates.clear();
 
             //check if our coordinates are the same: that means no path
             if (agentX == man.getX_location() && agentY == man.getY_location()) {
                 //bomb the wall towards the enemy
-                System.out.println("No path!");
-                bombTowardsDirection(getEnemyDirection(enemyX,enemyY));
+                System.out.println("No path, creating one!");
+                bombTowardsDirection(getEnemyDirection(enemyX, enemyY));
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                moveTowardsEnemy();
-
             }
-
         }
+
     }
 
     void bombTowardsDirection(MoveUtility.Actions direction){
@@ -230,7 +234,8 @@ public class RemcoAI {
 
 
 
-    void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY, ArrayList<Pair> consideredCoordinates) {
+    //finds a path, if possible, and moves to target
+    void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY, ArrayList<Pair> consideredCoordinates, int distanceToKeep) {
 
         //DEBUG
         //targetX = 8;
@@ -285,10 +290,9 @@ public class RemcoAI {
             System.out.println("FINAL path = " + finalPath.toString());
 
             for (int i = finalPath.size() - 1; i >= 0; i--) {
-                moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), 2);
-
+                moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), distanceToKeep);
             }
-
+            System.out.println("Done moving.");
             return;
         }
 
@@ -319,27 +323,27 @@ public class RemcoAI {
         //After adding all possible options, we make a move
         if ((checkMovementPossible(ownX + 1, ownY)) && !(consideredCoordinates.contains(new Pair((ownX + 1), ownY)))) {
 
-            searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates, distanceToKeep);
 
         }
         if (checkMovementPossible(ownX - 1, ownY) && !(consideredCoordinates.contains(new Pair((ownX - 1), ownY)))) {
 
-            searchAndGoToLocation(targetX, targetY, ownX - 1, ownY, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX - 1, ownY, consideredCoordinates,distanceToKeep);
 
         }
         if (checkMovementPossible(ownX, ownY - 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY - 1))))) {
 
-            searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates,distanceToKeep);
 
         }
         if (checkMovementPossible(ownX, ownY + 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY + 1))))) {
 
-            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
+            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates,distanceToKeep);
 
         }
 
         //Start again, since queue isn't empty yet
-        searchAndGoToLocation(targetX, targetY, ownX, ownY, consideredCoordinates);
+        searchAndGoToLocation(targetX, targetY, ownX, ownY, consideredCoordinates,distanceToKeep);
     }
 
 

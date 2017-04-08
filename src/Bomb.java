@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by joseph on 09/02/2017.
  */
@@ -5,6 +7,7 @@ public class Bomb {
     private Boolean DEBUGPRINT = false; // Activates debug prints for bomb
 
     private int timer;
+    private int cleanupTimer;
     private int range;
     int x_location;
     int y_location;
@@ -31,6 +34,16 @@ public class Bomb {
         else Explode();
     }
 
+    void cleanupCountdown(){
+        if (cleanupTimer > 0){
+            cleanupTimer--;
+        }
+        if(exploded && cleanupTimer == 0) {
+            cleanExplosion();
+        }
+
+    }
+
 
     private void ModifyPoints(BomberMan man, int amount){ //Method for adding or subtracting points from an agent
         int points = man.points.get(man.points.size()-1)+amount;
@@ -38,37 +51,86 @@ public class Bomb {
     }
 
 
-    //TODO add explosion graphic
+    //TODO fix bug where an explosion can only be drawn once: next time it won't be drawn.
     private void Explode() {
         if (exploded) return;
 
         // check for exploding up
         for (int yTemp = y_location; yTemp <= y_location + range; yTemp++) {
             if (yTemp >= 0 && yTemp < world.gridSize) {
+                if (!(world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.SOFTWALL))  world.positions[x_location][yTemp].type = WorldPosition.Fieldtypes.EXPLOSION;
                if(ExplodeHit(x_location,yTemp)) yTemp = y_location + range+1;
             }
         }
         //check for exploding down
         for (int yTemp = y_location; yTemp >= y_location - range; yTemp--) {
             if (yTemp >= 0 && yTemp < world.gridSize) {
+                if (!(world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[x_location][yTemp].type = WorldPosition.Fieldtypes.EXPLOSION;
                if(ExplodeHit(x_location,yTemp)) yTemp = y_location-range-1;
             }
         }
         // check for exploding left
         for (int xTemp = x_location; xTemp <= x_location + range; xTemp ++) {
             if (xTemp  >= 0 && xTemp  < world.gridSize) {
+                if (!(world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[xTemp][y_location].type = WorldPosition.Fieldtypes.EXPLOSION;
                 if(ExplodeHit(xTemp,y_location)) xTemp = x_location + range +1;
             }
         }
         // check for exploding right
         for (int xTemp = x_location; xTemp >= x_location - range; xTemp--) {
             if (xTemp >= 0 && xTemp < world.gridSize) {
+                if (!(world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[xTemp][y_location].type = WorldPosition.Fieldtypes.EXPLOSION;
                 if(ExplodeHit(xTemp,y_location)) xTemp = x_location - range -1;
             }
         }
 
         exploded = true;
+
+        //world.positions[x_location][y_location].deleteBomb();
+
+        //Clean explosion graphic next turn
+        cleanupTimer = 2;
+        //cleanExplosion();
+    }
+
+
+    void cleanExplosion(){
+
         world.positions[x_location][y_location].deleteBomb();
+
+        // check for exploding up
+        for (int yTemp = y_location; yTemp <= y_location + range; yTemp++) {
+            if (yTemp >= 0 && yTemp < world.gridSize) {
+                if (!(world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.SOFTWALL))  world.positions[x_location][yTemp].type = WorldPosition.Fieldtypes.EMPTY;
+            }
+        }
+        //check for exploding down
+        for (int yTemp = y_location; yTemp >= y_location - range; yTemp--) {
+            if (yTemp >= 0 && yTemp < world.gridSize) {
+                if (!(world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[x_location][yTemp].type = WorldPosition.Fieldtypes.EMPTY;
+            }
+        }
+        // check for exploding left
+        for (int xTemp = x_location; xTemp <= x_location + range; xTemp ++) {
+            if (xTemp  >= 0 && xTemp  < world.gridSize) {
+                if (!(world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[xTemp][y_location].type = WorldPosition.Fieldtypes.EMPTY;
+            }
+        }
+        // check for exploding right
+        for (int xTemp = x_location; xTemp >= x_location - range; xTemp--) {
+            if (xTemp >= 0 && xTemp < world.gridSize) {
+                if (!(world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[xTemp][y_location].type = WorldPosition.Fieldtypes.EMPTY;
+            }
+        }
+
     }
 
 

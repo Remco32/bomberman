@@ -147,6 +147,7 @@ public class GameWorld {
             // update all bombs
             for (Bomb bomb : activeBombList) {
                 bomb.Countdown();
+
             }
             for (Bomb bomb : activeBombList) {
                 if(bomb.exploded){
@@ -154,6 +155,7 @@ public class GameWorld {
                 }
             }
             for(Bomb bomb : explodedBombList){
+                bomb.cleanupCountdown();
                 activeBombList.remove(bomb);
             }
 

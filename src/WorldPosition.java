@@ -24,7 +24,7 @@ public class WorldPosition {
 
     //TODO dangerzones maken in world
     public enum Fieldtypes {
-        EMPTY, SOFTWALL, HARDWALL
+        EMPTY, SOFTWALL, HARDWALL, EXPLOSION
     }
 
     void addBomb(Bomb bomb){
