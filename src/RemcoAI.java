@@ -20,13 +20,13 @@ public class RemcoAI {
         this.man = man;
     }
 
-    void play() {
+    void play(int distanceToKeepInSteps) {
         while (world.bomberManList.get(0).alive) {
-            moveTowardsEnemy();
+            moveTowardsEnemy(distanceToKeepInSteps);
         }
     }
 
-    void moveTowardsEnemy() {
+    void moveTowardsEnemy(int distanceToKeepInSteps) {
         if (!findClosestEnemy().isEmpty()) {
             int enemyX = (int) findClosestEnemy().get(0);
             int enemyY = (int) findClosestEnemy().get(1);
@@ -39,7 +39,7 @@ public class RemcoAI {
             int agentX = man.getX_location();
             int agentY = man.getY_location();
 
-            searchAndGoToLocation(enemyX, enemyY, agentX, agentY, consideredCoordinates, 1);
+            searchAndGoToLocation(enemyX, enemyY, agentX, agentY, consideredCoordinates, distanceToKeepInSteps);
             queue.clear();
             consideredCoordinates.clear();
 
@@ -235,7 +235,7 @@ public class RemcoAI {
 
 
     //finds a path, if possible, and moves to target
-    void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY, ArrayList<Pair> consideredCoordinates, int distanceToKeep) {
+    void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY, ArrayList<Pair> consideredCoordinates, int distanceToKeepInSteps) {
 
         //DEBUG
         //targetX = 8;
@@ -266,6 +266,7 @@ public class RemcoAI {
         //BASE CASE
         if (targetX == ownX && targetY == ownY) {
 
+            System.out.println("Our coordinates are " + man.getX_location() + " " + man.getY_location());
             System.out.println("path = " + consideredCoordinates.toString());
 
             //Achterstevoren lijst af, checken of manhatten distance 1 is, daaruit nieuwe lijst maken wat uiteindelijk pad is
@@ -289,10 +290,11 @@ public class RemcoAI {
             }
             System.out.println("FINAL path = " + finalPath.toString());
 
-            for (int i = finalPath.size() - 1; i >= 0; i--) {
-                moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), distanceToKeep);
+            for (int i = finalPath.size() - 1; i - distanceToKeepInSteps >= 0; i--) {
+                moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), 0);
             }
-            System.out.println("Done moving.");
+            System.out.println("Done moving, coordinates now are " + man.getX_location() + " " + man.getY_location());
+            System.out.println();
             return;
         }
 
@@ -323,27 +325,28 @@ public class RemcoAI {
         //After adding all possible options, we make a move
         if ((checkMovementPossible(ownX + 1, ownY)) && !(consideredCoordinates.contains(new Pair((ownX + 1), ownY)))) {
 
-            searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates, distanceToKeep);
+            searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates, distanceToKeepInSteps);
 
         }
         if (checkMovementPossible(ownX - 1, ownY) && !(consideredCoordinates.contains(new Pair((ownX - 1), ownY)))) {
 
-            searchAndGoToLocation(targetX, targetY, ownX - 1, ownY, consideredCoordinates,distanceToKeep);
+            searchAndGoToLocation(targetX, targetY, ownX - 1, ownY, consideredCoordinates,distanceToKeepInSteps);
 
         }
         if (checkMovementPossible(ownX, ownY - 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY - 1))))) {
 
-            searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates,distanceToKeep);
+            searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates,distanceToKeepInSteps);
 
         }
         if (checkMovementPossible(ownX, ownY + 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY + 1))))) {
 
-            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates,distanceToKeep);
+            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates,distanceToKeepInSteps);
 
         }
 
         //Start again, since queue isn't empty yet
-        searchAndGoToLocation(targetX, targetY, ownX, ownY, consideredCoordinates,distanceToKeep);
+        searchAndGoToLocation(targetX, targetY, ownX, ownY, consideredCoordinates,distanceToKeepInSteps);
+        return;
     }
 
 
