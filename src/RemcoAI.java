@@ -21,15 +21,16 @@ public class RemcoAI {
     }
 
     void play(int distanceToKeepInSteps) {
-        while (world.bomberManList.get(0).alive) {
+        //while (world.bomberManList.get(0).alive) {
             moveTowardsEnemy(distanceToKeepInSteps);
-        }
+        //}
     }
 
     void moveTowardsEnemy(int distanceToKeepInSteps) {
-        if (!findClosestEnemy().isEmpty()) {
-            int enemyX = (int) findClosestEnemy().get(0);
-            int enemyY = (int) findClosestEnemy().get(1);
+        if (world.bomberManList.size() > 0) { //still other players
+            BomberMan enemy = findClosestEnemy();
+            int enemyX = enemy.getX_location();
+            int enemyY = enemy.getY_location();
 
             //add our initial position to queue
             queue.add(new Pair(man.getX_location(), man.getY_location()));
@@ -53,7 +54,11 @@ public class RemcoAI {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                //try again for a path
+                moveTowardsEnemy(distanceToKeepInSteps);
             }
+            //Try trapping enemy
+            //trappingStrategy();
         }
 
     }
@@ -144,30 +149,13 @@ public class RemcoAI {
 
 
 
-    void pairCheck(){
-        Pair testPair1 = new Pair(1,2);
-        Pair testPair2 = new Pair(2,2);
-
-        ArrayList<Pair> testList = new ArrayList<>();
-
-        testList.add(testPair1);
-
-        if(testList.contains(testPair1)){
-            System.out.println("pair1 zit erin");
-        }
-        if(testList.contains(testPair2)){
-            System.out.println("pair2 zit erin");
-        }
-    }
-
-    //TODO use pair instead of list
-    //find the closest enemy, and return its coordinates in a list (x-coordinate, then y-coordinate)
-    List findClosestEnemy() {
+    //find the closest enemy, and return it
+    BomberMan findClosestEnemy() {
         List<Integer> coordinates = new ArrayList<Integer>();
         int amountOfPlayers = world.bomberManList.size() - 1; //minus 1 for index
 
         int distanceClosestEnemy = 0;
-        //int closestEnemyID = 0;
+        int closestEnemyID = 0;
         //search for enemy closest
         for (int i = 1; i <= amountOfPlayers; i++) {
 
@@ -176,14 +164,17 @@ public class RemcoAI {
             int distance = manhattanDistance(enemyX, man.getX_location(), enemyY, man.getY_location());
             if (distanceClosestEnemy < distance) {
                 distanceClosestEnemy = distance;
+                /**
                 coordinates.clear(); //empty list
                 coordinates.add(enemyX); //add X of closest enemy
                 coordinates.add(enemyY); // add Y of closest enemy
-                //closestEnemyID = i;
+                 **/
+                closestEnemyID = i;
+
             }
         }
         //System.out.println("Closest enemy is ID " + closestEnemyID + " with distance " + distanceClosestEnemy);
-        return coordinates;
+        return world.bomberManList.get(closestEnemyID);
     }
 
 
