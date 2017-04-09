@@ -22,13 +22,24 @@ public class RemcoAI {
 
     void play(int distanceToKeepInSteps) {
         //while (world.bomberManList.get(0).alive) {
-            moveTowardsEnemy(distanceToKeepInSteps);
+        moveTowardsEnemy(distanceToKeepInSteps);
+        //Try trapping enemy
+        trappingStrategy();
         //}
     }
 
+    void trappingStrategy(){
+        System.out.println("Do cool stuff.");
+    }
+
     void moveTowardsEnemy(int distanceToKeepInSteps) {
-        if (world.bomberManList.size() > 0) { //still other players
-            BomberMan enemy = findClosestEnemy();
+        if (world.bomberManList.size() <= 1) { //no other players
+            return;
+        }
+        BomberMan enemy = findClosestEnemy();
+
+        //We are not yet at the right location
+        while (!(manhattanDistanceBomberman(man, enemy) == distanceToKeepInSteps)) {
             int enemyX = enemy.getX_location();
             int enemyY = enemy.getY_location();
 
@@ -55,19 +66,14 @@ public class RemcoAI {
                     e.printStackTrace();
                 }
                 //try again for a path
-                moveTowardsEnemy(distanceToKeepInSteps);
-            }
-            //We are at the right location
-            if(manhattanDistanceBomberman(man, enemy) == distanceToKeepInSteps){
-                System.out.println("Right location and distance!");
-                //Try trapping enemy
-                //trappingStrategy();
-            }
-            else{
-                moveTowardsEnemy(distanceToKeepInSteps);
             }
 
+
         }
+
+        //We arived at location
+        System.out.println("Right location and distance!");
+
 
     }
 

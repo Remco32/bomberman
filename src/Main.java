@@ -29,7 +29,7 @@ public class Main {
 
 
         //ai.add(new NeuralNetworkAISimpleFeatures(world,world.bomberManList.get(0),weights));// create neural network
-        //for(int idx=1;idx<world.amountPlayers;idx++) ai.add(new RandomAI(world,world.bomberManList.get(idx)));
+        //for(int idx=1;idx<world.amountPlayers;idx++) ai.add(new RandomAI(world,world.bomberManList.get(idx))); //activates enemy AI
 
         world.SetAi(ai);
         world.RunGameLoop();
