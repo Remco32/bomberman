@@ -57,8 +57,16 @@ public class RemcoAI {
                 //try again for a path
                 moveTowardsEnemy(distanceToKeepInSteps);
             }
-            //Try trapping enemy
-            //trappingStrategy();
+            //We are at the right location
+            if(manhattanDistanceBomberman(man, enemy) == distanceToKeepInSteps){
+                System.out.println("Right location and distance!");
+                //Try trapping enemy
+                //trappingStrategy();
+            }
+            else{
+                moveTowardsEnemy(distanceToKeepInSteps);
+            }
+
         }
 
     }
@@ -432,6 +440,10 @@ public class RemcoAI {
 
     int manhattanDistance(int x0, int x1, int y1, int y0){
         return abs(x1-x0) + abs(y1-y0);
+    }
+
+    int manhattanDistanceBomberman(BomberMan bomber1, BomberMan bomber2){
+        return manhattanDistance(bomber1.getX_location(),  bomber2.getX_location(),  bomber2.getY_location(),  bomber1.getY_location());
     }
 
     boolean checkMovementPossible(int targetX, int targetY) {
