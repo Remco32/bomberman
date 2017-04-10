@@ -104,6 +104,8 @@ public class GameWorld {
         positions[4][4] = new WorldPosition(4,4, WorldPosition.Fieldtypes.SOFTWALL);
         positions[2][4] = new WorldPosition(2,4, WorldPosition.Fieldtypes.SOFTWALL);
         positions[0][4] = new WorldPosition(0,4, WorldPosition.Fieldtypes.SOFTWALL);
+        //positions[0][7] = new WorldPosition(0,4, WorldPosition.Fieldtypes.SOFTWALL);
+
 
         // init the players
 
@@ -180,7 +182,7 @@ public class GameWorld {
         System.out.println("Elapsed time: " + (double) (endTime - startTime)/1000 + " seconds");
     }
 
-    private Boolean PlayerCheck() {
+    Boolean PlayerCheck() {
         if (!bomberManList.get(0).alive) return false;
         for (int idx = 1; idx < bomberManList.size(); idx++) {
             if (bomberManList.get(idx).alive) return true;

@@ -29,14 +29,14 @@ public class Main {
 
 
         //ai.add(new NeuralNetworkAISimpleFeatures(world,world.bomberManList.get(0),weights));// create neural network
-        //for(int idx=1;idx<world.amountPlayers;idx++) ai.add(new RandomAI(world,world.bomberManList.get(idx))); //activates enemy AI
+        for(int idx=1;idx<world.amountPlayers;idx++) ai.add(new RandomAI(world,world.bomberManList.get(idx))); //activates enemy AI
 
         world.SetAi(ai);
         world.RunGameLoop();
         RemcoAI AI_Remco = new RemcoAI(world,world.bomberManList.get(0)); //add player
 
         //while(world.bomberManList.get(0).alive){
-            AI_Remco.play(3);
+            AI_Remco.play(2);
 
         //}
 
