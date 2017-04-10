@@ -38,6 +38,7 @@ public class RemcoAI {
             }
             //try to kill enemy
             trappingStrategy();
+            simplifiedQFunction();
 
             //Adhere to the timesteps of the game
             try {
@@ -46,6 +47,10 @@ public class RemcoAI {
                 e.printStackTrace();
             }
         }
+    }
+
+    void playQLearning(){
+        simplifiedQFunction();
     }
 
     void trappingStrategy() {
@@ -321,8 +326,8 @@ public class RemcoAI {
             for (int i = finalPath.size() - 1; i - distanceToKeepInSteps >= 0; i--) {
                 moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), 0);
             }
-            System.out.println("Done moving, coordinates now are " + man.getX_location() + " " + man.getY_location());
-            System.out.println();
+            //System.out.println("Done moving, coordinates now are " + man.getX_location() + " " + man.getY_location());
+            //System.out.println();
             return;
         }
 
@@ -474,11 +479,6 @@ public class RemcoAI {
 
     }
 
-    double simplifiedQFunction() {
-
-
-        return 0;
-    }
 
     //calculates reward for taking an action, given coordinates and an action
     int rewardFunction(int xAgent, int yAgent, MoveUtility.Actions action) {
@@ -698,5 +698,63 @@ public class RemcoAI {
         return closestBomb;
     }
 
+    double simplifiedQFunction() {
+
+        int amountOfFeatures = 3;
+        /**
+         * Features:
+         * [0] == empty space or soft wall {0,1}
+         * [1] == Dangerzone {0-1}
+         * [2] == Bomberman (self not included) {0,1}
+         */
+
+        double inputVector[] = new double[amountOfFeatures * (world.gridSize * world.gridSize)];
+        //populate inputVector
+        for (int index = 0; index < (world.gridSize * world.gridSize); index++) {
+
+            int x = index % world.gridSize; // x goes from 0-8
+            int y = index / world.gridSize; // y goes from 0-8 as well. Increments after 8 iterations
+
+            //[0] == empty space or soft wall {0,1}
+            //if (index % amountOfFeatures == 0) {
+            if (world.positions[x][y].type == WorldPosition.Fieldtypes.SOFTWALL) {
+                inputVector[0 + amountOfFeatures * index] = 1; //offset = 0
+                //inputVector[index] = 1;
+            } else {
+                inputVector[0 + amountOfFeatures * index] = 0;
+                //inputVector[index] = 0;
+                // }
+
+                //[1] == Dangerzone {0-1}
+                //if (index % amountOfFeatures == 1) {
+                if (world.positions[x][y].dangerousTimer > 0) {
+                    //TODO make it a scale instead of binary
+                    inputVector[1 + amountOfFeatures * index] = 1; //offset = 1
+                    //inputVector[index] = 1;
+                } else {
+                    inputVector[1 + amountOfFeatures * index] = 0;
+                    //inputVector[index] = 0;
+                }
+                //}
+
+                //[2] == Bomberman (self not included) {0,1}
+                //if (index % amountOfFeatures == 2) {
+                if (!world.positions[x][y].bombermanList.isEmpty() && !world.positions[x][y].bombermanList.contains(man)) { //contains a bomberman, that isn't us
+                    inputVector[2 + amountOfFeatures * index] = 1; //offset = 2
+                    //inputVector[index] = 1;
+                } else {
+                    inputVector[2 + amountOfFeatures * index] = 0;
+                    //inputVector[index] = 0;
+                }
+                //}
+            }
+
+            //double QValue = // reward_next + discountRate * maxQ(next_state, this_action)
+
+        }
+
+        System.out.println("Input vector made");
+        return 0;
+    }
 }
 
