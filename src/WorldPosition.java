@@ -22,7 +22,6 @@ public class WorldPosition {
         bombermanList = new ArrayList<>();
     }
 
-    //TODO dangerzones maken in world
     public enum Fieldtypes {
         EMPTY, SOFTWALL, HARDWALL, EXPLOSION
     }

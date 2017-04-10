@@ -12,7 +12,8 @@ public class BomberMan {
     ArrayList<Integer> points;
     Boolean alive;
     GameWorld world;
-    int bombCooldown = 0; //cooldown time for when new bomb can be placed
+    int bombCooldown; //cooldown time for when new bomb can be placed
+    int BOMBCOOLDOWNTIME = 5;
 
     BomberMan(int x, int y, int id, GameWorld world) {
         this.x_location = x;
@@ -22,8 +23,10 @@ public class BomberMan {
         points = new ArrayList<>();
         points.add(0);
         alive = true;
+        bombCooldown = 0;
     }
 
+    //decreases cooldown of bomb by 1.
     void updateBombCooldown() {
         if (bombCooldown > 0) bombCooldown--;
     }
@@ -47,32 +50,17 @@ public class BomberMan {
                 MakeMove(1, 0);//move right
                 break;
             case PLACEBOMB:
-                if (DEBUGPRINT) System.out.println("player " + this.id + " placed a bomb");
-                if (world.positions[x_location][y_location].bomb == null) {
+                if (world.positions[x_location][y_location].bomb == null && bombCooldown == 0) {
                     Bomb bomb = new Bomb(x_location, y_location, this, world);
                     world.activeBombList.add(bomb);
                     world.positions[x_location][y_location].addBomb(bomb);
+                    if (DEBUGPRINT) System.out.println("player " + this.id + " placed a bomb");
                     bomb.createDangerzones();
+                    bombCooldown = BOMBCOOLDOWNTIME;
                 } else if (DEBUGPRINT) System.out.println("Bomb has already been placed at this location");
                 break;
         }
 
-        /**
-         if (type == 1) MakeMove(-1, 0);//move left
-         if (type == 2) MakeMove(0, -1); //move up
-         if (type == 3) MakeMove(0, 1);//move down
-         if (type == 4) MakeMove(1, 0);//move right
-
-
-         if (type == 5) { //place bomb
-         if(DEBUGPRINT) System.out.println("player " + this.id + " placed a bomb");
-         if (world.positions[x_location][y_location].bomb == null) {
-         Bomb bomb = new Bomb(x_location, y_location, this, world);
-         world.activeBombList.add(bomb);
-         world.positions[x_location][y_location].addBomb(bomb);
-         } else if(DEBUGPRINT) System.out.println("Bomb has already been placed at this location");
-         }
-         **/
     }
 
 

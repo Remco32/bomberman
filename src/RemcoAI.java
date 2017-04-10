@@ -15,6 +15,16 @@ public class RemcoAI {
     ArrayList<MoveUtility> moves;
     Queue<Pair> queue = new LinkedList<>();
 
+    int RANGE = 2; //TODO add value to bomberman, and use that when placing bombs
+    int TIMER_BOMB = 5; //TODO obtain value
+
+    int UTILITY_ENEMY_WILL_STAND_IN_DANGERZONE = 5;
+    int UTILITY_DEATH = -100;
+    int UTILITY_STANDING_IN_DANGERZONE = -5;
+    int UTILITY_IDLING = -1;
+
+    double DISCOUNT_FACTOR = 0.5;
+
     RemcoAI(GameWorld world, BomberMan man) {
         this.world = world;
         this.man = man;
@@ -28,7 +38,7 @@ public class RemcoAI {
         //}
     }
 
-    void trappingStrategy(){
+    void trappingStrategy() {
         System.out.println("Do cool stuff.");
     }
 
@@ -68,105 +78,96 @@ public class RemcoAI {
                 //try again for a path
             }
 
-
         }
 
         //We arived at location
         System.out.println("Right location and distance!");
 
-
     }
 
-    void bombTowardsDirection(MoveUtility.Actions direction){
-        switch (direction){
+    void bombTowardsDirection(MoveUtility.Actions direction) {
+        switch (direction) {
             case UP:
                 //move towards wall in up direction
-                while(checkMovementPossible(man.getX_location(),man.getY_location()-1)){
-                    moveToArea(man.getX_location(),man.getY_location()-1,0);
+                while (checkMovementPossible(man.getX_location(), man.getY_location() - 1)) {
+                    moveToArea(man.getX_location(), man.getY_location() - 1, 0);
                 }
                 //place bomb
                 man.move(MoveUtility.Actions.PLACEBOMB);
                 //TODO replace with avoidDanger()
                 //move back
-                for(int i = 0; i < 3; i++){
-                    moveToArea(man.getX_location(),man.getY_location()+1,0);
+                for (int i = 0; i < 3; i++) {
+                    moveToArea(man.getX_location(), man.getY_location() + 1, 0);
                 }
                 break;
             case DOWN:
                 //move towards wall in up direction
-                while(checkMovementPossible(man.getX_location(),man.getY_location()+1)){
-                    moveToArea(man.getX_location(),man.getY_location()+1,0);
+                while (checkMovementPossible(man.getX_location(), man.getY_location() + 1)) {
+                    moveToArea(man.getX_location(), man.getY_location() + 1, 0);
                 }
                 //place bomb
                 man.move(MoveUtility.Actions.PLACEBOMB);
                 //move back
-                for(int i = 0; i < 3; i++){
-                    moveToArea(man.getX_location(),man.getY_location()-1,0);
+                for (int i = 0; i < 3; i++) {
+                    moveToArea(man.getX_location(), man.getY_location() - 1, 0);
                 }
                 break;
             case RIGHT:
                 //move towards wall in up direction
-                while(checkMovementPossible(man.getX_location()+1,man.getY_location())){
-                    moveToArea(man.getX_location()+1,man.getY_location(),0);
+                while (checkMovementPossible(man.getX_location() + 1, man.getY_location())) {
+                    moveToArea(man.getX_location() + 1, man.getY_location(), 0);
                 }
                 //place bomb
                 man.move(MoveUtility.Actions.PLACEBOMB);
                 //move back
-                for(int i = 0; i < 3; i++){
-                    moveToArea(man.getX_location()-1,man.getY_location(),0);
+                for (int i = 0; i < 3; i++) {
+                    moveToArea(man.getX_location() - 1, man.getY_location(), 0);
                 }
                 break;
             case LEFT:
                 //move towards wall in up direction
-                while(checkMovementPossible(man.getX_location()-1,man.getY_location())){
-                    moveToArea(man.getX_location()-1,man.getY_location(),0);
+                while (checkMovementPossible(man.getX_location() - 1, man.getY_location())) {
+                    moveToArea(man.getX_location() - 1, man.getY_location(), 0);
                 }
                 //place bomb
                 man.move(MoveUtility.Actions.PLACEBOMB);
                 //move back
-                for(int i = 0; i < 3; i++){
-                    moveToArea(man.getX_location()+1,man.getY_location(),0);
+                for (int i = 0; i < 3; i++) {
+                    moveToArea(man.getX_location() + 1, man.getY_location(), 0);
                 }
                 break;
 
-
         }
-
 
     }
 
-    MoveUtility.Actions getEnemyDirection(int enemyX, int enemyY){
+    MoveUtility.Actions getEnemyDirection(int enemyX, int enemyY) {
         if (abs(man.getX_location() - enemyX) > abs(man.getY_location() - enemyY)) { //x distance is bigger than y distance
-            if((man.getX_location() - enemyX) > 0){ // enemy is to the left of us
+            if ((man.getX_location() - enemyX) > 0) { // enemy is to the left of us
                 return MoveUtility.Actions.LEFT;
-            }
-            else{ // enemy is to the right of us
+            } else { // enemy is to the right of us
                 return MoveUtility.Actions.RIGHT;
             }
         } else {  //y distance is bigger than x distance
-            if((man.getY_location() - enemyY) > 0) { // enemy is to above us
+            if ((man.getY_location() - enemyY) > 0) { // enemy is to above us
                 return MoveUtility.Actions.UP;
-            }
-            else{ // enemy is to below us
+            } else { // enemy is to below us
                 return MoveUtility.Actions.DOWN;
             }
 
         }
 
-
     }
 
     //Moves the agent out of harms way
-    void avoidDanger(){
+    void avoidDanger() {
         //check if there is a dangerzone in our field
-        if(world.positions[man.getX_location()][man.getY_location()].dangerousTimer > 0){
+        if (world.positions[man.getX_location()][man.getY_location()].dangerousTimer > 0) {
             //move out of the way, preferably to a safe field
 
         }
 
     }
-
-
 
     //find the closest enemy, and return it
     BomberMan findClosestEnemy() {
@@ -184,9 +185,9 @@ public class RemcoAI {
             if (distanceClosestEnemy < distance) {
                 distanceClosestEnemy = distance;
                 /**
-                coordinates.clear(); //empty list
-                coordinates.add(enemyX); //add X of closest enemy
-                coordinates.add(enemyY); // add Y of closest enemy
+                 coordinates.clear(); //empty list
+                 coordinates.add(enemyX); //add X of closest enemy
+                 coordinates.add(enemyY); // add Y of closest enemy
                  **/
                 closestEnemyID = i;
 
@@ -196,23 +197,21 @@ public class RemcoAI {
         return world.bomberManList.get(closestEnemyID);
     }
 
-
     //move agent towards a coordinate. Stops when it gets close.
-    void moveToArea(int x, int y, int distanceToKeep){
+    void moveToArea(int x, int y, int distanceToKeep) {
 
-        while(distanceToKeep < manhattanDistance(x, man.getX_location(), y, man.getY_location())) {
+        while (distanceToKeep < manhattanDistance(x, man.getX_location(), y, man.getY_location())) {
 
             //TODO replace with enemy direction methodcall
             if (abs(man.getX_location() - x) > abs(man.getY_location() - y)) { //x distance is bigger than y distance
-                if((man.getX_location() - x) > 0){ // enemy is to the left of us
+                if ((man.getX_location() - x) > 0) { // enemy is to the left of us
                     man.move(MoveUtility.Actions.LEFT);
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
-                else{ // enemy is to the right of us
+                } else { // enemy is to the right of us
                     man.move(MoveUtility.Actions.RIGHT);
                     try {
                         Thread.sleep(500);
@@ -221,15 +220,14 @@ public class RemcoAI {
                     }
                 }
             } else {  //y distance is bigger than x distance
-                if((man.getY_location() - y) > 0) { // enemy is to above us
+                if ((man.getY_location() - y) > 0) { // enemy is to above us
                     man.move(MoveUtility.Actions.UP);
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
-                else{ // enemy is to below us
+                } else { // enemy is to below us
                     man.move(MoveUtility.Actions.DOWN);
                     try {
                         Thread.sleep(500);
@@ -241,8 +239,6 @@ public class RemcoAI {
             }
         }
     }
-
-
 
     //finds a path, if possible, and moves to target
     void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY, ArrayList<Pair> consideredCoordinates, int distanceToKeepInSteps) {
@@ -334,132 +330,115 @@ public class RemcoAI {
 
         //After adding all possible options, we make a move
         if ((checkMovementPossible(ownX + 1, ownY)) && !(consideredCoordinates.contains(new Pair((ownX + 1), ownY)))) {
-
             searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates, distanceToKeepInSteps);
-
         }
         if (checkMovementPossible(ownX - 1, ownY) && !(consideredCoordinates.contains(new Pair((ownX - 1), ownY)))) {
-
-            searchAndGoToLocation(targetX, targetY, ownX - 1, ownY, consideredCoordinates,distanceToKeepInSteps);
-
+            searchAndGoToLocation(targetX, targetY, ownX - 1, ownY, consideredCoordinates, distanceToKeepInSteps);
         }
         if (checkMovementPossible(ownX, ownY - 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY - 1))))) {
-
-            searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates,distanceToKeepInSteps);
-
+            searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates, distanceToKeepInSteps);
         }
         if (checkMovementPossible(ownX, ownY + 1) && !(consideredCoordinates.contains(new Pair(ownX, (ownY + 1))))) {
-
-            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates,distanceToKeepInSteps);
-
+            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates, distanceToKeepInSteps);
         }
 
         //Start again, since queue isn't empty yet
-        searchAndGoToLocation(targetX, targetY, ownX, ownY, consideredCoordinates,distanceToKeepInSteps);
+        searchAndGoToLocation(targetX, targetY, ownX, ownY, consideredCoordinates, distanceToKeepInSteps);
         return;
     }
 
+    /**
+     * //See if we can move LEFT
+     * if (checkMovementPossible(ownX-1, ownY)) {
+     * if (targetX == ownX-1 && targetY == ownY) { //found target
+     * //once we are back at our own position, move to the found path
+     * /**
+     * man.move(MoveUtility.Actions.LEFT);
+     * try {
+     * Thread.sleep(500);
+     * } catch (InterruptedException e) {
+     * e.printStackTrace();
+     * }
+     * <p>
+     * return consideredCoordinates;
+     * }
+     * if(!consideredCoordinates.contains(new Pair(ownX-1, ownY))) {
+     * consideredCoordinates.add(new Pair(ownX-1, ownY));
+     * searchAndGoToLocation(targetX, targetY, ownX-1, ownY, consideredCoordinates);
+     * }
+     * }
+     * <p>
+     * //check if we can make a move to the RIGHT
+     * if (checkMovementPossible(ownX + 1, ownY)) {
+     * //check if our target is to the right
+     * //if (targetX == ownX+1 && targetY == ownY && !consideredCoordinates.contains(new Pair(ownX+1, ownY))) {
+     * //add final step to the list
+     * consideredCoordinates.add(new Pair(ownX + 1, ownY));
+     * searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates);
+     * //return consideredCoordinates;
+     * //}
+     * //else{
+     * //    searchAndGoToLocation(targetX, targetY, ownX+1, ownY, consideredCoordinates);
+     * //}
+     * //if(!consideredCoordinates.contains(new Pair(ownX+1, ownY))) {
+     * //  consideredCoordinates.add(new Pair(ownX+1, ownY));
+     * //searchAndGoToLocation(targetX, targetY, ownX+1, ownY, consideredCoordinates);
+     * //}
+     * }
+     * /**
+     * //See if we can move UP
+     * if (checkMovementPossible(ownX, ownY-1)) {
+     * if (targetX == ownX && targetY == ownY-1) {
+     * /**
+     * man.move(MoveUtility.Actions.UP);
+     * try {
+     * Thread.sleep(500);
+     * } catch (InterruptedException e) {
+     * e.printStackTrace();
+     * }
+     * return consideredCoordinates;
+     * }
+     * if (!consideredCoordinates.contains(new Pair(ownX, ownY - 1))) {
+     * consideredCoordinates.add(new Pair(ownX, ownY - 1));
+     * searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates);
+     * }
+     * }
+     * <p>
+     * <p>
+     * //See if we can move DOWN
+     * if (checkMovementPossible(ownX, ownY + 1)) {
+     * //if (targetX == ownX && targetY == ownY + 1 && !consideredCoordinates.contains(new Pair(ownX, ownY + 1))) {
+     * <p>
+     * //add final step to the list
+     * consideredCoordinates.add(new Pair(ownX, ownY + 1));
+     * searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
+     * <p>
+     * //return consideredCoordinates;
+     * //}
+     * //else{
+     * //    searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
+     * //}
+     * //if (!consideredCoordinates.contains(new Pair(ownX, ownY + 1))) {
+     * //  consideredCoordinates.add(new Pair(ownX, ownY + 1));
+     * //searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
+     * //}
+     * }
+     * <p>
+     * //No solution found, return empty list
+     * }
+     **/
 
-
-
-
-        /**
-         //See if we can move LEFT
-         if (checkMovementPossible(ownX-1, ownY)) {
-         if (targetX == ownX-1 && targetY == ownY) { //found target
-         //once we are back at our own position, move to the found path
-         /**
-         man.move(MoveUtility.Actions.LEFT);
-         try {
-         Thread.sleep(500);
-         } catch (InterruptedException e) {
-         e.printStackTrace();
-         }
-
-         return consideredCoordinates;
-         }
-         if(!consideredCoordinates.contains(new Pair(ownX-1, ownY))) {
-         consideredCoordinates.add(new Pair(ownX-1, ownY));
-         searchAndGoToLocation(targetX, targetY, ownX-1, ownY, consideredCoordinates);
-         }
-         }
-
-        //check if we can make a move to the RIGHT
-        if (checkMovementPossible(ownX + 1, ownY)) {
-            //check if our target is to the right
-            //if (targetX == ownX+1 && targetY == ownY && !consideredCoordinates.contains(new Pair(ownX+1, ownY))) {
-            //add final step to the list
-            consideredCoordinates.add(new Pair(ownX + 1, ownY));
-            searchAndGoToLocation(targetX, targetY, ownX + 1, ownY, consideredCoordinates);
-            //return consideredCoordinates;
-            //}
-            //else{
-            //    searchAndGoToLocation(targetX, targetY, ownX+1, ownY, consideredCoordinates);
-            //}
-            //if(!consideredCoordinates.contains(new Pair(ownX+1, ownY))) {
-            //  consideredCoordinates.add(new Pair(ownX+1, ownY));
-            //searchAndGoToLocation(targetX, targetY, ownX+1, ownY, consideredCoordinates);
-            //}
-        }
-        /**
-         //See if we can move UP
-         if (checkMovementPossible(ownX, ownY-1)) {
-         if (targetX == ownX && targetY == ownY-1) {
-         /**
-         man.move(MoveUtility.Actions.UP);
-         try {
-         Thread.sleep(500);
-         } catch (InterruptedException e) {
-         e.printStackTrace();
-         }
-         return consideredCoordinates;
-         }
-         if (!consideredCoordinates.contains(new Pair(ownX, ownY - 1))) {
-         consideredCoordinates.add(new Pair(ownX, ownY - 1));
-         searchAndGoToLocation(targetX, targetY, ownX, ownY - 1, consideredCoordinates);
-         }
-         }
-
-
-        //See if we can move DOWN
-        if (checkMovementPossible(ownX, ownY + 1)) {
-            //if (targetX == ownX && targetY == ownY + 1 && !consideredCoordinates.contains(new Pair(ownX, ownY + 1))) {
-
-            //add final step to the list
-            consideredCoordinates.add(new Pair(ownX, ownY + 1));
-            searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
-
-            //return consideredCoordinates;
-            //}
-            //else{
-            //    searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
-            //}
-            //if (!consideredCoordinates.contains(new Pair(ownX, ownY + 1))) {
-            //  consideredCoordinates.add(new Pair(ownX, ownY + 1));
-            //searchAndGoToLocation(targetX, targetY, ownX, ownY + 1, consideredCoordinates);
-            //}
-        }
-
-        //No solution found, return empty list
-    }
-    **/
-
-
-
-
-
-
-    int manhattanDistance(int x0, int x1, int y1, int y0){
-        return abs(x1-x0) + abs(y1-y0);
+    int manhattanDistance(int x0, int x1, int y1, int y0) {
+        return abs(x1 - x0) + abs(y1 - y0);
     }
 
-    int manhattanDistanceBomberman(BomberMan bomber1, BomberMan bomber2){
-        return manhattanDistance(bomber1.getX_location(),  bomber2.getX_location(),  bomber2.getY_location(),  bomber1.getY_location());
+    int manhattanDistanceBomberman(BomberMan bomber1, BomberMan bomber2) {
+        return manhattanDistance(bomber1.getX_location(), bomber2.getX_location(), bomber2.getY_location(), bomber1.getY_location());
     }
 
     boolean checkMovementPossible(int targetX, int targetY) {
         //out of bounds
-        if (targetX > world.gridSize-1 || targetY > world.gridSize-1 || targetX < 0 || targetY < 0) {
+        if (targetX > world.gridSize - 1 || targetY > world.gridSize - 1 || targetX < 0 || targetY < 0) {
             return false;
         }
 
@@ -473,30 +452,102 @@ public class RemcoAI {
 
     }
 
-    double simplifiedQFunction(){
+    double simplifiedQFunction() {
+
 
         return 0;
     }
 
-    //calculates reward for taking an action
-    int rewardFunction(int xAgent, int yAgent, MoveUtility.Actions action){
+    //calculates reward for taking an action, given coordinates and an action
+    int rewardFunction(int xAgent, int yAgent, MoveUtility.Actions action) {
 
-        //Points awarded for killing enemy -- not possible by just one move, has to be done by bomb
+        /** //Points awarded for killing enemy -- not possible by just one move, has to be done by bomb **/
 
         //Points awarded for danger zone being placed on enemy
+        if (action == MoveUtility.Actions.PLACEBOMB && checkEnemyInPotentialDangerzone(man.getX_location(), man.getY_location(), RANGE)) { //In case we are able to place a bomb, and we will trap someone with it.
+            return UTILITY_ENEMY_WILL_STAND_IN_DANGERZONE;
+        }
 
         //Points penalty for being killed
+        if (action != MoveUtility.Actions.PLACEBOMB) { //any movement
+            //Check if moving to a direction will get us killed
+            switch (action) {
+                case UP:
+                    if (world.positions[xAgent][yAgent - 1].dangerousTimer == 1) { //moving here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+                case DOWN:
+                    if (world.positions[xAgent][yAgent + 1].dangerousTimer == 1) { //moving here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+                case LEFT:
+                    if (world.positions[xAgent - 1][yAgent].dangerousTimer == 1) { //moving here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+                case RIGHT:
+                    if (world.positions[xAgent + 1][yAgent].dangerousTimer == 1) { //moving here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+                case IDLE:
+                    if (world.positions[xAgent][yAgent].dangerousTimer == 1) { //staying here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+            }
+
+        }
 
         //Points penalty for standing in dangerzone, depending on the danger level (timer)
+        if (action != MoveUtility.Actions.PLACEBOMB) { //any movement
+            //Check if moving to a direction will get us killed
+            switch (action) {
+                case UP:
+                    if (world.positions[xAgent][yAgent - 1].dangerousTimer > 0) { //moving here will be dangerous
+                        //returns a value that gets higher when the bomb gets closer to 0. Gives highest penalty for time==1, since time==0 equals death anyway.
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent][yAgent - 1].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB);
+                    }
+                    break;
+                case DOWN:
+                    if (world.positions[xAgent][yAgent + 1].dangerousTimer > 0) {
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent][yAgent + 1].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB);
+                    }
+                    break;
+                case LEFT:
+                    if (world.positions[xAgent - 1][yAgent].dangerousTimer > 0) {
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent - 1][yAgent].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB);
+                    }
+                    break;
+                case RIGHT:
+                    if (world.positions[xAgent + 1][yAgent].dangerousTimer > 0) {
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent + 1][yAgent].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB);
+                    }
+                    break;
+                case IDLE:
+                    if (world.positions[xAgent][yAgent].dangerousTimer > 0) { //staying here will be dangerous
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent][yAgent].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB);
+                    }
+                    break;
+            }
 
-        //Points penalty for idling, but less points deducted than for standing in dangerzone.
+            //Points penalty for idling, but less points deducted than for standing in dangerzone.
+            //Gets checked after previous statement, because the penalty for idling in a dangerzone is higher.
+
+            if(action == MoveUtility.Actions.IDLE){
+                return UTILITY_IDLING;
+            }
 
 
+
+        }
         return 0;
     }
 
     //returns a list of possible actions for a state
-    ArrayList<MoveUtility.Actions> possibleActions(int xAgent, int yAgent){
+    ArrayList<MoveUtility.Actions> giveAllPossibleActions(int xAgent, int yAgent) {
         ArrayList<MoveUtility.Actions> moveList = new ArrayList<>();
 
         //Check for movements
@@ -513,15 +564,60 @@ public class RemcoAI {
             moveList.add(MoveUtility.Actions.DOWN);
         }
 
-        if(man.bombCooldown == 0){ //No cooldown
+        if (man.bombCooldown == 0) { //No cooldown
             moveList.add(MoveUtility.Actions.PLACEBOMB);
         }
 
         //Idling is always possible
         moveList.add(MoveUtility.Actions.IDLE);
 
-
         return moveList;
+    }
+
+    //Check if, when placing a bomb here, an enemy will stand in a dangerzone
+    boolean checkEnemyInPotentialDangerzone(int x_location, int y_location, int range) {
+        for (int yTemp = y_location; yTemp <= y_location + range; yTemp++) {
+            if (yTemp >= 0 && yTemp < world.gridSize) {
+                if (!(world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.SOFTWALL)
+                        && !world.positions[x_location][yTemp].bombermanList.isEmpty() // there is a bomberman here...
+                        && !world.positions[x_location][yTemp].bombermanList.contains(man)) { //and it ain't us
+                    return true;
+                }
+            }
+        }
+
+        for (int yTemp = y_location; yTemp >= y_location - range; yTemp--) {
+            if (yTemp >= 0 && yTemp < world.gridSize) {
+                if (!(world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.SOFTWALL)
+                        && !world.positions[x_location][yTemp].bombermanList.isEmpty() // there is a bomberman here...
+                        && !world.positions[x_location][yTemp].bombermanList.contains(man)) { //and it ain't us
+                    return true;
+                }
+            }
+        }
+        for (int xTemp = x_location; xTemp <= x_location + range; xTemp++) {
+            if (xTemp >= 0 && xTemp < world.gridSize) {
+                if (!(world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.SOFTWALL)
+                        && !world.positions[xTemp][y_location].bombermanList.isEmpty() // there is a bomberman here...
+                        && !world.positions[xTemp][y_location].bombermanList.contains(man)) { //and it ain't us
+                    return true;
+                }
+            }
+        }
+        for (int xTemp = x_location; xTemp >= x_location - range; xTemp--) {
+            if (xTemp >= 0 && xTemp < world.gridSize) {
+                if (!(world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.SOFTWALL)
+                        && !world.positions[xTemp][y_location].bombermanList.isEmpty() // there is a bomberman here...
+                        && !world.positions[xTemp][y_location].bombermanList.contains(man)) { //and it ain't us
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

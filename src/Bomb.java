@@ -33,22 +33,6 @@ public class Bomb {
         if (timer > 0){
             timer--;
             updateDangerzones();
-/**
-            //update dangerzone values area around bomb
-            for(int i = x_location - range; i <= x_location + range; i++){//full x range
-                //take care of out of bounds
-                if(i < 0) i = 0;
-                if(i > world.gridSize-1) i = world.gridSize-1;
-                for(int j = y_location - range; i <= y_location + range; j++){ //full y range
-                    //take care of out of bounds
-                    if(j < 0) i = 0;
-                    if(j > world.gridSize-1) j = world.gridSize-1;
-
-                    if(world.positions[i][j].dangerousTimer > 0){ // if it's dangerous...
-                        world.positions[i][j].dangerousTimer = timer; //timer becomes equal to bomb timer.
-                    }
-                }
-            }**/
         }
 
 
