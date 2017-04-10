@@ -158,6 +158,11 @@ public class RemcoAI {
 
     //Moves the agent out of harms way
     void avoidDanger(){
+        //check if there is a dangerzone in our field
+        if(world.positions[man.getX_location()][man.getY_location()].dangerousTimer > 0){
+            //move out of the way, preferably to a safe field
+
+        }
 
     }
 
@@ -466,6 +471,57 @@ public class RemcoAI {
         }
         return true;
 
+    }
+
+    double simplifiedQFunction(){
+
+        return 0;
+    }
+
+    //calculates reward for taking an action
+    int rewardFunction(int xAgent, int yAgent, MoveUtility.Actions action){
+
+        //Points awarded for killing enemy -- not possible by just one move, has to be done by bomb
+
+        //Points awarded for danger zone being placed on enemy
+
+        //Points penalty for being killed
+
+        //Points penalty for standing in dangerzone, depending on the danger level (timer)
+
+        //Points penalty for idling, but less points deducted than for standing in dangerzone.
+
+
+        return 0;
+    }
+
+    //returns a list of possible actions for a state
+    ArrayList<MoveUtility.Actions> possibleActions(int xAgent, int yAgent){
+        ArrayList<MoveUtility.Actions> moveList = new ArrayList<>();
+
+        //Check for movements
+        if (checkMovementPossible(xAgent - 1, yAgent)) {
+            moveList.add(MoveUtility.Actions.LEFT);
+        }
+        if (checkMovementPossible(xAgent + 1, yAgent)) {
+            moveList.add(MoveUtility.Actions.RIGHT);
+        }
+        if (checkMovementPossible(xAgent, yAgent - 1)) {
+            moveList.add(MoveUtility.Actions.UP);
+        }
+        if (checkMovementPossible(xAgent, yAgent + 1)) {
+            moveList.add(MoveUtility.Actions.DOWN);
+        }
+
+        if(man.bombCooldown == 0){ //No cooldown
+            moveList.add(MoveUtility.Actions.PLACEBOMB);
+        }
+
+        //Idling is always possible
+        moveList.add(MoveUtility.Actions.IDLE);
+
+
+        return moveList;
     }
 
 }

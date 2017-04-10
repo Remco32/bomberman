@@ -30,7 +30,28 @@ public class Bomb {
 
     void Countdown() { //Counts down until the bomb explodes. Used by the gameloop.
         if (exploded) return;
-        if (timer > 0) timer--;
+        if (timer > 0){
+            timer--;
+            updateDangerzones();
+/**
+            //update dangerzone values area around bomb
+            for(int i = x_location - range; i <= x_location + range; i++){//full x range
+                //take care of out of bounds
+                if(i < 0) i = 0;
+                if(i > world.gridSize-1) i = world.gridSize-1;
+                for(int j = y_location - range; i <= y_location + range; j++){ //full y range
+                    //take care of out of bounds
+                    if(j < 0) i = 0;
+                    if(j > world.gridSize-1) j = world.gridSize-1;
+
+                    if(world.positions[i][j].dangerousTimer > 0){ // if it's dangerous...
+                        world.positions[i][j].dangerousTimer = timer; //timer becomes equal to bomb timer.
+                    }
+                }
+            }**/
+        }
+
+
         else Explode();
     }
 
@@ -49,6 +70,42 @@ public class Bomb {
         int points = man.points.get(man.points.size()-1)+amount;
         man.points.add(points);
     }
+
+    //Sets and updates dangerzones in world
+    void createDangerzones(){
+        for (int yTemp = y_location; yTemp <= y_location + range; yTemp++) {
+            if (yTemp >= 0 && yTemp < world.gridSize) {
+                if (!(world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.SOFTWALL))  world.positions[x_location][yTemp].dangerousTimer = timer;
+                //if(ExplodeHit(x_location,yTemp)) yTemp = y_location + range+1;
+            }
+        }
+        //check for exploding down
+        for (int yTemp = y_location; yTemp >= y_location - range; yTemp--) {
+            if (yTemp >= 0 && yTemp < world.gridSize) {
+                if (!(world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[x_location][yTemp].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[x_location][yTemp].dangerousTimer = timer;
+                //if(ExplodeHit(x_location,yTemp)) yTemp = y_location-range-1;
+            }
+        }
+        // check for exploding left
+        for (int xTemp = x_location; xTemp <= x_location + range; xTemp ++) {
+            if (xTemp  >= 0 && xTemp  < world.gridSize) {
+                if (!(world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[xTemp][y_location].dangerousTimer = timer;
+                //if(ExplodeHit(xTemp,y_location)) xTemp = x_location + range +1;
+            }
+        }
+        // check for exploding right
+        for (int xTemp = x_location; xTemp >= x_location - range; xTemp--) {
+            if (xTemp >= 0 && xTemp < world.gridSize) {
+                if (!(world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.HARDWALL
+                        || world.positions[xTemp][y_location].getType() == WorldPosition.Fieldtypes.SOFTWALL)) world.positions[xTemp][y_location].dangerousTimer = timer;
+                //if(ExplodeHit(xTemp,y_location)) xTemp = x_location - range -1;
+            }
+        }
+    }
+
 
 
     //TODO fix bug where an explosion can only be drawn once: next time it won't be drawn.
@@ -131,6 +188,8 @@ public class Bomb {
             }
         }
 
+        //cleanDangerzones();
+
     }
 
 
@@ -153,6 +212,15 @@ public class Bomb {
             return true;
         }
         return false;
+    }
+
+    int getTimer(){
+        return timer;
+    }
+
+    //alias for readability
+    void updateDangerzones(){
+        createDangerzones();
     }
 
 }

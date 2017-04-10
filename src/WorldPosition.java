@@ -13,7 +13,7 @@ public class WorldPosition {
     private int x_location;
     private int y_location;
     Fieldtypes type;
-    boolean dangerous;
+    int dangerousTimer = 0;
 
      WorldPosition(int x,int y,Fieldtypes type){
         this.x_location=x;
@@ -25,6 +25,11 @@ public class WorldPosition {
     //TODO dangerzones maken in world
     public enum Fieldtypes {
         EMPTY, SOFTWALL, HARDWALL, EXPLOSION
+    }
+
+    //counts down danger timer
+    void countDown(){
+        dangerousTimer = bomb.getTimer();
     }
 
     void addBomb(Bomb bomb){

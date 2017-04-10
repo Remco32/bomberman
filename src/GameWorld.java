@@ -147,7 +147,6 @@ public class GameWorld {
             // update all bombs
             for (Bomb bomb : activeBombList) {
                 bomb.Countdown();
-
             }
             for (Bomb bomb : activeBombList) {
                 if(bomb.exploded){
@@ -157,6 +156,11 @@ public class GameWorld {
             for(Bomb bomb : explodedBombList){
                 bomb.cleanupCountdown();
                 activeBombList.remove(bomb);
+            }
+
+            //update bomb cooldown
+            for(BomberMan man : bomberManList){
+                man.updateBombCooldown();
             }
 
 
@@ -171,7 +175,7 @@ public class GameWorld {
         if (bomberManList.get(0).alive) System.out.println("You won");
         else System.out.println("You lost");
 
-        System.out.println(amountOfRounds);
+        System.out.println("Amount of elapsed timesteps: " + amountOfRounds);
         long endTime = System.currentTimeMillis();
         System.out.println("Elapsed time: " + (double) (endTime - startTime)/1000 + " seconds");
     }

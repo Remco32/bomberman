@@ -3,6 +3,8 @@ import java.util.ArrayList;
 /**
  * Created by joseph on 15-2-2017.
  */
+
+//TODO implement bombCooldown
 public class RandomAI extends AIHandler {
 
     RandomAI(GameWorld world,BomberMan man) {

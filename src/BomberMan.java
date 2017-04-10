@@ -12,6 +12,7 @@ public class BomberMan {
     ArrayList<Integer> points;
     Boolean alive;
     GameWorld world;
+    int bombCooldown = 0; //cooldown time for when new bomb can be placed
 
     BomberMan(int x, int y, int id, GameWorld world) {
         this.x_location = x;
@@ -21,6 +22,10 @@ public class BomberMan {
         points = new ArrayList<>();
         points.add(0);
         alive = true;
+    }
+
+    void updateBombCooldown() {
+        if (bombCooldown > 0) bombCooldown--;
     }
 
     void move(MoveUtility.Actions action) {
@@ -47,6 +52,7 @@ public class BomberMan {
                     Bomb bomb = new Bomb(x_location, y_location, this, world);
                     world.activeBombList.add(bomb);
                     world.positions[x_location][y_location].addBomb(bomb);
+                    bomb.createDangerzones();
                 } else if (DEBUGPRINT) System.out.println("Bomb has already been placed at this location");
                 break;
         }
@@ -68,6 +74,10 @@ public class BomberMan {
          }
          **/
     }
+
+
+
+
 
     private void MakeMove(int x, int y) {
         world.positions[x_location][y_location].deleteBomberman(this); //remove from current location
