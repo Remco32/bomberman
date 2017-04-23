@@ -33,6 +33,7 @@ class NeuralNetRemco {
     private double[][] weightValueArray;
 
     //Constructor
+    //TODO change targetSet to targetVector
     public NeuralNetRemco(double[][] inputVector, int amountHiddenNodes, int amountHiddenLayers, double[][] targetOutput, double learningRate) {
 
         //store values
@@ -93,6 +94,10 @@ class NeuralNetRemco {
 
     void changeTargetOutputSet(double[][] newTargetOutputSet){
         targetOutputSet = newTargetOutputSet;
+    }
+
+    double[] getTargetOutput(){
+        return targetOutput;
     }
 
 
@@ -178,7 +183,7 @@ class NeuralNetRemco {
 
     }
 
-    private void backwardsPass() {
+    void backwardsPass() {
         //if(neuronValueArray weightValueArray[].length - 1
 
         //UPDATE FROM INPUT TO OUTPUT (LEFT TO RIGHT)
