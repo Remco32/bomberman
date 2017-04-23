@@ -2,8 +2,10 @@ import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.random;
 
 /**
  * Created by Remco on 29-3-2017.
@@ -24,6 +26,7 @@ public class RemcoAI {
     int UTILITY_IDLING = -1;
 
     double DISCOUNT_FACTOR = 0.5;
+    double EPSILON_RANDOMNESS = 0.1;
 
     RemcoAI(GameWorld world, BomberMan man) {
         this.world = world;
@@ -38,7 +41,7 @@ public class RemcoAI {
             }
             //try to kill enemy
             trappingStrategy();
-            simplifiedQFunction();
+            //simplifiedQLearning();
 
             //Adhere to the timesteps of the game
             try {
@@ -50,7 +53,12 @@ public class RemcoAI {
     }
 
     void playQLearning(){
-        simplifiedQFunction();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        simplifiedQLearning();
     }
 
     void trappingStrategy() {
@@ -698,8 +706,68 @@ public class RemcoAI {
         return closestBomb;
     }
 
-    double simplifiedQFunction() {
+    double simplifiedQLearning() {
 
+        //TODO replace with global var
+        int amountOfFeatures = 3;
+
+        double[][] currentStateVector = new double[1][amountOfFeatures * (world.gridSize * world.gridSize)];
+        currentStateVector[0] = createInputVector();
+
+        System.out.println();
+
+
+
+        return 0;
+
+        /**
+
+        double currentStateVector[] = createInputVector();
+        //TODO remove
+        double currentStateVector2D[][] = new double[1][currentStateVector.length];
+        for(int i = 0; 0 < currentStateVector.length; i++){
+            currentStateVector2D[1][i] = 0;
+        }
+
+
+        ArrayList<MoveUtility.Actions> allActions = giveAllPossibleActions(man.getX_location(), man.getY_location());
+
+        double[][] target = {{0, 0, 0, 0, 0, 0}}; // 6 outputs, for 6 actions
+
+        NeuralNetRemco NeuralNet = new NeuralNetRemco(currentStateVector2D, 30, 1, target, 0.5);
+        NeuralNet.learn(1);
+        double[] outputLayer = NeuralNet.getOutputLayer();
+
+        int epoch = 0;
+        int maxEpochs = 100;
+
+        while(epoch < 100) {
+
+            //choose random action instead of the best
+            double random = (double) ThreadLocalRandom.current().nextInt(0 * 1000, 1 * 1000 + 1) / 1000;
+            if (random > EPSILON_RANDOMNESS) {
+                //take random action
+                int randomActionValue = new Random().nextInt(allActions.size());
+                int rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), allActions.get(randomActionValue));
+                target[getArrayIndexHighestValue(outputLayer)][0] = rewardForAction;
+                man.move(allActions.get(randomActionValue));
+            } else {
+                //choose best action from NN
+                MoveUtility.Actions bestAction = allActions.get(getArrayIndexHighestValue(outputLayer));
+                int rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), bestAction);
+                target[getArrayIndexHighestValue(outputLayer)][0] = rewardForAction;
+
+                man.move(bestAction);
+
+            }
+            epoch++;
+        }
+
+        return 0;
+         **/
+    }
+
+    double[] createInputVector() {
         int amountOfFeatures = 3;
         /**
          * Features:
@@ -723,38 +791,53 @@ public class RemcoAI {
             } else {
                 inputVector[0 + amountOfFeatures * index] = 0;
                 //inputVector[index] = 0;
-                // }
-
-                //[1] == Dangerzone {0-1}
-                //if (index % amountOfFeatures == 1) {
-                if (world.positions[x][y].dangerousTimer > 0) {
-                    //TODO make it a scale instead of binary
-                    inputVector[1 + amountOfFeatures * index] = 1; //offset = 1
-                    //inputVector[index] = 1;
-                } else {
-                    inputVector[1 + amountOfFeatures * index] = 0;
-                    //inputVector[index] = 0;
-                }
-                //}
-
-                //[2] == Bomberman (self not included) {0,1}
-                //if (index % amountOfFeatures == 2) {
-                if (!world.positions[x][y].bombermanList.isEmpty() && !world.positions[x][y].bombermanList.contains(man)) { //contains a bomberman, that isn't us
-                    inputVector[2 + amountOfFeatures * index] = 1; //offset = 2
-                    //inputVector[index] = 1;
-                } else {
-                    inputVector[2 + amountOfFeatures * index] = 0;
-                    //inputVector[index] = 0;
-                }
-                //}
             }
 
-            //double QValue = // reward_next + discountRate * maxQ(next_state, this_action)
+            //[1] == Dangerzone {0-1}
+            //if (index % amountOfFeatures == 1) {
+            if (world.positions[x][y].dangerousTimer > 0) {
 
+                double stepSize =  (double)1 / (double)TIMER_BOMB;
+                double dangerScale = ((TIMER_BOMB - world.positions[x][y].dangerousTimer)+1) * stepSize;
+
+                inputVector[1 + amountOfFeatures * index] = dangerScale; //offset = 1
+                //inputVector[index] = 1;
+            } else {
+                inputVector[1 + amountOfFeatures * index] = 0;
+                //inputVector[index] = 0;
+            }
+            //}
+
+            //[2] == Bomberman (self not included) {0,1}
+            //if (index % amountOfFeatures == 2) {
+            if (!world.positions[x][y].bombermanList.isEmpty() && !world.positions[x][y].bombermanList.contains(man)) { //contains a bomberman, that isn't us
+                inputVector[2 + amountOfFeatures * index] = 1; //offset = 2
+                //inputVector[index] = 1;
+            } else {
+                inputVector[2 + amountOfFeatures * index] = 0;
+                //inputVector[index] = 0;
+            }
+            //}
         }
 
+        //double QValue = // reward_next + discountRate * maxQ(next_state, this_action)
+
         System.out.println("Input vector made");
-        return 0;
+
+        return inputVector;
+
+    }
+
+    int getArrayIndexHighestValue(double[] array){
+        double highestValue = 0;
+        int index = -1;
+        for (int i = 0; i < array.length; i++){
+            if(array[i] > highestValue){
+                highestValue = array[i];
+                index = i;
+            }
+        }
+        return index;
     }
 }
 

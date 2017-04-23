@@ -84,7 +84,14 @@ class NeuralNetRemco {
     }
 
 
+
+
     //Methods
+
+    void changeTargetOutputSet(double[][] newTargetOutputSet){
+        targetOutputSet = newTargetOutputSet;
+    }
+
 
     private double[] initializeArrayRandomValues(int rows, int min, int max) {
         double[] outputArray = new double[rows];
@@ -351,6 +358,10 @@ class NeuralNetRemco {
     private double outputNode(double input){
         return (1/(1+exp(-(input))));
 
+    }
+
+    double[] getOutputLayer(){
+        return neuronValueArray[amountHiddenLayers+2];
     }
 
 }
