@@ -40,6 +40,9 @@ class NeuralNetRemco {
         this.targetOutputSet = targetOutput;
         this.learningRate = learningRate;
 
+        //set our own targetoutput to the first set
+        this.targetOutput = targetOutputSet[0];
+
         //Store amount of nodes per layer in array //TODO replace amountOfNodesPerLayer with array.length when initial sizes are correct
         this.amountOfNodesPerLayer = new int[amountHiddenLayers + 2];
         this.amountOfNodesPerLayer[0] = inputVector[0].length;
@@ -123,6 +126,7 @@ class NeuralNetRemco {
 
     }
 
+    /**
     double[] getOutput(double[] input){
         neuronValueArray[0] = input;
         for (int layer = 1; layer < amountHiddenLayers + 2; layer++) //amountHiddenLayers+1 == final layer index
@@ -133,8 +137,21 @@ class NeuralNetRemco {
             }
         return neuronValueArray[amountOfNodesPerLayer.length-1];
     }
+    **/
 
-    private void forwardPass() {
+    double[] getOutputLayer(){
+        return neuronValueArray[amountHiddenLayers+1]; //hiddenlayer + input + output, index starts at 0
+    }
+
+
+    void forwardPass(double[] input){
+        //Change the input of the network
+        neuronValueArray[0] = input;
+        //Do the forwardpass
+        forwardPass();
+    }
+
+    void forwardPass() {
         //System.out.println("output " + outputNode(netInputNode(1, 0)));
 
         //update values of nodes:
@@ -360,9 +377,6 @@ class NeuralNetRemco {
 
     }
 
-    double[] getOutputLayer(){
-        return neuronValueArray[amountHiddenLayers+2];
-    }
 
 }
 

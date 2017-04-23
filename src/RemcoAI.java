@@ -53,12 +53,15 @@ public class RemcoAI {
     }
 
     void playQLearning(){
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
+            //Adhere to the timesteps of the game
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            simplifiedQLearning(0.1);
         }
-        simplifiedQLearning();
     }
 
     void trappingStrategy() {
@@ -632,6 +635,27 @@ public class RemcoAI {
         return moveList;
     }
 
+    //Return the action that corresponds to a certain index. i.e. 0 is left, 1 is right, 2 is up, etc
+    MoveUtility.Actions giveActionAtIndex(int index){
+        switch (index) {
+            case 0:
+                return MoveUtility.Actions.LEFT;
+            case 1:
+                return MoveUtility.Actions.RIGHT;
+            case 2:
+                return MoveUtility.Actions.UP;
+            case 3:
+                return MoveUtility.Actions.DOWN;
+            case 4:
+                return MoveUtility.Actions.PLACEBOMB;
+            case 5:
+                return MoveUtility.Actions.IDLE;
+
+        }
+
+        return null;
+    }
+
     MoveUtility.Actions getBestAction(int xAgent, int yAgent){
 
         int maxReward = -10000; //negative value, since we can have a 'least worst' option that is <0 points
@@ -706,15 +730,83 @@ public class RemcoAI {
         return closestBomb;
     }
 
-    double simplifiedQLearning() {
+    double simplifiedQLearning(double randomMoveChance) {
 
         //TODO replace with global var
         int amountOfFeatures = 3;
+        //TODO replace with multiple networks
+        int amountOfMovementOptions = 6;
+
+        //variables
+        double[] previousState;
+        MoveUtility.Actions previousAction;
+        MoveUtility.Actions action;
+        int rewardForAction;
+
 
         double[][] currentStateVector = new double[1][amountOfFeatures * (world.gridSize * world.gridSize)];
         currentStateVector[0] = createInputVector();
 
+        //create empty target vector for constructor
+        double[][] emptyTargetVector = new double[1][amountOfMovementOptions];
+
+        //create a neuralNet
+        NeuralNetRemco neuralNet = new NeuralNetRemco(currentStateVector, 20, 1, emptyTargetVector, 0.5);
+
+        /** Q-learning starts here **/
+
+        /** Do a forwardpass **/
+        neuralNet.forwardPass(currentStateVector[0]);
+        //System.out.println(Arrays.toString(neuralNet.getOutputLayer()));
+
+        /** pick a random move or highest Q-value **/
+        ArrayList<MoveUtility.Actions> allActions = giveAllPossibleActions(man.getX_location(), man.getY_location());
+
+        //generate random number between 0.000 and 1.000
+        double random = (double) ThreadLocalRandom.current().nextInt(0 * 1000, 1 * 1000 + 1) / 1000;
+        if (random > (1 - randomMoveChance)) { //take random action
+            //Get all possible moves
+
+            int randomActionValue = new Random().nextInt(allActions.size());
+            action = allActions.get(randomActionValue);
+            System.out.println("Random action was " + action);
+
+        } else { //use highest q-value
+            //get the highest Q-value index
+            double[] outputLayer = neuralNet.getOutputLayer();
+            //take node with highest activation
+            int actionIndex = getArrayIndexHighestValue(outputLayer);
+            action = giveActionAtIndex(actionIndex);
+
+            //check if action is possible, else take the next highest one
+
+            while(!allActions.contains(action)) {
+                outputLayer[actionIndex] = 0;
+                actionIndex = getArrayIndexHighestValue(outputLayer);
+                action = giveActionAtIndex(actionIndex);
+
+            }
+            System.out.println("Q-value action was " + action);
+
+        }
+
+        //Save current state and action
+        previousState = currentStateVector[0];
+        previousAction = action;
+
+        /** make move **/
+        rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), action);
+        man.move(action);
+
+        System.out.println("Reward was " + rewardForAction);
         System.out.println();
+
+
+
+
+
+
+
 
 
 
@@ -822,7 +914,7 @@ public class RemcoAI {
 
         //double QValue = // reward_next + discountRate * maxQ(next_state, this_action)
 
-        System.out.println("Input vector made");
+        //System.out.println("Input vector made");
 
         return inputVector;
 
