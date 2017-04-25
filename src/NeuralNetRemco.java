@@ -148,6 +148,18 @@ class NeuralNetRemco {
         return neuronValueArray[amountHiddenLayers+1]; //hiddenlayer + input + output, index starts at 0
     }
 
+    //get it after forwardpass
+    double[] getOutputLayer(double[] input){
+        neuronValueArray[0] = input;
+        for (int layer = 1; layer < amountHiddenLayers + 2; layer++) //amountHiddenLayers+1 == final layer index
+            //amount of nodes
+            for (int node = 0; node < amountOfNodesPerLayer[layer]; node++) {
+                //Get the netInput, transform that into the output, and update the value
+                neuronValueArray[layer][node] = outputNode(netInputNode(layer, node));
+            }
+        return neuronValueArray[amountOfNodesPerLayer.length-1];
+    }
+
 
     void forwardPass(double[] input){
         //Change the input of the network
@@ -382,6 +394,12 @@ class NeuralNetRemco {
 
     }
 
+    public double[][] getNeuronValueArray() {
+        return neuronValueArray;
+    }
 
+    public double[][] getWeightValueArray() {
+        return weightValueArray;
+    }
 }
 

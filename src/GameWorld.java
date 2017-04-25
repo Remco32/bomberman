@@ -26,26 +26,32 @@ public class GameWorld {
 
         this.windowBool = windowBool;
         if (worldType == 1) {
-            InitWorld(); //create default world
+            initWorld(); //create default world
         }
         if (worldType == 2) {
-            InitEmptyWorld(); //create default world
+            initEmptyWorld(); //create default world
         }
 
         if (windowBool) window = new ShowWindow(this);
 
     }
 
-    void SetAi(ArrayList<AIHandler> ai){
-        this.ai=ai;
+    void SetAi() {
+        ArrayList<AIHandler> ai = new ArrayList<>();
+        for(int idx=1;idx<amountPlayers;idx++) {
+            ai.add(new RandomAI(this, this.bomberManList.get(idx))); //activates enemy AI
+        }
+        this.ai = ai;
     }
-    private void InitWorld() {
+
+    private void initWorld() {
         positions = new WorldPosition[gridSize][gridSize];
         //init the grid
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
                 positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.SOFTWALL); // fills whole world with softwalls, will get overwritten later
-                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.HARDWALL); //add hardwalls at uneven positions
+                if (x % 2 == 1 && y % 2 == 1)
+                    positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.HARDWALL); //add hardwalls at uneven positions
                 //if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
                 //if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
             }
@@ -82,7 +88,7 @@ public class GameWorld {
         }
     }
 
-    private void InitEmptyWorld() {
+    private void initEmptyWorld() {
         positions = new WorldPosition[gridSize][gridSize];
         //init the grid
         for (int x = 0; x < gridSize; x++) {
@@ -188,6 +194,13 @@ public class GameWorld {
             if (bomberManList.get(idx).alive) return true;
         }
         return false;
+    }
+
+    void resetGame(){
+        bomberManList.clear(); // remove all bombermen
+        initWorld(); //reset world
+
+
     }
 
 }

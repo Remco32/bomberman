@@ -53,21 +53,19 @@ public class RemcoAI {
         }
     }
 
-    void playQLearning(){
+    void playQLearning() {
 
-
-            simplifiedQLearning(0.1);
+        simplifiedQLearning(0.2);
 
     }
 
     void trappingStrategy() {
-            System.out.println();
-            System.out.println("Trapping strategy in progress.");
+        System.out.println();
+        System.out.println("Trapping strategy in progress.");
 
-            MoveUtility.Actions action = getBestAction(man.getX_location(), man.getY_location());
-            System.out.println(action.toString());
-            man.move(action);
-
+        MoveUtility.Actions action = getBestAction(man.getX_location(), man.getY_location());
+        System.out.println(action.toString());
+        man.move(action);
 
     }
 
@@ -726,6 +724,7 @@ public class RemcoAI {
         return closestBomb;
     }
 
+    //TODO reduce randomMoveChance over time
     void simplifiedQLearning(double randomMoveChance) {
 
         //TODO replace with global var
