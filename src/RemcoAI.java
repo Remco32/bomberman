@@ -17,6 +17,8 @@ public class RemcoAI {
     ArrayList<MoveUtility> moves;
     Queue<Pair> queue = new LinkedList<>();
 
+    NeuralNetRemco neuralNet;
+
     int RANGE = 2; //TODO add value to bomberman, and use that when placing bombs
     int TIMER_BOMB = 5; //TODO obtain value
 
@@ -29,9 +31,19 @@ public class RemcoAI {
     double EPSILON_RANDOMNESS = 0.1;
     double GAMMA = 0.5;
 
-    RemcoAI(GameWorld world, BomberMan man) {
+    RemcoAI(GameWorld world, BomberMan man, int amountHiddenNodes, int amountHiddenLayers, double learningRate) {
         this.world = world;
         this.man = man;
+
+        //TODO replace with global var
+        int amountOfFeatures = 3;
+
+        double[][] currentStateVector = new double[1][amountOfFeatures * (world.gridSize * world.gridSize)];
+        currentStateVector[0] = createInputVector();
+
+        double[][] targetVector ={ {1,1,1,1,1,1}};
+
+        this.neuralNet = new NeuralNetRemco(currentStateVector, amountHiddenNodes, amountHiddenLayers, targetVector, learningRate);
     }
 
     void play(int distanceToKeepInSteps) {
@@ -746,10 +758,11 @@ public class RemcoAI {
         double[][] targetVector ={ {1,1,1,1,1,1}};
 
         //create a neuralNet
-        NeuralNetRemco neuralNet = new NeuralNetRemco(currentStateVector, 20, 1, targetVector, 0.5);
+        //NeuralNetRemco neuralNet = new NeuralNetRemco(currentStateVector, 20, 1, targetVector, 0.5);
 
         /** Q-learning starts here **/
 
+        //Keep making moves until the game ends
         while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
             /** Do a forwardpass **/
             neuralNet.forwardPass(currentStateVector[0]);

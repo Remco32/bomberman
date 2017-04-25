@@ -10,6 +10,10 @@ public class GameWorld {
     private Boolean windowBool;
     private ShowWindow window;
 
+    RemcoAI AI_Remco;
+
+    int trials;
+
     WorldPosition[][] positions;
     private ArrayList<AIHandler> ai;
     ArrayList<BomberMan> bomberManList;
@@ -36,9 +40,10 @@ public class GameWorld {
 
     }
 
-    void SetAi() {
+    //Give all the enemies the RandomAI
+    void setAi() {
         ArrayList<AIHandler> ai = new ArrayList<>();
-        for(int idx=1;idx<amountPlayers;idx++) {
+        for (int idx = 1; idx < amountPlayers; idx++) {
             ai.add(new RandomAI(this, this.bomberManList.get(idx))); //activates enemy AI
         }
         this.ai = ai;
@@ -57,7 +62,6 @@ public class GameWorld {
             }
 
         }
-        //TODO randomize the grid
 
         // init the players
 
@@ -88,13 +92,16 @@ public class GameWorld {
         }
     }
 
+
+
     private void initEmptyWorld() {
         positions = new WorldPosition[gridSize][gridSize];
         //init the grid
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
                 positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.EMPTY); // fills whole world with emptyness. How deep.
-                if (x % 2 == 1 && y % 2 == 1) positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.HARDWALL); //add hardwalls at uneven positions
+                if (x % 2 == 1 && y % 2 == 1)
+                    positions[x][y] = new WorldPosition(x, y, WorldPosition.Fieldtypes.HARDWALL); //add hardwalls at uneven positions
                 //if (x == 0 || x == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
                 //if (y == 0 || y == gridSize - 1) positions[x][y] = new WorldPosition(x, y, SOFTWALL); //redundant
             }
@@ -105,13 +112,12 @@ public class GameWorld {
         //positions[0][2] = new WorldPosition(0,2, WorldPosition.Fieldtypes.SOFTWALL);
         //positions[2][2] = new WorldPosition(2,2, WorldPosition.Fieldtypes.SOFTWALL);
         //positions[2][0] = new WorldPosition(2,0, WorldPosition.Fieldtypes.SOFTWALL);
-        positions[4][0] = new WorldPosition(4,0, WorldPosition.Fieldtypes.SOFTWALL);
-        positions[4][2] = new WorldPosition(4,2, WorldPosition.Fieldtypes.SOFTWALL);
-        positions[4][4] = new WorldPosition(4,4, WorldPosition.Fieldtypes.SOFTWALL);
-        positions[2][4] = new WorldPosition(2,4, WorldPosition.Fieldtypes.SOFTWALL);
-        positions[0][4] = new WorldPosition(0,4, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[4][0] = new WorldPosition(4, 0, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[4][2] = new WorldPosition(4, 2, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[4][4] = new WorldPosition(4, 4, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[2][4] = new WorldPosition(2, 4, WorldPosition.Fieldtypes.SOFTWALL);
+        positions[0][4] = new WorldPosition(0, 4, WorldPosition.Fieldtypes.SOFTWALL);
         //positions[0][7] = new WorldPosition(0,4, WorldPosition.Fieldtypes.SOFTWALL);
-
 
         // init the players
 
@@ -132,7 +138,18 @@ public class GameWorld {
         }
     }
 
-    void RunGameLoop(){
+    void cleanWorld(){
+        /**
+        for (int x = 0; x < gridSize; x++) {
+            for (int y = 0; y < gridSize; y++) {
+                positions[x][y].setType(WorldPosition.Fieldtypes.EMPTY);
+            }
+        }
+         **/
+        window.repaint();
+    }
+
+    void runGameLoop(){
 
         Thread loop = new Thread(){
             @Override
@@ -186,6 +203,14 @@ public class GameWorld {
         System.out.println("Amount of elapsed timesteps: " + amountOfRounds);
         long endTime = System.currentTimeMillis();
         System.out.println("Elapsed time: " + (double) (endTime - startTime)/1000 + " seconds");
+
+        //restart game if there are still trials left to run
+        if (trials > 1) { //frist game isn't counted
+            trials--;
+            resetGame();
+
+        }
+
     }
 
     Boolean PlayerCheck() {
@@ -196,10 +221,34 @@ public class GameWorld {
         return false;
     }
 
-    void resetGame(){
-        bomberManList.clear(); // remove all bombermen
-        initWorld(); //reset world
+    void resetGame() {
+        System.out.println();
+        System.out.println("New game started.");
 
+        //clean arrays
+        ai.clear();
+        bomberManList.clear(); // remove all bombermen
+        activeBombList.clear();
+        explodedBombList.clear();
+
+
+
+        cleanWorld(); //empty world
+        initWorld(); //reinitialize world
+
+        setAi();
+        runGameLoop();
+        AI_Remco.playQLearning();
+
+    }
+
+    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate) {
+        this.trials = amountOfTrials;
+
+        setAi();
+        runGameLoop();
+        this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
+        AI_Remco.playQLearning();
 
     }
 

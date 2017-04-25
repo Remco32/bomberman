@@ -47,6 +47,7 @@ public class WorldPosition {
         return type;
     }
 
-
-
+    public void setType(Fieldtypes type) {
+        this.type = type;
+    }
 }
