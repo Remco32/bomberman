@@ -41,7 +41,7 @@ public class GameWorld {
     }
 
     //Give all the enemies the RandomAI
-    void setAi() {
+    void setEnemyAI() {
         ArrayList<AIHandler> ai = new ArrayList<>();
         for (int idx = 1; idx < amountPlayers; idx++) {
             ai.add(new RandomAI(this, this.bomberManList.get(idx))); //activates enemy AI
@@ -231,13 +231,12 @@ public class GameWorld {
         activeBombList.clear();
         explodedBombList.clear();
 
-
-
         cleanWorld(); //empty world
         initWorld(); //reinitialize world
 
-        setAi();
+        setEnemyAI();
         runGameLoop();
+        AI_Remco.setBomberman(this.bomberManList.get(0));
         AI_Remco.playQLearning();
 
     }
@@ -245,11 +244,15 @@ public class GameWorld {
     void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate) {
         this.trials = amountOfTrials;
 
-        setAi();
+        setEnemyAI();
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
         AI_Remco.playQLearning();
 
+    }
+
+    void repaint(){
+        window.repaint();
     }
 
 }

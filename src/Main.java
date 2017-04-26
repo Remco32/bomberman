@@ -23,7 +23,7 @@ public class Main {
         // for threshold the amount of rows should equal the amount of output nodes
 
         GameWorld world = new GameWorld(9, 4, true, 1); // gridsize should be of 2*n +1
-        world.startGame(world, 2, 20, 1, 0.5);
+        world.startGame(world, 5, 20, 1, 0.5);
 
 
         //ai.add(new NeuralNetworkAISimpleFeatures(world,world.bomberManList.get(0),weights));// create neural network
@@ -31,8 +31,8 @@ public class Main {
         //    ai.add(new RandomAI(world, world.bomberManList.get(idx))); //activates enemy AI
         //}
 
-        //world.setAi(ai);
-        //world.setAi();
+        //world.setEnemyAI(ai);
+        //world.setEnemyAI();
         //world.runGameLoop();
         //RemcoAI AI_Remco = new RemcoAI(world,world.bomberManList.get(0)); //add player
 

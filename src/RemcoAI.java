@@ -976,5 +976,9 @@ public class RemcoAI {
         }
         return index;
     }
+
+    void setBomberman(BomberMan man){
+        this.man = man;
+    }
 }
 
