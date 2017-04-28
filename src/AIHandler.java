@@ -23,6 +23,7 @@ public class AIHandler {
 
     void MakeMove(){
        man.move(moves.get(moves.size()-1).getMove());
+        //man.waitForNextTurn();
     }
 
     void CalculateBestMove() {

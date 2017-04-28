@@ -10,16 +10,20 @@ public class GameWorld {
     private Boolean windowBool;
     private ShowWindow window;
 
+    int ROUND_TIME_MILISECONDS = 500;
+
     RemcoAI AI_Remco;
 
     int trials;
+    boolean agentMadeKill = false;
+    boolean DELAY_BEFORE_START = true; //enables waiting so debuging is easier
 
     WorldPosition[][] positions;
     private ArrayList<AIHandler> ai;
     ArrayList<BomberMan> bomberManList;
     ArrayList<Bomb> activeBombList;
     ArrayList<Bomb> explodedBombList;
-
+    private double randomMoveChance;
 
     GameWorld(int gridSize, int amountOfPlayers, Boolean windowBool, int worldType) {
         this.gridSize = gridSize;
@@ -139,17 +143,25 @@ public class GameWorld {
     }
 
     void cleanWorld(){
-        /**
+
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
                 positions[x][y].setType(WorldPosition.Fieldtypes.EMPTY);
             }
         }
-         **/
+
         window.repaint();
     }
 
     void runGameLoop(){
+
+        if(DELAY_BEFORE_START) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         Thread loop = new Thread(){
             @Override
@@ -165,44 +177,54 @@ public class GameWorld {
         //time execution time
         long startTime = System.currentTimeMillis();
         while (PlayerCheck()) {
-            for(AIHandler temp:ai)temp.CalculateBestMove();
-            for (AIHandler temp:ai) {
-               temp.MakeMove(); // get the last appended move
+
+            if(!(ai == null)) {
+                for (AIHandler temp : ai) temp.CalculateBestMove();
+                for (AIHandler temp : ai) {
+                    temp.MakeMove(); // get the last appended move
+                }
             }
+
+            //Make requested move for the agent
+            bomberManList.get(0).move(bomberManList.get(0).nextAction);
+
             // update all bombs
             for (Bomb bomb : activeBombList) {
-                bomb.Countdown();
+                bomb.countdown();
             }
             for (Bomb bomb : activeBombList) {
-                if(bomb.exploded){
+                if (bomb.exploded) {
                     explodedBombList.add(bomb);
                 }
             }
-            for(Bomb bomb : explodedBombList){
+            for (Bomb bomb : explodedBombList) {
                 bomb.cleanupCountdown();
                 activeBombList.remove(bomb);
             }
 
             //update bomb cooldown
-            for(BomberMan man : bomberManList){
+            for (BomberMan man : bomberManList) {
                 man.updateBombCooldown();
             }
 
-
             amountOfRounds++;
-            if(windowBool) try {
+
+            //game timestep
+            if (windowBool) try {
                 window.repaint();
-                Thread.sleep(500);
+                Thread.sleep(ROUND_TIME_MILISECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            //if(windowBool) window.repaint();
         }
         if (bomberManList.get(0).alive) System.out.println("You won");
         else System.out.println("You lost");
 
         System.out.println("Amount of elapsed timesteps: " + amountOfRounds);
         long endTime = System.currentTimeMillis();
-        System.out.println("Elapsed time: " + (double) (endTime - startTime)/1000 + " seconds");
+        System.out.println("Elapsed time: " + (double) (endTime - startTime) / 1000 + " seconds");
 
         //restart game if there are still trials left to run
         if (trials > 1) { //frist game isn't counted
@@ -236,19 +258,20 @@ public class GameWorld {
 
         setEnemyAI();
         runGameLoop();
-        AI_Remco.setBomberman(this.bomberManList.get(0));
-        AI_Remco.playQLearning();
+        AI_Remco.setBomberman(this.bomberManList.get(0)); //reset AI
+        //AI_Remco.playQLearning(randomMoveChance);
+        AI_Remco.play(3, 0.2);
 
     }
 
-    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate) {
+    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance) {
         this.trials = amountOfTrials;
+        this.randomMoveChance = randomMoveChance;
 
-        setEnemyAI();
+        //setEnemyAI(); //TODO weer aan
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
-        AI_Remco.playQLearning();
-
+        AI_Remco.play(3, 0.2);
     }
 
     void repaint(){

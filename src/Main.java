@@ -22,8 +22,8 @@ public class Main {
         // amount of rows should == the amount of columns +1(for the threshold) from the last output in weights
         // for threshold the amount of rows should equal the amount of output nodes
 
-        GameWorld world = new GameWorld(9, 4, true, 1); // gridsize should be of 2*n +1
-        world.startGame(world, 5, 20, 1, 0.5);
+        GameWorld world = new GameWorld(9, 2, true, 1); // gridsize should be of 2*n +1
+        world.startGame(world, 2, 20, 1, 0.5, 0.2);
 
 
         //ai.add(new NeuralNetworkAISimpleFeatures(world,world.bomberManList.get(0),weights));// create neural network

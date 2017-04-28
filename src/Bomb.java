@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
  * Created by joseph on 09/02/2017.
  */
 public class Bomb {
-    private Boolean DEBUGPRINT = false; // Activates debug prints for bomb
+    private Boolean DEBUGPRINT = true; // Activates debug prints for bomb
 
     private int timer;
     private int cleanupTimer;
@@ -28,7 +28,7 @@ public class Bomb {
         exploded = false;
     }
 
-    void Countdown() { //Counts down until the bomb explodes. Used by the gameloop.
+    void countdown() { //Counts down until the bomb explodes. Used by the gameloop.
         if (exploded) return;
         if (timer > 0){
             timer--;
@@ -183,7 +183,14 @@ public class Bomb {
                 ModifyPoints(placedBy,100); // 100 points for killing
                 ModifyPoints(man,-300);//-300 points for dying
                 man.Die();
-                if(DEBUGPRINT)System.out.println("player " + man.id + " has been killed by player " + placedBy.id);
+                if(DEBUGPRINT) {
+                    System.out.println("player " + man.id + " has been killed by player " + placedBy.id);
+                }
+                if(placedBy.id == 0){ //killed by our agent
+                    //notify agent
+                    world.agentMadeKill = true;
+                }
+
             }
             world.positions[xTemp][yTemp].bombermanList.clear();
         }

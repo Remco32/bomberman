@@ -15,6 +15,8 @@ public class BomberMan {
     int bombCooldown; //cooldown time for when new bomb can be placed
     int BOMBCOOLDOWNTIME = 5;
 
+    MoveUtility.Actions nextAction = MoveUtility.Actions.IDLE;
+
     BomberMan(int x, int y, int id, GameWorld world) {
         this.x_location = x;
         this.y_location = y;
@@ -37,17 +39,23 @@ public class BomberMan {
         points.add(moveCost);
         //if (type == 0) ; // do nothing; redundant
         switch (action) {
+            case IDLE:
+                //waitForNextTurn();
             case UP:
                 MakeMove(0, -1); //move up
+                //waitForNextTurn();
                 break;
             case DOWN:
                 MakeMove(0, 1);//move down
+                //waitForNextTurn();
                 break;
             case LEFT:
                 MakeMove(-1, 0);//move left
+                //waitForNextTurn();
                 break;
             case RIGHT:
                 MakeMove(1, 0);//move right
+                //waitForNextTurn();
                 break;
             case PLACEBOMB:
                 if (world.positions[x_location][y_location].bomb == null && bombCooldown == 0) {
@@ -57,6 +65,9 @@ public class BomberMan {
                     if (DEBUGPRINT) System.out.println("player " + this.id + " placed a bomb");
                     bomb.createDangerzones();
                     bombCooldown = BOMBCOOLDOWNTIME;
+
+                    //waitForNextTurn();
+
                 } else if (DEBUGPRINT) System.out.println("Bomb has already been placed at this location");
                 break;
         }
@@ -89,6 +100,21 @@ public class BomberMan {
             }
         }
         world.positions[x_location][y_location].addBomberman(this); //move to new location
+
+
+
+    }
+
+    void waitForNextTurn(){
+
+        //Adhere to the timesteps of the game
+        try {
+            Thread.sleep(world.ROUND_TIME_MILISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     ArrayList<MoveUtility.Actions> AbleMoves() {
@@ -125,4 +151,10 @@ public class BomberMan {
         return y_location;
     }
 
+    //To put in the gameloop
+    void setNextMove(MoveUtility.Actions action) {
+        nextAction = action;
+        //don't make another action before waiting your turn
+        waitForNextTurn();
+    }
 }

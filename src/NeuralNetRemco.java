@@ -70,7 +70,7 @@ class NeuralNetRemco {
 
         //initialize weights
         for(int layer = 0; layer < (amountHiddenLayers +1); layer++) {
-            this.weightValueArray[layer] = initializeArrayRandomValues(((amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1), 0, 1);
+            this.weightValueArray[layer] = initializeArrayRandomValues(((amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1), 0, 100);
         }
 
         //DEBUG_EXAMPLE_ARRAYS INITIALIZATION
