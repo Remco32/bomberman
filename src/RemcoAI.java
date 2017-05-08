@@ -11,6 +11,9 @@ import static java.lang.Math.abs;
  */
 public class RemcoAI {
 
+    boolean DEBUGPRINTS = false;
+    boolean DEBUGPRINTS_QLEARNING = true;
+
     GameWorld world;
     BomberMan man;
     ArrayList<MoveUtility> moves;
@@ -29,7 +32,7 @@ public class RemcoAI {
 
     double DISCOUNT_FACTOR = 0.5;
     double EPSILON_RANDOMNESS = 0.1;
-    double GAMMA = 0.5;
+    double GAMMA = 0.6;
 
     RemcoAI(GameWorld world, BomberMan man, int amountHiddenNodes, int amountHiddenLayers, double learningRate) {
         this.world = world;
@@ -41,7 +44,7 @@ public class RemcoAI {
         double[][] currentStateVector = new double[1][amountOfFeatures * (world.gridSize * world.gridSize)];
         currentStateVector[0] = createInputVector();
 
-        double[][] targetVector = {{1, 1, 1, 1, 1, 1}};
+        double[][] targetVector = {{2, 2, 2, 2, 2, 2}};
 
         this.neuralNet = new NeuralNetRemco(currentStateVector, amountHiddenNodes, amountHiddenLayers, targetVector, learningRate);
     }
@@ -65,7 +68,7 @@ public class RemcoAI {
 
     void trappingStrategy() {
         System.out.println();
-        System.out.println("Trapping strategy in progress.");
+        if(DEBUGPRINTS) System.out.println("Trapping strategy in progress.");
 
         MoveUtility.Actions action = getBestAction(man.getX_location(), man.getY_location());
         System.out.println(action.toString());
@@ -75,7 +78,7 @@ public class RemcoAI {
 
     void moveTowardsEnemy(int distanceToKeepInSteps) {
         System.out.println();
-        System.out.println("Moving to enemy strategy in progress.");
+        if(DEBUGPRINTS) System.out.println("Moving to enemy strategy in progress.");
         if (world.bomberManList.size() <= 1) { //no other players
             return;
         }
@@ -94,23 +97,37 @@ public class RemcoAI {
             int agentX = man.getX_location();
             int agentY = man.getY_location();
 
-            searchAndGoToLocation(enemyX, enemyY, agentX, agentY, consideredCoordinates, distanceToKeepInSteps);
+            if(!queue.isEmpty()) {
+                searchAndGoToLocation(enemyX, enemyY, agentX, agentY, consideredCoordinates, distanceToKeepInSteps);
+            }
+            else{
+                break;
+            }
             queue.clear();
             consideredCoordinates.clear();
 
             //check if our coordinates are the same: that means no path
             if (agentX == man.getX_location() && agentY == man.getY_location()) {
                 //bomb the wall towards the enemy
-                System.out.println("No path, creating one!");
+                if(DEBUGPRINTS) System.out.println("No path, creating one!");
                 findAndGoToPathInDirection(getDirectionTarget(enemyX, enemyY));
                 bombTowardsDirection(getDirectionTarget(enemyX, enemyY));
-                //man.waitForNextTurn();
                 avoidDanger();
 
+                int bombTimer = 0;
 
+                //search for our bomb, if there is one
+                for(Bomb bomb : world.activeBombList){
+                    //check if our own bomb
+                    if(bomb.placedBy == man){
+                        bombTimer = bomb.getTimer();
+                    }
+                }
                 //wait for bomb to explode
+
                 try {
-                    Thread.sleep(2500);
+                    if(DEBUGPRINTS) System.out.println("Waiting " + (world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS) + "ms for bomb to explode");
+                    Thread.sleep(world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -122,7 +139,7 @@ public class RemcoAI {
         }
 
         //We arrived at location
-        System.out.println("Right location and distance!");
+        if(DEBUGPRINTS) System.out.println("Right location and distance!");
 
     }
 
@@ -340,7 +357,13 @@ public class RemcoAI {
         }
 
         //take entry from queue
-        Pair currentPair = queue.remove(); //can't dequeue twice and still get the same pair.
+        Pair currentPair;
+        try {
+            currentPair = queue.remove();
+        }catch (NoSuchElementException E){
+            return; //prevents crashing
+        }
+        //can't dequeue twice and still get the same pair.
         ownX = (int) currentPair.getFirst();
         ownY = (int) currentPair.getSecond();
 
@@ -381,7 +404,7 @@ public class RemcoAI {
                 }
 
             }
-            System.out.println("FINAL path = " + finalPath.toString());
+            if(DEBUGPRINTS) System.out.println("FINAL path = " + finalPath.toString());
 
             for (int i = finalPath.size() - 1; i - distanceToKeepInSteps >= 0; i--) {
                 moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), 0);
@@ -827,7 +850,7 @@ public class RemcoAI {
 
                 int randomActionValue = new Random().nextInt(allActions.size());
                 action = allActions.get(randomActionValue);
-                System.out.println("Random action was " + action);
+                if(DEBUGPRINTS_QLEARNING) System.out.println("Random action was " + action);
 
             } else { //use highest q-value
                 //get the highest Q-value index
@@ -843,8 +866,8 @@ public class RemcoAI {
                     action = giveActionAtIndex(actionIndex);
 
                 }
-                System.out.println("Q-value action was " + action);
-                System.out.println("QValue was " + outputLayer[actionIndex]);
+                if(DEBUGPRINTS_QLEARNING) System.out.println("Q-value action was " + action);
+                if(DEBUGPRINTS_QLEARNING) System.out.println("QValue was " + outputLayer[actionIndex]);
 
             }
 
@@ -857,8 +880,8 @@ public class RemcoAI {
             rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), action);
             man.setNextMove(action);
 
-            System.out.println("Reward was " + rewardForAction);
-            System.out.println();
+            if(DEBUGPRINTS_QLEARNING) System.out.println("Reward was " + rewardForAction);
+            if(DEBUGPRINTS_QLEARNING) System.out.println();
 
             /** Feed forward again **/
             //get the new state as vector
@@ -887,7 +910,8 @@ public class RemcoAI {
             //change the value
             targetOutput[actionIndex] = QTarget;
             targetVector[0] = targetOutput;
-            neuralNet.changeTargetOutputSet(targetVector);
+            //neuralNet.changeTargetOutputSet(targetVector);
+            neuralNet.targetOutput = targetOutput;
 
             /** Do the backward pass **/
             neuralNet.backwardsPass();
@@ -979,30 +1003,33 @@ public class RemcoAI {
     //Get as close to a direction (i.e. down/south) as possible
     void findAndGoToPathInDirection(MoveUtility.Actions direction) {
 
-        //TODO remove unneccesairy search in the wrong direction
+        if(DEBUGPRINTS) System.out.println("findAndGoToPathInDirection");
 
-        int x_target = -1;
-        int y_target = -1;
+        //TODO remove unnecessary search in the wrong direction
+
+        int x_target = -10;
+        int y_target = -10;
         int manhattanDistanceToTarget = world.gridSize * 2;
         int oldManhattanDistance = world.gridSize * 2 + 1;
 
         //look at manhattandistannce around ourselves for empty spaces
         int searchDistance = 1;
         while (oldManhattanDistance > manhattanDistanceToTarget && !(searchDistance > world.gridSize * 2)) {
-            oldManhattanDistance = manhattanDistanceToTarget;
-            for (int i = 0 - searchDistance; i <= searchDistance; i++) {
-                for (int j = 0 - searchDistance; j <= searchDistance; j++) {
+
+            for (int x = 0 - searchDistance; x <= searchDistance; x++) {
+                for (int y = 0 - searchDistance; y <= searchDistance; y++) {
                     //check if this is a valid location
-                    if (checkMovementPossible(man.getX_location() + i, man.getY_location() + j)) {
+                    if (checkMovementPossible(man.getX_location() + x, man.getY_location() + y)) {
                         //check if move is in the right direction
-                        if ((getDirectionTarget(man.getX_location() + i, man.getY_location() + j) == direction) && (i != 0 || j != 0)) { // Don't move when both are 0: would be no move
+                        if ((getDirectionTarget(man.getX_location() + x, man.getY_location() + y) == direction) && (x != 0 || y != 0)) { // Don't move when both are 0: would be no move
                             //look around agent's coordinates
-                            if (world.positions[man.getX_location() + i][man.getY_location() + j].type == WorldPosition.Fieldtypes.EMPTY) {
-                                //new distance is shorter
-                                if (manhattanDistanceToTarget > manhattanDistance(man, man.getX_location() + i, man.getY_location() + j)) {
-                                    manhattanDistanceToTarget = manhattanDistance(man, man.getX_location() + i, man.getY_location() + j);
-                                    x_target = man.getX_location() + i;
-                                    y_target = man.getY_location() + j;
+                            if (world.positions[man.getX_location() + x][man.getY_location() + y].type == WorldPosition.Fieldtypes.EMPTY) {
+                                //old distance is longer
+                                if (manhattanDistanceToTarget > manhattanDistance(man, man.getX_location() + x, man.getY_location() + y)) {
+                                    manhattanDistanceToTarget = manhattanDistance(man, man.getX_location() + x, man.getY_location() + y);
+                                    x_target = man.getX_location() + x;
+                                    y_target = man.getY_location() + y;
+                                    oldManhattanDistance = manhattanDistanceToTarget;///TODO
                                 }
 
                             }
@@ -1012,7 +1039,7 @@ public class RemcoAI {
             }
             //increment the search area
             searchDistance++;
-            if (manhattanDistanceToTarget == oldManhattanDistance) { //distance did not change, old location was best bet
+            if (manhattanDistanceToTarget == oldManhattanDistance && x_target != -10 && y_target != -10) { //distance did not change, old location was best bet
                 //if now no empty space is found, go to the closest location to our agent, from the previous step
                 searchAndGoToLocation(x_target, y_target, man.getX_location(), man.getY_location());
             }

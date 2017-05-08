@@ -26,7 +26,7 @@ class NeuralNetRemco {
     private int[] amountOfNodesPerLayer;
     private double[][] inputSet;
     private double[][] targetOutputSet;
-    private double[] targetOutput;
+    double[] targetOutput;
     private List<Double> totalError = new ArrayList<>(); //list so we can keep the previous values
 
     private double[][] neuronValueArray;
@@ -390,9 +390,22 @@ class NeuralNetRemco {
     //give actual output
     //by means of an activation function, or other function
     private double outputNode(double input){
-        return (1/(1+exp(-(input))));
+        //set activation function here
+        return sigmoidFunction(input);
 
     }
+
+    /** Activation functions **/
+
+    private double sigmoidFunction(double input){
+        return (1/(1+exp(-(input))));
+    }
+
+    private double identityFunction(double input){
+        return input;
+    }
+
+
 
     public double[][] getNeuronValueArray() {
         return neuronValueArray;

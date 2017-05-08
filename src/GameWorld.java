@@ -15,6 +15,7 @@ public class GameWorld {
     RemcoAI AI_Remco;
 
     int trials;
+    int totalAmountOfTrials;
     boolean agentMadeKill = false;
     boolean DELAY_BEFORE_START = true; //enables waiting so debuging is easier
 
@@ -157,7 +158,7 @@ public class GameWorld {
 
         if(DELAY_BEFORE_START) {
             try {
-                Thread.sleep(3000);
+                Thread.sleep(ROUND_TIME_MILISECONDS*4);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -227,7 +228,7 @@ public class GameWorld {
         System.out.println("Elapsed time: " + (double) (endTime - startTime) / 1000 + " seconds");
 
         //restart game if there are still trials left to run
-        if (trials > 1) { //frist game isn't counted
+        if (trials > 1) { //first game isn't counted
             trials--;
             resetGame();
 
@@ -245,7 +246,7 @@ public class GameWorld {
 
     void resetGame() {
         System.out.println();
-        System.out.println("New game started.");
+        System.out.println("Game " + (totalAmountOfTrials-trials) + " started.");
 
         //clean arrays
         ai.clear();
@@ -256,6 +257,8 @@ public class GameWorld {
         cleanWorld(); //empty world
         initWorld(); //reinitialize world
 
+        amountOfRounds = 0;
+
         setEnemyAI();
         runGameLoop();
         AI_Remco.setBomberman(this.bomberManList.get(0)); //reset AI
@@ -264,11 +267,15 @@ public class GameWorld {
 
     }
 
-    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance) {
+    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs) {
+
+        ROUND_TIME_MILISECONDS = roundTimeInMs;
+
         this.trials = amountOfTrials;
+        this.totalAmountOfTrials = amountOfTrials;
         this.randomMoveChance = randomMoveChance;
 
-        //setEnemyAI(); //TODO weer aan
+        setEnemyAI();
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
         AI_Remco.play(3, 0.2);
