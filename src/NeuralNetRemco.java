@@ -41,6 +41,7 @@ class NeuralNetRemco {
         this.targetOutputSet = targetOutput;
         this.learningRate = learningRate;
 
+
         //set our own targetoutput to the first set
         this.targetOutput = targetOutputSet[0];
 
@@ -70,7 +71,7 @@ class NeuralNetRemco {
 
         //initialize weights
         for(int layer = 0; layer < (amountHiddenLayers +1); layer++) {
-            this.weightValueArray[layer] = initializeArrayRandomValues(((amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1), 0, 100);
+            this.weightValueArray[layer] = initializeArrayRandomValues(((amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1), 0, 1);
         }
 
         //DEBUG_EXAMPLE_ARRAYS INITIALIZATION
@@ -124,7 +125,7 @@ class NeuralNetRemco {
                     forwardPass();
                     backwardsPass();
 
-                System.out.println(totalError.get(totalError.size() - 1)); //pakt nieuwste element
+                System.out.println("Total error is " + totalError.get(totalError.size() - 1)); //pakt nieuwste element
             }
         }
 
@@ -173,7 +174,7 @@ class NeuralNetRemco {
 
         //update values of nodes:
         //amount of layers
-        for (int layer = 1; layer < amountHiddenLayers + 2; layer++) //amountHiddenLayers+1 == final layer index
+        for (int layer = 1; layer < amountHiddenLayers + 2; layer++)  //amountHiddenLayers+1 == final layer index
             //amount of nodes
             for (int node = 0; node < amountOfNodesPerLayer[layer]; node++) {
                 //Get the netInput, transform that into the output, and update the value
