@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-
 import static java.lang.Integer.max;
+import static java.lang.Math.abs;
 import static java.lang.Math.exp;
+import static java.lang.Math.log;
 
 class NeuralNetRemco {
 
@@ -41,7 +42,6 @@ class NeuralNetRemco {
         this.targetOutputSet = targetOutput;
         this.learningRate = learningRate;
 
-
         //set our own targetoutput to the first set
         this.targetOutput = targetOutputSet[0];
 
@@ -55,23 +55,21 @@ class NeuralNetRemco {
 
         this.neuronValueArray = new double[amountHiddenLayers + 2][max(max(inputVector.length, amountHiddenNodes), targetOutput.length)]; //+2 for input and output layer
 
-
         for (int i = 0; i < amountHiddenLayers + 2; i++) {
             this.neuronValueArray[i] = new double[amountOfNodesPerLayer[i]];
         }
         this.inputSet = inputVector;
 
-
         this.weightValueArray = new double[amountHiddenLayers + 1][max(max(inputVector.length, amountHiddenNodes), targetOutput.length)];
 
         //set sizes of weightValueArray
-        for(int layer = 0; layer < (amountHiddenLayers +1); layer++){
-            this.weightValueArray[layer] = new double[(amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1];
+        for (int layer = 0; layer < (amountHiddenLayers + 1); layer++) {
+            this.weightValueArray[layer] = new double[(amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer + 1]) + 1];
         }
 
         //initialize weights
-        for(int layer = 0; layer < (amountHiddenLayers +1); layer++) {
-            this.weightValueArray[layer] = initializeArrayRandomValues(((amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer+1])+1), 0, 1);
+        for (int layer = 0; layer < (amountHiddenLayers + 1); layer++) {
+            this.weightValueArray[layer] = initializeArrayRandomValues(((amountOfNodesPerLayer[layer] * amountOfNodesPerLayer[layer + 1]) + 1), 0, 1);
         }
 
         //DEBUG_EXAMPLE_ARRAYS INITIALIZATION
@@ -88,20 +86,17 @@ class NeuralNetRemco {
 
     }
 
-
-
-
     //Methods
 
-    void changeTargetOutputSet(double[][] newTargetOutputSet){
+    void changeTargetOutputSet(double[][] newTargetOutputSet) {
         targetOutputSet = newTargetOutputSet;
     }
 
-    double[] getTargetOutput(){
+    double[] getTargetOutput() {
         return targetOutput;
     }
 
-
+    //TODO goes wrong when max >1
     private double[] initializeArrayRandomValues(int rows, int min, int max) {
         double[] outputArray = new double[rows];
 
@@ -113,44 +108,41 @@ class NeuralNetRemco {
         return outputArray;
     }
 
-
-
-    void learn(int epochs){
+    void learn(int epochs) {
         neuronValueArray[0] = inputSet[0];
         targetOutput = targetOutputSet[0];
-            for (; epochs > 0 ; epochs--) {
-                for (int i = inputSet.length; i > 0 ; i--){
-                    neuronValueArray[0] = inputSet[i-1];
-                    targetOutput = targetOutputSet[i-1];
-                    forwardPass();
-                    backwardsPass();
+        for (; epochs > 0; epochs--) {
+            for (int i = inputSet.length; i > 0; i--) {
+                neuronValueArray[0] = inputSet[i - 1];
+                targetOutput = targetOutputSet[i - 1];
+                forwardPass();
+                backwardsPass();
 
                 System.out.println("Total error is " + totalError.get(totalError.size() - 1)); //pakt nieuwste element
             }
         }
 
-
     }
 
     /**
-    double[] getOutput(double[] input){
-        neuronValueArray[0] = input;
-        for (int layer = 1; layer < amountHiddenLayers + 2; layer++) //amountHiddenLayers+1 == final layer index
-            //amount of nodes
-            for (int node = 0; node < amountOfNodesPerLayer[layer]; node++) {
-                //Get the netInput, transform that into the output, and update the value
-                neuronValueArray[layer][node] = outputNode(netInputNode(layer, node));
-            }
-        return neuronValueArray[amountOfNodesPerLayer.length-1];
-    }
-    **/
+     * double[] getOutput(double[] input){
+     * neuronValueArray[0] = input;
+     * for (int layer = 1; layer < amountHiddenLayers + 2; layer++) //amountHiddenLayers+1 == final layer index
+     * //amount of nodes
+     * for (int node = 0; node < amountOfNodesPerLayer[layer]; node++) {
+     * //Get the netInput, transform that into the output, and update the value
+     * neuronValueArray[layer][node] = outputNode(netInputNode(layer, node));
+     * }
+     * return neuronValueArray[amountOfNodesPerLayer.length-1];
+     * }
+     **/
 
-    double[] getOutputLayer(){
-        return neuronValueArray[amountHiddenLayers+1]; //hiddenlayer + input + output, index starts at 0
+    double[] getOutputLayer() {
+        return neuronValueArray[amountHiddenLayers + 1]; //hiddenlayer + input + output, index starts at 0
     }
 
     //get it after forwardpass
-    double[] getOutputLayer(double[] input){
+    double[] getOutputLayer(double[] input) {
         neuronValueArray[0] = input;
         for (int layer = 1; layer < amountHiddenLayers + 2; layer++) //amountHiddenLayers+1 == final layer index
             //amount of nodes
@@ -158,11 +150,10 @@ class NeuralNetRemco {
                 //Get the netInput, transform that into the output, and update the value
                 neuronValueArray[layer][node] = outputNode(netInputNode(layer, node));
             }
-        return neuronValueArray[amountOfNodesPerLayer.length-1];
+        return neuronValueArray[amountOfNodesPerLayer.length - 1];
     }
 
-
-    void forwardPass(double[] input){
+    void forwardPass(double[] input) {
         //Change the input of the network
         neuronValueArray[0] = input;
         //Do the forwardpass
@@ -221,7 +212,7 @@ class NeuralNetRemco {
             //System.out.println("Waarde van weight " + weightValueArray[layerNumber - 1][list.get(i)]);
             //System.out.println("Waarde van input " + neuronValueArray[layerNumber - 1][i]);
 
-            if(neuronValueArray[layerNumber - 1][i] != 0) {
+            if (neuronValueArray[layerNumber - 1][i] != 0) {
                 value += weightValueArray[layerNumber - 1][list.get(i)] * neuronValueArray[layerNumber - 1][i];
             }
             //No need for else statement, value will be 0 in that case. Adding 0 to the total value is useless.
@@ -236,16 +227,6 @@ class NeuralNetRemco {
     }
 
     private void updateWeightsToOutputLayer() {
-
-        /**
-         for (int layer = 0; layer < amountHiddenLayers + 1; layer++) { //amountHiddenLayers+1 == final layer index, -1 because we have a layer less because weights are between neuronlayers
-         for (int weight = 0; weight < weightValueArray[layer].length-1; weight++) {
-         //int nodeToWeight = findNodeToWeight(layer,weight);
-         //int nodeFromWeight = findNodeFromWeight(layer,weight);
-         }
-         }
-         **/
-
         //werkt alleen met hiddenlayer <-> outputlayer, oftewel laatste layer
 
         int outputLayer = neuronValueArray.length - 1; //final layer, AKA outputlayer
@@ -325,21 +306,18 @@ class NeuralNetRemco {
         }
     }
 
-
-
-
-
     private double calculateError(double output, double target) {
-        return Math.pow((target - output), 2)/2;
+        return Math.pow((target - output), 2) / 2;
     }
 
-    /** (Node_a) =Weight_w=> (Node_b)
-     WeightToNode: w is connected to b
-     NodeToWeight: b is connected to w
-     WeightFromNode: w is connected (starts from) from node a
-     NodeFromWeight: node a is connected from w: it spawns w.
-
-     vanaf de node; naar de node
+    /**
+     * (Node_a) =Weight_w=> (Node_b)
+     * WeightToNode: w is connected to b
+     * NodeToWeight: b is connected to w
+     * WeightFromNode: w is connected (starts from) from node a
+     * NodeFromWeight: node a is connected from w: it spawns w.
+     * <p>
+     * vanaf de node; naar de node
      **/
 
     //Returns list of numbers corresponding to the weights that are connecting FROM a node.
@@ -348,9 +326,9 @@ class NeuralNetRemco {
         List<Integer> list = new ArrayList<>();
 
         //add all connected weights
-        for(int i = 0; i < neuronValueArray[layerNumber+1].length; i++) {
+        for (int i = 0; i < neuronValueArray[layerNumber + 1].length; i++) {
             //System.out.println("Node " + nodeNumber + " heeft weight " + (nodeNumber*neuronValueArray[layerNumber+1].length+i) );
-            list.add(nodeNumber*neuronValueArray[layerNumber+1].length+i);
+            list.add(nodeNumber * neuronValueArray[layerNumber + 1].length + i);
         }
         return list;
     }
@@ -375,7 +353,7 @@ class NeuralNetRemco {
 
         //System.out.println("Weight w " + weightNumber + " uit weightlaag " + weightLayerNumber + " hoort bij volgende node nummer " + weightNumber%amountOfNodesPerLayer[weightLayerNumber+1]);
 
-        return weightNumber%amountOfNodesPerLayer[weightLayerNumber+1];
+        return weightNumber % amountOfNodesPerLayer[weightLayerNumber + 1];
     }
 
     //Returns the node number where the weight is coming from
@@ -384,29 +362,40 @@ class NeuralNetRemco {
 
         //System.out.println("Weight w " + weightNumber + " uit weightlaag " + weightLayerNumber + " hoort bij vorige node nummer " + weightNumber/amountOfNodesPerLayer[weightLayerNumber+1]);
 
-        return weightNumber/amountOfNodesPerLayer[weightLayerNumber+1];
+        return weightNumber / amountOfNodesPerLayer[weightLayerNumber + 1];
     }
-
 
     //give actual output
     //by means of an activation function, or other function
-    private double outputNode(double input){
+    private double outputNode(double input) {
         //set activation function here
+
         return sigmoidFunction(input);
+        //return identityFunction(input);
+        //return softsignFunction(input);
+        //return softplusFunction(input);
 
     }
 
-    /** Activation functions **/
+    /**
+     * Activation functions, NaN means value doesn't fit anymore in a double
+     **/
 
-    private double sigmoidFunction(double input){
-        return (1/(1+exp(-(input))));
-    }
+    private double sigmoidFunction(double input) {
+        return (1 / (1 + exp(-(input))));
+    } //range == (0,1)
 
-    private double identityFunction(double input){
+    private double identityFunction(double input) {
         return input;
-    }
+    } //range == (-inf,inf)
 
+    private double softsignFunction(double input){
+        return input / (1 + abs(input));
+    } //range == (-1,1)
 
+    private double softplusFunction(double input){
+        return log(1 + exp(input));
+    } //range == (0,inf)
 
     public double[][] getNeuronValueArray() {
         return neuronValueArray;

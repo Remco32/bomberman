@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
  * Created by joseph on 09/02/2017.
  */
 public class Bomb {
-    private Boolean DEBUGPRINT = true; // Activates debug prints for bomb
+    private Boolean DEBUGPRINT = false; // Activates debug prints for bomb
 
     private int timer;
     private int cleanupTimer;

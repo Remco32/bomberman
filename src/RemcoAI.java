@@ -67,11 +67,11 @@ public class RemcoAI {
 
 
     void trappingStrategy() {
-        System.out.println();
+        if(DEBUGPRINTS) System.out.println();
         if(DEBUGPRINTS) System.out.println("Trapping strategy in progress.");
 
         MoveUtility.Actions action = getBestAction(man.getX_location(), man.getY_location());
-        System.out.println(action.toString());
+        if(DEBUGPRINTS) System.out.println(action.toString());
         man.setNextMove(action);
 
     }

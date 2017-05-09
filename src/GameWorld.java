@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class GameWorld {
     int gridSize; // in 1 dimension
     int amountPlayers;
-    private int amountOfRounds=0;
+    private int amountOfRounds = 0;
     private Boolean windowBool;
     private ShowWindow window;
 
@@ -18,6 +18,8 @@ public class GameWorld {
     int totalAmountOfTrials;
     boolean agentMadeKill = false;
     boolean DELAY_BEFORE_START = true; //enables waiting so debuging is easier
+    boolean DEBUGPRINTS = false;
+    boolean SHOWROUNDS = true;
 
     WorldPosition[][] positions;
     private ArrayList<AIHandler> ai;
@@ -97,8 +99,6 @@ public class GameWorld {
         }
     }
 
-
-
     private void initEmptyWorld() {
         positions = new WorldPosition[gridSize][gridSize];
         //init the grid
@@ -143,7 +143,7 @@ public class GameWorld {
         }
     }
 
-    void cleanWorld(){
+    void cleanWorld() {
 
         for (int x = 0; x < gridSize; x++) {
             for (int y = 0; y < gridSize; y++) {
@@ -154,17 +154,17 @@ public class GameWorld {
         window.repaint();
     }
 
-    void runGameLoop(){
+    void runGameLoop() {
 
-        if(DELAY_BEFORE_START) {
+        if (DELAY_BEFORE_START) {
             try {
-                Thread.sleep(ROUND_TIME_MILISECONDS*4);
+                Thread.sleep(ROUND_TIME_MILISECONDS * 4);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        Thread loop = new Thread(){
+        Thread loop = new Thread() {
             @Override
             public void run() {
                 GameLoop();
@@ -173,13 +173,14 @@ public class GameWorld {
         loop.start();
 
     }
+
     private void GameLoop() {
 
         //time execution time
         long startTime = System.currentTimeMillis();
         while (PlayerCheck()) {
 
-            if(!(ai == null)) {
+            if (!(ai == null)) {
                 for (AIHandler temp : ai) temp.CalculateBestMove();
                 for (AIHandler temp : ai) {
                     temp.MakeMove(); // get the last appended move
@@ -220,12 +221,12 @@ public class GameWorld {
 
             //if(windowBool) window.repaint();
         }
-        if (bomberManList.get(0).alive) System.out.println("You won");
-        else System.out.println("You lost");
+        if (bomberManList.get(0).alive && DEBUGPRINTS) System.out.println("You won");
+        else if (DEBUGPRINTS) System.out.println("You lost");
 
-        System.out.println("Amount of elapsed timesteps: " + amountOfRounds);
+        if (DEBUGPRINTS) System.out.println("Amount of elapsed timesteps: " + amountOfRounds);
         long endTime = System.currentTimeMillis();
-        System.out.println("Elapsed time: " + (double) (endTime - startTime) / 1000 + " seconds");
+        if (DEBUGPRINTS) System.out.println("Elapsed time: " + (double) (endTime - startTime) / 1000 + " seconds");
 
         //restart game if there are still trials left to run
         if (trials > 1) { //first game isn't counted
@@ -245,8 +246,8 @@ public class GameWorld {
     }
 
     void resetGame() {
-        System.out.println();
-        System.out.println("Game " + (totalAmountOfTrials-trials) + " started.");
+        if (DEBUGPRINTS) System.out.println();
+        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trials) + " started.");
 
         //clean arrays
         ai.clear();
@@ -281,7 +282,7 @@ public class GameWorld {
         AI_Remco.play(3, 0.2);
     }
 
-    void repaint(){
+    void repaint() {
         window.repaint();
     }
 
