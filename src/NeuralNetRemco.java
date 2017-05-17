@@ -4,6 +4,7 @@
 
 //TODO list met tuples vervangen
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,7 +14,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 
-class NeuralNetRemco {
+class NeuralNetRemco implements Serializable {
 
     //DEBUG BOOLEANS
     private boolean DEBUG_EXAMPLE_ARRAYS = false;

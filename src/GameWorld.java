@@ -232,7 +232,9 @@ public class GameWorld {
         if (trials > 1) { //first game isn't counted
             trials--;
             resetGame();
-
+        }
+        if (trials == 1){
+            AI_Remco.writeNetworkToFile();
         }
 
     }
@@ -285,5 +287,7 @@ public class GameWorld {
     void repaint() {
         window.repaint();
     }
+
+
 
 }

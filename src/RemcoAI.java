@@ -1,10 +1,21 @@
 import org.apache.commons.math3.util.Pair;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Math.abs;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+/** Serialization method based on https://www.mkyong.com/java/how-to-read-and-write-java-object-to-a-file/ **/
+
 
 /**
  * Created by Remco on 29-3-2017.
@@ -1044,6 +1055,30 @@ public class RemcoAI {
                 searchAndGoToLocation(x_target, y_target, man.getX_location(), man.getY_location());
             }
         }
+
+    }
+
+    void writeNetworkToFile() {
+        try {
+            FileOutputStream f = new FileOutputStream(new File("NeuralNetwork"));
+            ObjectOutputStream o = new ObjectOutputStream(f);
+
+            // Write objects to file
+            o.writeObject(this.neuralNet);
+
+            o.close();
+            f.close();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error initializing stream");
+            System.err.println(e);
+
+        }
+    }
+
+    void readNetworkFromFile(){
 
     }
 

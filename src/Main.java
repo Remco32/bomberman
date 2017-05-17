@@ -37,7 +37,7 @@ public class Main {
 
     static void playGame() {
         GameWorld world = new GameWorld(9, 2, true, 1); // gridsize should be of 2*n +1
-        world.startGame(world, 1000, 20, 1, 0.8, 0.2, 1);
+        world.startGame(world, 3, 20, 1, 0.8, 0.2, 20);
         System.out.println("All rounds have ended.");
     }
 
