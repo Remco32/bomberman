@@ -24,9 +24,9 @@ public class RemcoAI {
     int RANGE = 2; //TODO add value to bomberman, and use that when placing bombs
     int TIMER_BOMB = 5; //TODO obtain value
 
-    int UTILITY_ENEMY_WILL_STAND_IN_DANGERZONE = 5;
+    int UTILITY_ENEMY_WILL_STAND_IN_DANGERZONE = 2;
     int UTILITY_DEATH = -100;
-    int UTILITY_STANDING_IN_DANGERZONE = -5;
+    int UTILITY_STANDING_IN_DANGERZONE = -2;
     int UTILITY_IDLING = -1;
     int UTILITY_AGENT_MADE_KILL = 100;
 

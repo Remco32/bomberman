@@ -370,7 +370,7 @@ class NeuralNetRemco {
     private double outputNode(double input) {
         //set activation function here
 
-        return sigmoidFunction(input);
+        return sigmoidFunction(input,0,0);
         //return identityFunction(input);
         //return softsignFunction(input);
         //return softplusFunction(input);
@@ -381,8 +381,8 @@ class NeuralNetRemco {
      * Activation functions, NaN means value doesn't fit anymore in a double
      **/
 
-    private double sigmoidFunction(double input) {
-        return (1 / (1 + exp(-(input))));
+    private double sigmoidFunction(double input, double activationThreshold, double steepnessCurve) {
+        return (1 / (1 + exp((activationThreshold-(input) / steepnessCurve))));
     } //range == (0,1)
 
     private double identityFunction(double input) {
@@ -403,6 +403,10 @@ class NeuralNetRemco {
 
     public double[][] getWeightValueArray() {
         return weightValueArray;
+    }
+
+    void saveNetworkToFile(){
+        
     }
 }
 
