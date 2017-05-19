@@ -1080,6 +1080,30 @@ public class RemcoAI {
 
     void readNetworkFromFile(){
 
+        try {
+
+            FileInputStream fi = new FileInputStream(new File("NeuralNetwork"));
+            ObjectInputStream oi = new ObjectInputStream(fi);
+
+            // Read objects
+            NeuralNetRemco loadedNN = (NeuralNetRemco) oi.readObject();
+
+            this.neuralNet = loadedNN;
+
+            oi.close();
+            fi.close();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+            System.err.println(e);
+        } catch (IOException e) {
+            System.out.println("Error initializing stream");
+            System.err.println(e);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
 

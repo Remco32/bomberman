@@ -244,11 +244,10 @@ public class GameWorld {
             resetGame();
         }
 
-        if (trials == 1){
+        if (trials == 1) {
             AI_Remco.writeNetworkToFile();
             endGame();
         }
-
 
     }
 
@@ -264,8 +263,6 @@ public class GameWorld {
         if (DEBUGPRINTS) System.out.println();
         if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trials) + " started.");
 
-
-
         cleanWorld(); //empty world
         initWorld(); //reinitialize world
 
@@ -278,8 +275,6 @@ public class GameWorld {
         AI_Remco.play(3, 0.2);
 
     }
-
-
 
     void endGame() {
         long totalTimeElapsed = System.currentTimeMillis() - startTimeTrials;
@@ -307,6 +302,11 @@ public class GameWorld {
         AI_Remco.play(3, 0.2);
     }
 
+    /**
+    void startGame(neuralnet){
 
+
+    }
+     **/
 
 }
