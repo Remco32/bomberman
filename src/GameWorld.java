@@ -300,16 +300,9 @@ public class GameWorld {
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
 
-        if(usePreviousNetwork) AI_Remco.readNetworkFromFile();
+        if (usePreviousNetwork) AI_Remco.readNetworkFromFile();
 
         AI_Remco.play(3, 0.2);
     }
-
-    /**
-    void startGame(neuralnet){
-
-
-    }
-     **/
 
 }

@@ -14,8 +14,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-/** Serialization method based on https://www.mkyong.com/java/how-to-read-and-write-java-object-to-a-file/ **/
-
+/**
+ * Serialization method based on https://www.mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
+ **/
 
 /**
  * Created by Remco on 29-3-2017.
@@ -75,21 +76,19 @@ public class RemcoAI {
         }
     }
 
-
-
     void trappingStrategy() {
-        if(DEBUGPRINTS) System.out.println();
-        if(DEBUGPRINTS) System.out.println("Trapping strategy in progress.");
+        if (DEBUGPRINTS) System.out.println();
+        if (DEBUGPRINTS) System.out.println("Trapping strategy in progress.");
 
         MoveUtility.Actions action = getBestAction(man.getX_location(), man.getY_location());
-        if(DEBUGPRINTS) System.out.println(action.toString());
+        if (DEBUGPRINTS) System.out.println(action.toString());
         man.setNextMove(action);
 
     }
 
     void moveTowardsEnemy(int distanceToKeepInSteps) {
         System.out.println();
-        if(DEBUGPRINTS) System.out.println("Moving to enemy strategy in progress.");
+        if (DEBUGPRINTS) System.out.println("Moving to enemy strategy in progress.");
         if (world.bomberManList.size() <= 1) { //no other players
             return;
         }
@@ -108,10 +107,9 @@ public class RemcoAI {
             int agentX = man.getX_location();
             int agentY = man.getY_location();
 
-            if(!queue.isEmpty()) {
+            if (!queue.isEmpty()) {
                 searchAndGoToLocation(enemyX, enemyY, agentX, agentY, consideredCoordinates, distanceToKeepInSteps);
-            }
-            else{
+            } else {
                 break;
             }
             queue.clear();
@@ -120,7 +118,7 @@ public class RemcoAI {
             //check if our coordinates are the same: that means no path
             if (agentX == man.getX_location() && agentY == man.getY_location()) {
                 //bomb the wall towards the enemy
-                if(DEBUGPRINTS) System.out.println("No path, creating one!");
+                if (DEBUGPRINTS) System.out.println("No path, creating one!");
                 findAndGoToPathInDirection(getDirectionTarget(enemyX, enemyY));
                 bombTowardsDirection(getDirectionTarget(enemyX, enemyY));
                 avoidDanger();
@@ -128,21 +126,21 @@ public class RemcoAI {
                 int bombTimer = 0;
 
                 //search for our bomb, if there is one
-                for(Bomb bomb : world.activeBombList){
+                for (Bomb bomb : world.activeBombList) {
                     //check if our own bomb
-                    if(bomb.placedBy == man){
+                    if (bomb.placedBy == man) {
                         bombTimer = bomb.getTimer();
                     }
                 }
                 //wait for bomb to explode
 
                 try {
-                    if(DEBUGPRINTS) System.out.println("Waiting " + (world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS) + "ms for bomb to explode");
+                    if (DEBUGPRINTS)
+                        System.out.println("Waiting " + (world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS) + "ms for bomb to explode");
                     Thread.sleep(world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
 
                 //try again for a path
             }
@@ -150,7 +148,7 @@ public class RemcoAI {
         }
 
         //We arrived at location
-        if(DEBUGPRINTS) System.out.println("Right location and distance!");
+        if (DEBUGPRINTS) System.out.println("Right location and distance!");
 
     }
 
@@ -242,37 +240,37 @@ public class RemcoAI {
     void avoidDanger() {
 
         /**
-        int dangerTimerCurrentPosition = world.positions[man.getX_location()][man.getY_location()].dangerousTimer;
+         int dangerTimerCurrentPosition = world.positions[man.getX_location()][man.getY_location()].dangerousTimer;
 
-        //check if there is a dangerzone in our field
-        while (dangerTimerCurrentPosition > 0) {
-            //get all possible actions
-            ArrayList<MoveUtility.Actions> allActions = giveAllPossibleActions(man.getX_location(),man.getY_location());
+         //check if there is a dangerzone in our field
+         while (dangerTimerCurrentPosition > 0) {
+         //get all possible actions
+         ArrayList<MoveUtility.Actions> allActions = giveAllPossibleActions(man.getX_location(),man.getY_location());
 
-            //take the one that will lead us to a zone without danger
-            if(allActions.contains(MoveUtility.Actions.UP)){
-                if(world.positions[man.getX_location()][man.getY_location()-1].dangerousTimer <= dangerTimerCurrentPosition){ //going up will put us in a safer, or as safe, place
-                    moveToArea(man.getX_location(), man.getY_location()-1, 0);
-                }
-            }
-            if(allActions.contains(MoveUtility.Actions.DOWN)){
-                if(world.positions[man.getX_location()][man.getY_location()+1].dangerousTimer <= dangerTimerCurrentPosition){
-                    moveToArea(man.getX_location(), man.getY_location()+1, 0);
-                }
-            }
-            if(allActions.contains(MoveUtility.Actions.RIGHT)){
-                if(world.positions[man.getX_location()+1][man.getY_location()].dangerousTimer <= dangerTimerCurrentPosition){
-                    moveToArea(man.getX_location()+1, man.getY_location(), 0);
-                }
-            }
-            if(allActions.contains(MoveUtility.Actions.LEFT)){
-                if(world.positions[man.getX_location()-1][man.getY_location()].dangerousTimer <= dangerTimerCurrentPosition){
-                    moveToArea(man.getX_location()-1, man.getY_location(), 0);
-                }
-            }
+         //take the one that will lead us to a zone without danger
+         if(allActions.contains(MoveUtility.Actions.UP)){
+         if(world.positions[man.getX_location()][man.getY_location()-1].dangerousTimer <= dangerTimerCurrentPosition){ //going up will put us in a safer, or as safe, place
+         moveToArea(man.getX_location(), man.getY_location()-1, 0);
+         }
+         }
+         if(allActions.contains(MoveUtility.Actions.DOWN)){
+         if(world.positions[man.getX_location()][man.getY_location()+1].dangerousTimer <= dangerTimerCurrentPosition){
+         moveToArea(man.getX_location(), man.getY_location()+1, 0);
+         }
+         }
+         if(allActions.contains(MoveUtility.Actions.RIGHT)){
+         if(world.positions[man.getX_location()+1][man.getY_location()].dangerousTimer <= dangerTimerCurrentPosition){
+         moveToArea(man.getX_location()+1, man.getY_location(), 0);
+         }
+         }
+         if(allActions.contains(MoveUtility.Actions.LEFT)){
+         if(world.positions[man.getX_location()-1][man.getY_location()].dangerousTimer <= dangerTimerCurrentPosition){
+         moveToArea(man.getX_location()-1, man.getY_location(), 0);
+         }
+         }
 
-            //update danger value
-            dangerTimerCurrentPosition = world.positions[man.getX_location()][man.getY_location()].dangerousTimer;
+         //update danger value
+         dangerTimerCurrentPosition = world.positions[man.getX_location()][man.getY_location()].dangerousTimer;
 
 
 
@@ -326,34 +324,31 @@ public class RemcoAI {
             if (abs(man.getX_location() - x) > abs(man.getY_location() - y)) { //x distance is bigger than y distance
                 if ((man.getX_location() - x) > 0) { // enemy is to the left of us
                     man.setNextMove(MoveUtility.Actions.LEFT);
-                    
+
                 } else { // enemy is to the right of us
                     man.setNextMove(MoveUtility.Actions.RIGHT);
-                    
+
                 }
             } else {  //y distance is bigger than x distance
                 if ((man.getY_location() - y) > 0) { // enemy is to above us
                     man.setNextMove(MoveUtility.Actions.UP);
-                    
+
                 } else { // enemy is to below us
                     man.setNextMove(MoveUtility.Actions.DOWN);
-                    
+
                 }
 
             }
         }
     }
 
-
-
-    void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY){
+    void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY) {
         ArrayList<Pair> consideredCoordinates = new ArrayList<>();
         queue.add(new Pair(man.getX_location(), man.getY_location()));
         searchAndGoToLocation(targetX, targetY, ownX, ownY, consideredCoordinates, 0);
         queue.clear();
 
     }
-
 
     //finds a path, if possible, and moves to target
     void searchAndGoToLocation(int targetX, int targetY, int ownX, int ownY, ArrayList<Pair> consideredCoordinates, int distanceToKeepInSteps) {
@@ -371,7 +366,7 @@ public class RemcoAI {
         Pair currentPair;
         try {
             currentPair = queue.remove();
-        }catch (NoSuchElementException E){
+        } catch (NoSuchElementException E) {
             return; //prevents crashing
         }
         //can't dequeue twice and still get the same pair.
@@ -415,7 +410,7 @@ public class RemcoAI {
                 }
 
             }
-            if(DEBUGPRINTS) System.out.println("FINAL path = " + finalPath.toString());
+            if (DEBUGPRINTS) System.out.println("FINAL path = " + finalPath.toString());
 
             for (int i = finalPath.size() - 1; i - distanceToKeepInSteps >= 0; i--) {
                 moveToArea((int) finalPath.get(i).getFirst(), (int) finalPath.get(i).getSecond(), 0);
@@ -554,7 +549,7 @@ public class RemcoAI {
     }
 
     int manhattanDistance(BomberMan bomber, int x0, int y0) {
-        return abs(bomber.getX_location() - x0) + abs(bomber.getY_location()- y0);
+        return abs(bomber.getX_location() - x0) + abs(bomber.getY_location() - y0);
     }
 
     int manhattanDistanceBomberman(BomberMan bomber1, BomberMan bomber2) {
@@ -861,7 +856,7 @@ public class RemcoAI {
 
                 int randomActionValue = new Random().nextInt(allActions.size());
                 action = allActions.get(randomActionValue);
-                if(DEBUGPRINTS_QLEARNING) System.out.println("Random action was " + action);
+                if (DEBUGPRINTS_QLEARNING) System.out.println("Random action was " + action);
 
             } else { //use highest q-value
                 //get the highest Q-value index
@@ -877,8 +872,8 @@ public class RemcoAI {
                     action = giveActionAtIndex(actionIndex);
 
                 }
-                if(DEBUGPRINTS_QLEARNING) System.out.println("Q-value action was " + action);
-                if(DEBUGPRINTS_QLEARNING) System.out.println("QValue was " + outputLayer[actionIndex]);
+                if (DEBUGPRINTS_QLEARNING) System.out.println("Q-value action was " + action);
+                if (DEBUGPRINTS_QLEARNING) System.out.println("QValue was " + outputLayer[actionIndex]);
 
             }
 
@@ -891,8 +886,8 @@ public class RemcoAI {
             rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), action);
             man.setNextMove(action);
 
-            if(DEBUGPRINTS_QLEARNING) System.out.println("Reward was " + rewardForAction);
-            if(DEBUGPRINTS_QLEARNING) System.out.println();
+            if (DEBUGPRINTS_QLEARNING) System.out.println("Reward was " + rewardForAction);
+            if (DEBUGPRINTS_QLEARNING) System.out.println();
 
             /** Feed forward again **/
             //get the new state as vector
@@ -932,7 +927,6 @@ public class RemcoAI {
         }
 
     }
-
 
     double[] createInputVector() {
         int amountOfFeatures = 3;
@@ -1014,7 +1008,7 @@ public class RemcoAI {
     //Get as close to a direction (i.e. down/south) as possible
     void findAndGoToPathInDirection(MoveUtility.Actions direction) {
 
-        if(DEBUGPRINTS) System.out.println("findAndGoToPathInDirection");
+        if (DEBUGPRINTS) System.out.println("findAndGoToPathInDirection");
 
         //TODO remove unnecessary search in the wrong direction
 
@@ -1078,7 +1072,7 @@ public class RemcoAI {
         }
     }
 
-    void readNetworkFromFile(){
+    void readNetworkFromFile() {
 
         try {
 
@@ -1105,7 +1099,6 @@ public class RemcoAI {
         }
 
     }
-
 
 }
 

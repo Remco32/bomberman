@@ -170,7 +170,9 @@ class NeuralNetRemco implements Serializable {
             //amount of nodes
             for (int node = 0; node < amountOfNodesPerLayer[layer]; node++) {
                 //Get the netInput, transform that into the output, and update the value
-                neuronValueArray[layer][node] = outputNode(netInputNode(layer, node));
+                double netInput = netInputNode(layer, node);
+                double output = outputNode(netInput);
+                neuronValueArray[layer][node] = output;
                 //neuronValueArray[1][0] = outputNode(netInputNode(1,0)); // for layer 1, node 0 AKA hidden0
             }
 
@@ -371,7 +373,7 @@ class NeuralNetRemco implements Serializable {
     private double outputNode(double input) {
         //set activation function here
 
-        return sigmoidFunction(input,0,0);
+        return sigmoidFunction(input, 0, 50, 1);
         //return identityFunction(input);
         //return softsignFunction(input);
         //return softplusFunction(input);
@@ -382,19 +384,19 @@ class NeuralNetRemco implements Serializable {
      * Activation functions, NaN means value doesn't fit anymore in a double
      **/
 
-    private double sigmoidFunction(double input, double activationThreshold, double steepnessCurve) {
-        return (1 / (1 + exp((activationThreshold-(input) / steepnessCurve))));
+    private double sigmoidFunction(double input, double activationThreshold, double steepnessCurve, int multiplier) {
+        return (1 / (1 + exp( (( activationThreshold - (input)) / steepnessCurve) ))) * multiplier;
     } //range == (0,1)
 
     private double identityFunction(double input) {
         return input;
     } //range == (-inf,inf)
 
-    private double softsignFunction(double input){
+    private double softsignFunction(double input) {
         return input / (1 + abs(input));
     } //range == (-1,1)
 
-    private double softplusFunction(double input){
+    private double softplusFunction(double input) {
         return log(1 + exp(input));
     } //range == (0,inf)
 
@@ -406,8 +408,8 @@ class NeuralNetRemco implements Serializable {
         return weightValueArray;
     }
 
-    void saveNetworkToFile(){
-        
+    void saveNetworkToFile() {
+
     }
 }
 

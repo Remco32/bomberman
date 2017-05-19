@@ -12,20 +12,21 @@ public class ShowWindow {
     JFrame frame;
     GameWorld world;
     GameCanvas gameCanvas;
-    ShowWindow(GameWorld world){
+
+    ShowWindow(GameWorld world) {
 
         this.world = world;
         frame = new JFrame("Bomberman");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameCanvas = new GameCanvas(world);
 
-        frame.add(gameCanvas,BorderLayout.CENTER);
+        frame.add(gameCanvas, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
     }
-    public void repaint(){
+
+    public void repaint() {
         gameCanvas.repaint();
     }
-
 
 }
