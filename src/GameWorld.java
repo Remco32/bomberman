@@ -287,7 +287,7 @@ public class GameWorld {
         System.exit(0);
     }
 
-    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs) {
+    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork) {
 
         ROUND_TIME_MILISECONDS = roundTimeInMs;
 
@@ -299,6 +299,9 @@ public class GameWorld {
         setEnemyAI();
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
+
+        if(usePreviousNetwork) AI_Remco.readNetworkFromFile();
+
         AI_Remco.play(3, 0.2);
     }
 
