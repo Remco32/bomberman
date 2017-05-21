@@ -12,12 +12,13 @@ public class GameWorld {
     private ShowWindow window;
 
     long startTimeTrials = System.currentTimeMillis();
+    long totalTimeElapsed;
 
     int ROUND_TIME_MILISECONDS = 500;
 
     RemcoAI AI_Remco;
 
-    int trials;
+    int trialsLeft;
     int totalAmountOfTrials;
     boolean agentMadeKill = false;
     boolean DELAY_BEFORE_START = true; //enables waiting so debuging is easier
@@ -239,13 +240,13 @@ public class GameWorld {
         if (DEBUGPRINTS) System.out.println("Elapsed time: " + (double) (endTime - startTime) / 1000 + " seconds");
 
         //restart game if there are still trials left to run
-        if (trials > 1) { //first game isn't counted
-            trials--;
+        if (trialsLeft > 1) { //first game isn't counted
+            trialsLeft--;
             resetGame();
         }
 
-        if (trials == 1) {
-            AI_Remco.writeNetworkToFile();
+        if (trialsLeft == 1) {
+            //AI_Remco.writeNetworkToFile();
             endGame();
         }
 
@@ -261,7 +262,7 @@ public class GameWorld {
 
     void resetGame() {
         if (DEBUGPRINTS) System.out.println();
-        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trials) + " started.");
+        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft) + " started.");
 
         cleanWorld(); //empty world
         initWorld(); //reinitialize world
@@ -272,16 +273,20 @@ public class GameWorld {
         runGameLoop();
         AI_Remco.setBomberman(this.bomberManList.get(0)); //reset AI
         //AI_Remco.playQLearning(randomMoveChance);
+
+        totalTimeElapsed = System.currentTimeMillis() - startTimeTrials;
+        window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed);
+
         AI_Remco.play(3, 0.2);
 
     }
 
     void endGame() {
-        long totalTimeElapsed = System.currentTimeMillis() - startTimeTrials;
+        totalTimeElapsed = System.currentTimeMillis() - startTimeTrials;
 
         JFrame frame = new JFrame();
         //Show message
-        JOptionPane.showMessageDialog(frame, "All trials have ended. The neural network is saved. Elapsed time: " + totalTimeElapsed + " ms.");
+        JOptionPane.showMessageDialog(frame, "All trials have ended. The neural network is saved. Elapsed time: " + totalTimeElapsed/1000 + " seconds.");
 
         //Close program
         System.exit(0);
@@ -291,16 +296,18 @@ public class GameWorld {
 
         ROUND_TIME_MILISECONDS = roundTimeInMs;
 
-        this.trials = amountOfTrials;
+        this.trialsLeft = amountOfTrials;
         this.totalAmountOfTrials = amountOfTrials;
         this.randomMoveChance = randomMoveChance;
 
-        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trials) + " started.");
+        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft) + " started.");
         setEnemyAI();
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
 
-        if (usePreviousNetwork) AI_Remco.readNetworkFromFile();
+        //if (usePreviousNetwork) AI_Remco.readNetworkFromFile();
+
+        window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed);
 
         AI_Remco.play(3, 0.2);
     }

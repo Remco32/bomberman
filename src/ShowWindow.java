@@ -29,4 +29,18 @@ public class ShowWindow {
         gameCanvas.repaint();
     }
 
+    public void updateTitle(int currentTrial, int totalTrials, long elapsedTime) {
+        double estimatedTimeLeft = 0;
+        if (currentTrial > 1) {
+
+            int remainingTrials = totalTrials - currentTrial;
+            int completedTrials = currentTrial - 1;
+            double averageTimePerTrial = elapsedTime / completedTrials;
+
+            estimatedTimeLeft = averageTimePerTrial * remainingTrials;
+        }
+
+        frame.setTitle("Bomberman | Trial " + currentTrial + " of " + totalTrials + " | Time left: ~" + (int)estimatedTimeLeft/1000 + " seconds");
+    }
+
 }
