@@ -36,8 +36,22 @@ public class Main {
     }
 
     static void playGame() {
-        GameWorld world = new GameWorld(9, 4, true, 1); // gridsize should be of 2*n +1
-        world.startGame(world, 3, 40, 1, 0.8, 0.2, 50, true);
+        int gridSize = 9;
+        int amountOfPlayers = 4;
+        boolean showWindow = true;
+        int worldType = 1;
+
+        int amountOfTrials = 10;
+        int amountHiddenNodes = 40;
+        int amountHiddenLayers = 1;
+        double learningRate = 0.5;
+        double randomMoveChance = 0.2;
+        int roundTimeInMs = 50;
+        boolean usePreviousNetwork = true;
+
+
+        GameWorld world = new GameWorld(gridSize, amountOfPlayers, showWindow, worldType); // gridsize should be of 2*n +1
+        world.startGame(world, amountOfTrials, amountHiddenNodes, amountHiddenLayers, learningRate, randomMoveChance, roundTimeInMs, usePreviousNetwork);
     }
 
     private static double[][] CreateRandomWeights(int rows, int columns) {
