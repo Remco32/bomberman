@@ -1091,55 +1091,62 @@ public class RemcoAI {
         }
 
     }
-/**
+
     void writeNetworkToFile() {
-        try {
-            FileOutputStream f = new FileOutputStream(new File("NeuralNetwork"));
-            ObjectOutputStream o = new ObjectOutputStream(f);
 
-            // Write objects to file
-            o.writeObject(this.neuralNet);
+        for (int i = 0; i < 6; i++) {
+            try {
+                FileOutputStream f = new FileOutputStream(new File("NeuralNetwork" + i));
+                ObjectOutputStream o = new ObjectOutputStream(f);
 
-            o.close();
-            f.close();
+                // Write objects to file
+                o.writeObject(neuralNetList.get(i));
 
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-        } catch (IOException e) {
-            System.out.println("Error initializing stream");
-            System.err.println(e);
+                o.close();
+                f.close();
 
+            } catch (FileNotFoundException e) {
+                System.out.println("File not found");
+            } catch (IOException e) {
+                System.out.println("Error initializing stream");
+                System.err.println(e);
+
+            }
         }
     }
 
     void readNetworkFromFile() {
+        for (int i = 0; i < 6; i++) {
+            try {
 
-        try {
+                FileInputStream fi = new FileInputStream(new File("NeuralNetwork" + i));
+                ObjectInputStream oi = new ObjectInputStream(fi);
 
-            FileInputStream fi = new FileInputStream(new File("NeuralNetwork"));
-            ObjectInputStream oi = new ObjectInputStream(fi);
+                // Read objects
+                NeuralNetRemco loadedNN = (NeuralNetRemco) oi.readObject();
 
-            // Read objects
-            NeuralNetRemco loadedNN = (NeuralNetRemco) oi.readObject();
+                //Overwrite networks
+                neuralNetList.set(i, loadedNN);
 
-            this.neuralNet = loadedNN;
+                oi.close();
+                fi.close();
 
-            oi.close();
-            fi.close();
+                if(DEBUGPRINTS) System.out.println("Network " + i + " loaded.");
 
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-            System.err.println(e);
-        } catch (IOException e) {
-            System.out.println("Error initializing stream");
-            System.err.println(e);
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                System.out.println("File not found");
+                System.err.println(e);
+            } catch (IOException e) {
+                System.out.println("Error initializing stream");
+                System.err.println(e);
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
         }
-
     }
- **/
+
 
 }
 

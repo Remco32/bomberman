@@ -14,6 +14,8 @@ public class GameWorld {
     long startTimeTrials = System.currentTimeMillis();
     long totalTimeElapsed;
 
+    int wonRounds = 0;
+
     int ROUND_TIME_MILISECONDS = 500;
 
     RemcoAI AI_Remco;
@@ -232,7 +234,10 @@ public class GameWorld {
 
             //if(windowBool) window.repaint();
         }
-        if (bomberManList.get(0).alive && DEBUGPRINTS) System.out.println("You won");
+        if (bomberManList.get(0).alive) {
+            wonRounds++;
+            if(DEBUGPRINTS) System.out.println("You won");
+        }
         else if (DEBUGPRINTS) System.out.println("You lost");
 
         if (DEBUGPRINTS) System.out.println("Amount of elapsed timesteps: " + amountOfRounds);
@@ -246,7 +251,7 @@ public class GameWorld {
         }
 
         if (trialsLeft == 1) {
-            //AI_Remco.writeNetworkToFile();
+            AI_Remco.writeNetworkToFile();
             endGame();
         }
 
@@ -275,7 +280,7 @@ public class GameWorld {
         //AI_Remco.playQLearning(randomMoveChance);
 
         totalTimeElapsed = System.currentTimeMillis() - startTimeTrials;
-        window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed);
+        window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed, wonRounds);
 
         AI_Remco.play(3, 0.2);
 
@@ -305,9 +310,9 @@ public class GameWorld {
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
 
-        //if (usePreviousNetwork) AI_Remco.readNetworkFromFile();
+        if (usePreviousNetwork) AI_Remco.readNetworkFromFile();
 
-        window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed);
+        window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed, wonRounds);
 
         AI_Remco.play(3, 0.2);
     }

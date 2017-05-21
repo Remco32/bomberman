@@ -29,18 +29,24 @@ public class ShowWindow {
         gameCanvas.repaint();
     }
 
-    public void updateTitle(int currentTrial, int totalTrials, long elapsedTime) {
+    public void updateTitle(int currentTrial, int totalTrials, long elapsedTime, int wonRounds) {
         double estimatedTimeLeft = 0;
+        double winrate = 0;
         if (currentTrial > 1) {
 
             int remainingTrials = totalTrials - currentTrial;
             int completedTrials = currentTrial - 1;
             double averageTimePerTrial = elapsedTime / completedTrials;
 
-            estimatedTimeLeft = averageTimePerTrial * remainingTrials;
+            estimatedTimeLeft = averageTimePerTrial * remainingTrials + averageTimePerTrial; // + averageTime for off-by-one error
+
+            winrate = (double) wonRounds / (double) (currentTrial - 1);
         }
 
-        frame.setTitle("Bomberman | Trial " + currentTrial + " of " + totalTrials + " | Time left: ~" + (int)estimatedTimeLeft/1000 + " seconds");
+        int minutes = (int) (estimatedTimeLeft / 1000 / 60);
+        int seconds = (int) (estimatedTimeLeft / 1000 % 60);
+
+        frame.setTitle("Time left: ~" + minutes + "m" + seconds + "s" + " | Current winrate: " + String.format("%.2f", winrate) + " | Trial " + currentTrial + " of " + totalTrials);
     }
 
 }

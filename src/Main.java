@@ -36,8 +36,8 @@ public class Main {
     }
 
     static void playGame() {
-        GameWorld world = new GameWorld(9, 2, true, 1); // gridsize should be of 2*n +1
-        world.startGame(world, 10, 40, 1, 0.8, 0.2, 50, false);
+        GameWorld world = new GameWorld(9, 4, true, 1); // gridsize should be of 2*n +1
+        world.startGame(world, 3, 40, 1, 0.8, 0.2, 50, true);
     }
 
     private static double[][] CreateRandomWeights(int rows, int columns) {
