@@ -23,10 +23,10 @@ import java.io.ObjectOutputStream;
  */
 public class RemcoAI {
 
-    boolean DEBUGPRINTS = false;
+    boolean DEBUGPRINTS = true;
     boolean DEBUGPRINTS_QLEARNING = true;
 
-    double MULTIPLIER_QVALUE = 100;
+    //double MULTIPLIER_QVALUE = 100;
 
     GameWorld world;
     BomberMan man;
@@ -39,11 +39,30 @@ public class RemcoAI {
     int RANGE = 2; //TODO add value to bomberman, and use that when placing bombs
     int TIMER_BOMB = 5; //TODO obtain value
 
+    /**
+     * Utility Values
+     * Trapping strategy
+     **/
+
     int UTILITY_ENEMY_WILL_STAND_IN_DANGERZONE = 2;
+    int UTILITY_AGENT_MADE_KILL = 100;
+
+    /**
+     * Utility Values
+     * Closing-in strategy
+     **/
+
+    int UTILITY_GETTING_CLOSER_TO_TARGET = 1;
+    int UTILITY_DISTANCE_TO_TARGET;
+
+    /**
+     * Utility Values
+     * Both strategy
+     **/
+
     int UTILITY_DEATH = -100;
     int UTILITY_STANDING_IN_DANGERZONE = -2;
     int UTILITY_IDLING = -1;
-    int UTILITY_AGENT_MADE_KILL = 100;
 
     double DISCOUNT_FACTOR = 0.5;
     double EPSILON_RANDOMNESS = 0.1;
@@ -62,7 +81,7 @@ public class RemcoAI {
         //double[][] targetVector = {{2, 2, 2, 2, 2, 2}};
         //this.neuralNet = new NeuralNetRemco(currentStateVector, amountHiddenNodes, amountHiddenLayers, targetVector, learningRate);
 
-        double[][] targetVector = {{0.5}};
+        double[][] targetVector = {{0.5}}; // sits between min (0) and max (1) Q-value
         //create 6 neural networks, one for each move we can make
         ArrayList<NeuralNetRemco> neuralNetList = new ArrayList<>();
         for (int i = 0; i < 6; i++){
@@ -79,7 +98,7 @@ public class RemcoAI {
                 moveTowardsEnemy(distanceToKeepInSteps);
             }
             //try to kill enemy
-            trappingStrategy();
+            //trappingStrategy();
             playQLearning(randomMoveChance);
 
             //Adhere to the timesteps of the game
@@ -138,19 +157,23 @@ public class RemcoAI {
 
                 //search for our bomb, if there is one
                 for (Bomb bomb : world.activeBombList) {
-                    //check if our own bomb
+                    //check if it is our own bomb
                     if (bomb.placedBy == man) {
                         bombTimer = bomb.getTimer();
                     }
                 }
                 //wait for bomb to explode
 
-                try {
-                    if (DEBUGPRINTS)
-                        System.out.println("Waiting " + (world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS) + "ms for bomb to explode");
-                    Thread.sleep(world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if (bombTimer > 0) {
+                    try {
+                        if (DEBUGPRINTS) {
+                            System.out.println("Waiting " + (world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS) + "ms for bomb to explode");
+                            System.out.println();
+                        }
+                        Thread.sleep(world.ROUND_TIME_MILISECONDS + bombTimer * world.ROUND_TIME_MILISECONDS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 //try again for a path
@@ -898,7 +921,7 @@ public class RemcoAI {
                 }
 
                 if (DEBUGPRINTS_QLEARNING) System.out.println("Q-value action was " + action);
-                if (DEBUGPRINTS_QLEARNING) System.out.println("QValue was " + outputLayer[actionIndex] * MULTIPLIER_QVALUE);
+                if (DEBUGPRINTS_QLEARNING) System.out.println("QValue was " + outputLayer[actionIndex]);
 
             }
 
@@ -936,7 +959,7 @@ public class RemcoAI {
                 action = giveActionAtIndex(actionIndex);
 
             }
-            double QTarget = rewardForAction + GAMMA * outputLayer[actionIndex] * MULTIPLIER_QVALUE;
+            double QTarget = rewardForAction + (GAMMA * outputLayer[actionIndex]);
 
             /** Update the target with our new value **/
 
@@ -1140,7 +1163,6 @@ public class RemcoAI {
                 System.out.println("Error initializing stream");
                 System.err.println(e);
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 

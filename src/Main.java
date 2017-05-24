@@ -41,12 +41,12 @@ public class Main {
         boolean showWindow = true;
         int worldType = 1;
 
-        int amountOfTrials = 10;
+        int amountOfTrials = 100;
         int amountHiddenNodes = 40;
         int amountHiddenLayers = 1;
         double learningRate = 0.5;
         double randomMoveChance = 0.2;
-        int roundTimeInMs = 50;
+        int roundTimeInMs = 500;
         boolean usePreviousNetwork = true;
 
 
