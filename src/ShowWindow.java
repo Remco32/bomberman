@@ -46,7 +46,12 @@ public class ShowWindow {
         int minutes = (int) (estimatedTimeLeft / 1000 / 60);
         int seconds = (int) (estimatedTimeLeft / 1000 % 60);
 
-        frame.setTitle("Time left: ~" + minutes + "m" + seconds + "s" + " | Current winrate: " + String.format("%.2f", winrate) + " | Trial " + currentTrial + " of " + totalTrials);
+        String timeLeft = "Time left: ~";
+        if(minutes > 0) timeLeft = timeLeft.concat(minutes + "m");
+        if(seconds > 0)  timeLeft = timeLeft.concat(seconds + "s");
+        if(seconds == 0 && minutes == 0) timeLeft = timeLeft.concat("unknown");
+
+        frame.setTitle(timeLeft + " | Current winrate: " + String.format("%.2f", winrate) + " | Trial " + currentTrial + " of " + totalTrials);
     }
 
 }

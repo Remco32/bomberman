@@ -23,7 +23,7 @@ import java.io.ObjectOutputStream;
 public class RemcoAI {
 
     boolean DEBUGPRINTS = true;
-    boolean DEBUGPRINTS_QLEARNING = true;
+    boolean DEBUGPRINTS_QLEARNING = false;
 
     BomberMan currentEnemyTarget;
 
@@ -98,18 +98,19 @@ public class RemcoAI {
         while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
             //get to right distance
 
-            while ((manhattanDistanceBomberman(man, findClosestEnemy()) > distanceToKeepInSteps + 1)) { // give a buffer in which we can keep a distance to the enemy. Useful after placing a bomb
+            currentEnemyTarget = findClosestEnemy();
+            while ((manhattanDistanceBomberman(man, currentEnemyTarget) > distanceToKeepInSteps + 1) && world.PlayerCheck()) { // give a buffer in which we can keep a distance to the enemy. Useful after placing a bomb
                 //moveTowardsEnemy(distanceToKeepInSteps);
                 //pick closest enemy as our target
-                currentEnemyTarget = findClosestEnemy();
+
                 playQLearning(randomMoveChance, "closingin");
             }
 
-            if(DEBUGPRINTS) System.out.println("Switching to trapping strategy.");
 
             //try to kill enemy
             //trappingStrategy();
-            while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
+            while (world.bomberManList.get(0).alive && world.PlayerCheck() && currentEnemyTarget.alive) {
+                if(DEBUGPRINTS) System.out.println("Switched to trapping strategy");
                 playQLearning(randomMoveChance, "trapping");
             }
 

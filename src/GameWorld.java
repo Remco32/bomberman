@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.util.ArrayList;
 
+import static javax.swing.JOptionPane.OK_OPTION;
+
 /**
  * Created by joseph on 09/02/2017.
  */
@@ -14,8 +16,6 @@ public class GameWorld {
     long startTimeTrials = System.currentTimeMillis();
     long totalTimeElapsed;
 
-    boolean saveNetworkAfterTraining = false;
-
     int wonRounds = 0;
 
     int ROUND_TIME_MILISECONDS = 500;
@@ -25,7 +25,7 @@ public class GameWorld {
     int trialsLeft;
     int totalAmountOfTrials;
     boolean agentMadeKill = false;
-    boolean DELAY_BEFORE_START = true; //enables waiting so debuging is easier
+    boolean DELAY_BEFORE_START; //enables waiting so debuging is easier
 
     boolean DEBUGPRINTS = true;
     boolean SHOWROUNDS = true;
@@ -171,13 +171,7 @@ public class GameWorld {
 
     void runGameLoop() {
 
-        if (DELAY_BEFORE_START) {
-            try {
-                Thread.sleep(ROUND_TIME_MILISECONDS * 4);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+
 
         Thread loop = new Thread() {
             @Override
@@ -289,39 +283,54 @@ public class GameWorld {
     }
 
     void endGame() {
-        //save networks
-        if(saveNetworkAfterTraining) AI_Remco.writeNetworkToFile("trapping");
-        if(saveNetworkAfterTraining) AI_Remco.writeNetworkToFile("closingin");
+        cleanWorld();
+
+        //Ask user if losing old networks is OK
+        int decision = JOptionPane.showConfirmDialog(null, "Do you want to save the trained networks? Old networks will be overwritten.",
+                "Saving networks?", JOptionPane.OK_CANCEL_OPTION);
+
+        if (decision == OK_OPTION) {
+            //save networks
+            AI_Remco.writeNetworkToFile("trapping");
+            AI_Remco.writeNetworkToFile("closingin");
+        }
 
         totalTimeElapsed = System.currentTimeMillis() - startTimeTrials;
 
         JFrame frame = new JFrame();
         //Show message
-        if(saveNetworkAfterTraining) {
-            JOptionPane.showMessageDialog(frame, "All trials have ended. The neural network is saved. Elapsed time: " + totalTimeElapsed / 1000 + " seconds.");
-        }else{
+
             JOptionPane.showMessageDialog(frame, "All trials have ended. Elapsed time: " + totalTimeElapsed / 1000 + " seconds.");
-        }
+
 
         //Close program
         System.exit(0);
     }
 
-    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork, boolean saveNetworkAfterTraining) {
+    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork, boolean delayStartOfTrial) {
 
         ROUND_TIME_MILISECONDS = roundTimeInMs;
 
         this.trialsLeft = amountOfTrials;
         this.totalAmountOfTrials = amountOfTrials;
         this.randomMoveChance = randomMoveChance;
-        this.saveNetworkAfterTraining = saveNetworkAfterTraining;
+        this.DELAY_BEFORE_START = delayStartOfTrial;
+
+        if (DELAY_BEFORE_START) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft) + " started.");
         setEnemyAI();
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
 
-        if (usePreviousNetwork) AI_Remco.readNetworkFromFile("test");
+        if (usePreviousNetwork) AI_Remco.readNetworkFromFile("trapping");
+        if (usePreviousNetwork) AI_Remco.readNetworkFromFile("closingin");
 
         window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed, wonRounds);
 
