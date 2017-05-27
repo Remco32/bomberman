@@ -14,6 +14,8 @@ public class GameWorld {
     long startTimeTrials = System.currentTimeMillis();
     long totalTimeElapsed;
 
+    boolean saveNetworkAfterTraining = false;
+
     int wonRounds = 0;
 
     int ROUND_TIME_MILISECONDS = 500;
@@ -251,7 +253,7 @@ public class GameWorld {
         }
 
         if (trialsLeft == 1) {
-            AI_Remco.writeNetworkToFile();
+
             endGame();
         }
 
@@ -287,30 +289,39 @@ public class GameWorld {
     }
 
     void endGame() {
+        //save networks
+        if(saveNetworkAfterTraining) AI_Remco.writeNetworkToFile("trapping");
+        if(saveNetworkAfterTraining) AI_Remco.writeNetworkToFile("closingin");
+
         totalTimeElapsed = System.currentTimeMillis() - startTimeTrials;
 
         JFrame frame = new JFrame();
         //Show message
-        JOptionPane.showMessageDialog(frame, "All trials have ended. The neural network is saved. Elapsed time: " + totalTimeElapsed/1000 + " seconds.");
+        if(saveNetworkAfterTraining) {
+            JOptionPane.showMessageDialog(frame, "All trials have ended. The neural network is saved. Elapsed time: " + totalTimeElapsed / 1000 + " seconds.");
+        }else{
+            JOptionPane.showMessageDialog(frame, "All trials have ended. Elapsed time: " + totalTimeElapsed / 1000 + " seconds.");
+        }
 
         //Close program
         System.exit(0);
     }
 
-    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork) {
+    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork, boolean saveNetworkAfterTraining) {
 
         ROUND_TIME_MILISECONDS = roundTimeInMs;
 
         this.trialsLeft = amountOfTrials;
         this.totalAmountOfTrials = amountOfTrials;
         this.randomMoveChance = randomMoveChance;
+        this.saveNetworkAfterTraining = saveNetworkAfterTraining;
 
         if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft) + " started.");
         setEnemyAI();
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
 
-        if (usePreviousNetwork) AI_Remco.readNetworkFromFile();
+        if (usePreviousNetwork) AI_Remco.readNetworkFromFile("test");
 
         window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed, wonRounds);
 

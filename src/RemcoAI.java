@@ -1,6 +1,5 @@
 import org.apache.commons.math3.util.Pair;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -26,6 +25,8 @@ public class RemcoAI {
     boolean DEBUGPRINTS = true;
     boolean DEBUGPRINTS_QLEARNING = true;
 
+    BomberMan currentEnemyTarget;
+
     //double MULTIPLIER_QVALUE = 100;
 
     GameWorld world;
@@ -34,7 +35,8 @@ public class RemcoAI {
     Queue<Pair> queue = new LinkedList<>();
 
     //NeuralNetRemco neuralNet;
-    ArrayList<NeuralNetRemco> neuralNetList;
+    ArrayList<NeuralNetRemco> neuralNetListTrapping;
+    ArrayList<NeuralNetRemco> neuralNetListClosingIn;
 
     int RANGE = 2; //TODO add value to bomberman, and use that when placing bombs
     int TIMER_BOMB = 5; //TODO obtain value
@@ -53,7 +55,6 @@ public class RemcoAI {
      **/
 
     int UTILITY_GETTING_CLOSER_TO_TARGET = 1;
-    int UTILITY_DISTANCE_TO_TARGET;
 
     /**
      * Utility Values
@@ -82,26 +83,35 @@ public class RemcoAI {
         //this.neuralNet = new NeuralNetRemco(currentStateVector, amountHiddenNodes, amountHiddenLayers, targetVector, learningRate);
 
         double[][] targetVector = {{0.5}}; // sits between min (0) and max (1) Q-value
-        //create 6 neural networks, one for each move we can make
+        //create 6 neural networks, one for each move we can make.
         ArrayList<NeuralNetRemco> neuralNetList = new ArrayList<>();
-        for (int i = 0; i < 6; i++){
+        for (int i = 0; i < 6; i++) {
             neuralNetList.add(new NeuralNetRemco(currentStateVector, amountHiddenNodes, amountHiddenLayers, targetVector, learningRate));
         }
-        this.neuralNetList = neuralNetList;
+        //Initial networks are identical, this isn't a problem
+        this.neuralNetListTrapping = neuralNetList;
+        this.neuralNetListClosingIn = neuralNetList;
 
     }
 
     void play(int distanceToKeepInSteps, double randomMoveChance) {
         while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
             //get to right distance
+
             while ((manhattanDistanceBomberman(man, findClosestEnemy()) > distanceToKeepInSteps + 1)) { // give a buffer in which we can keep a distance to the enemy. Useful after placing a bomb
-                moveTowardsEnemy(distanceToKeepInSteps);
+                //moveTowardsEnemy(distanceToKeepInSteps);
+                //pick closest enemy as our target
+                currentEnemyTarget = findClosestEnemy();
+                playQLearning(randomMoveChance, "closingin");
             }
+
+            if(DEBUGPRINTS) System.out.println("Switching to trapping strategy.");
+
             //try to kill enemy
             //trappingStrategy();
-            playQLearning(randomMoveChance);
-
-            //Adhere to the timesteps of the game
+            while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
+                playQLearning(randomMoveChance, "trapping");
+            }
 
         }
     }
@@ -110,7 +120,7 @@ public class RemcoAI {
         if (DEBUGPRINTS) System.out.println();
         if (DEBUGPRINTS) System.out.println("Trapping strategy in progress.");
 
-        MoveUtility.Actions action = getBestAction(man.getX_location(), man.getY_location());
+        MoveUtility.Actions action = getBestAction(man.getX_location(), man.getY_location(), "trapping");
         if (DEBUGPRINTS) System.out.println(action.toString());
         man.setNextMove(action);
 
@@ -122,12 +132,12 @@ public class RemcoAI {
         if (world.bomberManList.size() <= 1) { //no other players
             return;
         }
-        BomberMan enemy = findClosestEnemy();
+        currentEnemyTarget = findClosestEnemy();
 
         //We are not yet at the right location
-        while (!(manhattanDistanceBomberman(man, enemy) <= distanceToKeepInSteps) && man.alive) { //closer is also fine
-            int enemyX = enemy.getX_location();
-            int enemyY = enemy.getY_location();
+        while (!(manhattanDistanceBomberman(man, currentEnemyTarget) <= distanceToKeepInSteps) && man.alive) { //closer is also fine
+            int enemyX = currentEnemyTarget.getX_location();
+            int enemyY = currentEnemyTarget.getY_location();
 
             //add our initial position to queue
             queue.add(new Pair(man.getX_location(), man.getY_location()));
@@ -315,7 +325,7 @@ public class RemcoAI {
 
         //check if there is a dangerzone in our field
         while (dangerTimerCurrentPosition > 0) {
-            man.setNextMove(getBestAction(man.getX_location(), man.getY_location()));
+            man.setNextMove(getBestAction(man.getX_location(), man.getY_location(), "closingin"));
             //update danger value
             dangerTimerCurrentPosition = world.positions[man.getX_location()][man.getY_location()].dangerousTimer;
         }
@@ -607,7 +617,7 @@ public class RemcoAI {
     }
 
     //calculates reward for taking an action, given coordinates and an action
-    int rewardFunction(int xAgent, int yAgent, MoveUtility.Actions action) {
+    int rewardFunctionTrapping(int xAgent, int yAgent, MoveUtility.Actions action) {
 
         //
         //Points awarded for killing enemy -- not possible by just one move, has to be done by bomb
@@ -729,6 +739,124 @@ public class RemcoAI {
         return 0;
     }
 
+    //calculates reward for taking an action, given coordinates and an action
+    int rewardFunctionClosingIn(int xAgent, int yAgent, MoveUtility.Actions action) {
+
+        //
+        //Points penalty for being killed
+        //
+        if (action != MoveUtility.Actions.PLACEBOMB) { //any movement
+            //Check if moving to a direction will get us killed
+            switch (action) {
+                case UP:
+                    if (world.positions[xAgent][yAgent - 1].dangerousTimer == 1) { //moving here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+                case DOWN:
+                    if (world.positions[xAgent][yAgent + 1].dangerousTimer == 1) { //moving here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+                case LEFT:
+                    if (world.positions[xAgent - 1][yAgent].dangerousTimer == 1) { //moving here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+                case RIGHT:
+                    if (world.positions[xAgent + 1][yAgent].dangerousTimer == 1) { //moving here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+                case IDLE:
+                    if (world.positions[xAgent][yAgent].dangerousTimer == 1) { //staying here will kill us
+                        return UTILITY_DEATH;
+                    }
+                    break;
+            }
+
+        }
+        //
+        //Points penalty for standing in dangerzone, depending on the danger level (timer)
+        //
+        int penalty = 0;
+        if (action != MoveUtility.Actions.PLACEBOMB) { //any movement
+
+            Bomb closestBomb = null;
+            if (!world.activeBombList.isEmpty()) {
+                closestBomb = getClosestBomb(man.getX_location(), man.getY_location());
+                //System.out.println("Bomb is in direction " + getDirectionTarget(closestBomb.x_location, closestBomb.y_location).toString());
+
+            }
+            //Check if moving to a direction will get us killed
+            switch (action) {
+                case UP:
+                    if (world.positions[xAgent][yAgent - 1].dangerousTimer > 0) { //moving here will be dangerous
+                        //penalty added for moving towards a bomb
+                        if (closestBomb != null && (getDirectionTarget(closestBomb.x_location, closestBomb.y_location) == MoveUtility.Actions.UP)) { //there is a bomb, and it's in the direction we want to go
+                            penalty = -10;
+                        }
+                        //returns a value that gets higher when the bomb gets closer to 0. Gives highest penalty for time==1, since time==0 equals death anyway.
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent][yAgent - 1].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB) + penalty;
+                    }
+                    break;
+                case DOWN:
+                    if (world.positions[xAgent][yAgent + 1].dangerousTimer > 0) {
+                        if (closestBomb != null && (getDirectionTarget(closestBomb.x_location, closestBomb.y_location) == MoveUtility.Actions.DOWN)) { //there is a bomb, and it's in the direction we want to go
+                            penalty = -10;
+                        }
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent][yAgent + 1].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB) + penalty;
+                    }
+                    break;
+                case LEFT:
+                    if (world.positions[xAgent - 1][yAgent].dangerousTimer > 0) {
+                        if (closestBomb != null && (getDirectionTarget(closestBomb.x_location, closestBomb.y_location) == MoveUtility.Actions.LEFT)) { //there is a bomb, and it's in the direction we want to go
+                            penalty = -10;
+                        }
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent - 1][yAgent].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB) + penalty;
+                    }
+                    break;
+                case RIGHT:
+                    if (world.positions[xAgent + 1][yAgent].dangerousTimer > 0) {
+                        if (closestBomb != null && (getDirectionTarget(closestBomb.x_location, closestBomb.y_location) == MoveUtility.Actions.RIGHT)) { //there is a bomb, and it's in the direction we want to go
+                            penalty = -10;
+                        }
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent + 1][yAgent].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB) + penalty;
+                    }
+                    break;
+                case IDLE:
+                    if (world.positions[xAgent][yAgent].dangerousTimer > 0) { //staying here will be dangerous
+                        if (closestBomb.x_location == xAgent && closestBomb.y_location == yAgent) {
+                            penalty = -20;
+                        }
+                        return UTILITY_STANDING_IN_DANGERZONE + (world.positions[xAgent][yAgent].dangerousTimer - 1) * (-UTILITY_STANDING_IN_DANGERZONE / TIMER_BOMB) + penalty;
+                    }
+                    break;
+            }
+
+            //
+            //Points penalty for idling, but less points deducted than for standing in dangerzone.
+            //Gets checked after previous statement, because the penalty for idling in a dangerzone is higher.
+            //
+            if (action == MoveUtility.Actions.IDLE) {
+                return UTILITY_IDLING;
+            }
+
+            //we get closer to our target
+            if (action == getDirectionTarget(currentEnemyTarget.getX_location(), currentEnemyTarget.getY_location())) {
+                return UTILITY_GETTING_CLOSER_TO_TARGET;
+            }
+
+        }
+        return 0;
+    }
+
+    int rewardFunction(int xAgent, int yAgent, MoveUtility.Actions action, String strategy) {
+        if (Objects.equals(strategy, "trapping")) return rewardFunctionTrapping(xAgent, yAgent, action);
+        else return rewardFunctionClosingIn(xAgent, yAgent, action);
+
+    }
+
     //returns a list of possible actions for a state
     ArrayList<MoveUtility.Actions> giveAllPossibleActions(int xAgent, int yAgent) {
         ArrayList<MoveUtility.Actions> moveList = new ArrayList<>();
@@ -778,18 +906,27 @@ public class RemcoAI {
         return null;
     }
 
-    MoveUtility.Actions getBestAction(int xAgent, int yAgent) {
+    MoveUtility.Actions getBestAction(int xAgent, int yAgent, String strategy) {
 
         int maxReward = -10000; //negative value, since we can have a 'least worst' option that is <0 points
         MoveUtility.Actions bestAction = null;
 
         ArrayList<MoveUtility.Actions> possibleActions = giveAllPossibleActions(man.getX_location(), man.getY_location());
 
+        //TODO rewrite
         for (MoveUtility.Actions action : possibleActions) {
-            if (rewardFunction(xAgent, yAgent, action) > maxReward) {
-                maxReward = rewardFunction(xAgent, yAgent, action);
-                bestAction = action;
+            if (Objects.equals(strategy, "trapping")) {
+                if (rewardFunctionTrapping(xAgent, yAgent, action) > maxReward) {
+                    maxReward = rewardFunctionTrapping(xAgent, yAgent, action);
+                    bestAction = action;
+                }
+            } else {
+                if (rewardFunctionClosingIn(xAgent, yAgent, action) > maxReward) {
+                    maxReward = rewardFunctionClosingIn(xAgent, yAgent, action);
+                    bestAction = action;
+                }
             }
+
         }
         return bestAction;
     }
@@ -853,7 +990,7 @@ public class RemcoAI {
     }
 
     //TODO reduce randomMoveChance over time
-    void playQLearning(double randomMoveChance) {
+    void playQLearning(double randomMoveChance, String strategy) {
 
         //TODO replace with global var
         int amountOfFeatures = 3;
@@ -874,17 +1011,26 @@ public class RemcoAI {
 
         double[][] targetVector = {{2}};
 
+        //set right strategy
+        ArrayList<NeuralNetRemco> neuralNetList;
+        if (Objects.equals(strategy, "trapping")) {
+            neuralNetList = neuralNetListTrapping;
+        } else {
+            neuralNetList = neuralNetListClosingIn;
+        }
+
         /** Q-learning starts here **/
 
+        /**
         //Keep making moves until the game ends
         while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
-
-
+         **/
 
             /** Do a forwardpass **/
-            for(NeuralNetRemco neuralNet : neuralNetList) {
+            for (NeuralNetRemco neuralNet : neuralNetList) {
                 neuralNet.forwardPass(currentStateVector[0]);
             }
+
             //System.out.println(Arrays.toString(neuralNet.getOutputLayer()));
 
             /** pick a random move or highest Q-value **/
@@ -901,10 +1047,9 @@ public class RemcoAI {
 
             } else { //use highest q-value
 
-
                 //get the highest Q-value index
                 //double[] outputLayer = neuralNet.getOutputLayer();
-                double[]outputLayer = getQValuesAllNetworks();
+                double[] outputLayer = getQValuesAllNetworks(strategy);
 
                 //take node with highest activation
                 int actionIndex = getArrayIndexHighestValue(outputLayer);
@@ -931,7 +1076,9 @@ public class RemcoAI {
             previousAction = action;
 
             /** make move **/
-            rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), action);
+
+            rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), action, strategy);
+
             man.setNextMove(action);
 
             if (DEBUGPRINTS_QLEARNING) System.out.println("Reward was " + rewardForAction);
@@ -940,14 +1087,14 @@ public class RemcoAI {
             /** Feed forward again **/
             //get the new state as vector
             currentStateVector[0] = createInputVector();
-            for(NeuralNetRemco neuralNet : neuralNetList) {
+            for (NeuralNetRemco neuralNet : neuralNetList) {
                 neuralNet.forwardPass(currentStateVector[0]);
             }
 
             /** Calculate Q-target **/
             //get the highest Q-value index
             //double[] outputLayer = neuralNet.getOutputLayer();
-            double[]outputLayer = getQValuesAllNetworks();
+            double[] outputLayer = getQValuesAllNetworks(strategy);
             //take node with highest activation
             int actionIndex = getArrayIndexHighestValue(outputLayer);
             action = giveActionAtIndex(actionIndex);
@@ -980,13 +1127,21 @@ public class RemcoAI {
             //man.waitForNextTurn();
         }
 
-    }
 
-    double[] getQValuesAllNetworks() {
+
+    double[] getQValuesAllNetworks(String strategy) {
+        ArrayList<NeuralNetRemco> neuralNetList;
+
+        if (Objects.equals(strategy, "trapping")) {
+            neuralNetList = neuralNetListTrapping;
+        } else {
+            neuralNetList = neuralNetListClosingIn;
+        }
+
         double[] allQValues = new double[6];
-        for(int i = 0; i < neuralNetList.size(); i++){
+        for (int i = 0; i < neuralNetList.size(); i++) {
             //put the value of the outputlayer inside the array
-            allQValues[i] = neuralNetList.get(i).getOutputLayer()[0] ;
+            allQValues[i] = neuralNetList.get(i).getOutputLayer()[0];
         }
         return allQValues;
     }
@@ -1115,11 +1270,18 @@ public class RemcoAI {
 
     }
 
-    void writeNetworkToFile() {
+    void writeNetworkToFile(String strategy) {
+
+        ArrayList<NeuralNetRemco> neuralNetList;
+        if (Objects.equals(strategy, "trapping")) {
+            neuralNetList = neuralNetListTrapping;
+        } else {
+            neuralNetList = neuralNetListClosingIn;
+        }
 
         for (int i = 0; i < 6; i++) {
             try {
-                FileOutputStream f = new FileOutputStream(new File("NeuralNetwork" + i));
+                FileOutputStream f = new FileOutputStream(new File("NeuralNetwork_" + strategy + i));
                 ObjectOutputStream o = new ObjectOutputStream(f);
 
                 // Write objects to file
@@ -1138,11 +1300,17 @@ public class RemcoAI {
         }
     }
 
-    void readNetworkFromFile() {
+    void readNetworkFromFile(String strategy) {
+        ArrayList<NeuralNetRemco> neuralNetList;
+        if (Objects.equals(strategy, "trapping")) {
+            neuralNetList = neuralNetListTrapping;
+        } else {
+            neuralNetList = neuralNetListClosingIn;
+        }
         for (int i = 0; i < 6; i++) {
             try {
 
-                FileInputStream fi = new FileInputStream(new File("NeuralNetwork" + i));
+                FileInputStream fi = new FileInputStream(new File("NeuralNetwork_" + strategy + i));
                 ObjectInputStream oi = new ObjectInputStream(fi);
 
                 // Read objects
@@ -1154,7 +1322,7 @@ public class RemcoAI {
                 oi.close();
                 fi.close();
 
-                if(DEBUGPRINTS) System.out.println("Network " + i + " loaded.");
+                if (DEBUGPRINTS) System.out.println("Network " + i + " loaded.");
 
             } catch (FileNotFoundException e) {
                 System.out.println("File not found");
@@ -1168,7 +1336,6 @@ public class RemcoAI {
 
         }
     }
-
 
 }
 
