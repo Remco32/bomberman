@@ -54,4 +54,5 @@ public class ShowWindow {
         frame.setTitle(timeLeft + " | Current winrate: " + String.format("%.2f", winrate) + " | Trial " + currentTrial + " of " + totalTrials);
     }
 
+
 }

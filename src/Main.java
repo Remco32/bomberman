@@ -24,7 +24,7 @@ public class Main {
         double[] testInput4 = {1, 1}; // XOR
 
         //TODO leert niet goed bij >40 hidden nodes
-        NeuralNetRemco NN_Remco = new NeuralNetRemco(input, 20, 1, targetOutput, 0.5);
+        NeuralNetRemco NN_Remco = new NeuralNetRemco(input, 30, 1, targetOutput, 0.5);
         NN_Remco.learn(10000);
         System.out.println();
         System.out.println(Arrays.toString(testInput1) + " gives " + Arrays.toString(NN_Remco.getOutputLayer(testInput1)) + " | target is " + Arrays.toString(targetOutput[0]));
@@ -41,18 +41,18 @@ public class Main {
         boolean showWindow = true;
         int worldType = 1;
 
-        int amountOfTrials = 100;
-        int amountHiddenNodes = 40;
+        int amountOfTrials = 10;
+        int amountHiddenNodes = 30;
         int amountHiddenLayers = 1;
         double learningRate = 0.5;
         double randomMoveChance = 0.2;
-        int roundTimeInMs = 150; //Setting this too low will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
-        boolean usePreviousNetwork = true;
-        boolean delayStartofTrial = false; //gives you time to move the gamewindow before it becomes unresponsive
+        int roundTimeInMs = 50; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
+        boolean usePreviousNetwork = false;
+        boolean delayStartOfTrial = false; //gives you time to move the gamewindow before it becomes unresponsive
 
 
         GameWorld world = new GameWorld(gridSize, amountOfPlayers, showWindow, worldType); // gridsize should be of 2*n +1
-        world.startGame(world, amountOfTrials, amountHiddenNodes, amountHiddenLayers, learningRate, randomMoveChance, roundTimeInMs, usePreviousNetwork, delayStartofTrial);
+        world.startGame(world, amountOfTrials, amountHiddenNodes, amountHiddenLayers, learningRate, randomMoveChance, roundTimeInMs, usePreviousNetwork, delayStartOfTrial);
     }
 
     private static double[][] CreateRandomWeights(int rows, int columns) {

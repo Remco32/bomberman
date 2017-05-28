@@ -35,8 +35,8 @@ public class RemcoAI {
     Queue<Pair> queue = new LinkedList<>();
 
     //NeuralNetRemco neuralNet;
-    ArrayList<NeuralNetRemco> neuralNetListTrapping;
-    ArrayList<NeuralNetRemco> neuralNetListClosingIn;
+    ArrayList<NeuralNetRemco> neuralNetListTrapping= new ArrayList<>();
+    ArrayList<NeuralNetRemco> neuralNetListClosingIn= new ArrayList<>();
 
     int RANGE = 2; //TODO add value to bomberman, and use that when placing bombs
     int TIMER_BOMB = 5; //TODO obtain value
@@ -90,7 +90,12 @@ public class RemcoAI {
         }
         //Initial networks are identical, this isn't a problem
         this.neuralNetListTrapping = neuralNetList;
-        this.neuralNetListClosingIn = neuralNetList;
+//TODO prettier implementation
+        ArrayList<NeuralNetRemco> neuralNetList2 = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            neuralNetList2.add(new NeuralNetRemco(currentStateVector, amountHiddenNodes, amountHiddenLayers, targetVector, learningRate));
+        }
+        this.neuralNetListClosingIn = neuralNetList2;
 
     }
 
@@ -1015,9 +1020,9 @@ public class RemcoAI {
         //set right strategy
         ArrayList<NeuralNetRemco> neuralNetList;
         if (Objects.equals(strategy, "trapping")) {
-            neuralNetList = neuralNetListTrapping;
+            neuralNetList = this.neuralNetListTrapping;
         } else {
-            neuralNetList = neuralNetListClosingIn;
+            neuralNetList = this.neuralNetListClosingIn;
         }
 
         /** Q-learning starts here **/
@@ -1123,9 +1128,6 @@ public class RemcoAI {
 
             /** Do the backward pass **/
             neuralNetList.get(actionIndex).backwardsPass();
-
-            //adhere the timesteps
-            //man.waitForNextTurn();
         }
 
 

@@ -373,7 +373,8 @@ class NeuralNetRemco implements Serializable {
     private double outputNode(double input) {
         //set activation function here
 
-        return sigmoidFunction(input, 0, 50);
+        return simpleSigmoid(input);
+        //return sigmoidFunction(input, 0, 50);
         //return identityFunction(input);
         //return softsignFunction(input);
         //return softplusFunction(input);
@@ -387,6 +388,10 @@ class NeuralNetRemco implements Serializable {
     private double sigmoidFunction(double input, double activationThreshold, double steepnessCurve) {
         return (1 / (1 + exp( (( activationThreshold - (input)) / steepnessCurve) )));
     } //range == (0,1)
+
+    private double simpleSigmoid(double input){
+        return (1/(1+exp(-(input))));
+    }
 
     private double identityFunction(double input) {
         return input;

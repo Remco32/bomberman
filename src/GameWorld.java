@@ -263,7 +263,7 @@ public class GameWorld {
 
     void resetGame() {
         if (DEBUGPRINTS) System.out.println();
-        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft) + " started.");
+        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft + 1) + " started.");
 
         cleanWorld(); //empty world
         initWorld(); //reinitialize world
@@ -299,9 +299,7 @@ public class GameWorld {
 
         JFrame frame = new JFrame();
         //Show message
-
-            JOptionPane.showMessageDialog(frame, "All trials have ended. Elapsed time: " + totalTimeElapsed / 1000 + " seconds.");
-
+        JOptionPane.showMessageDialog(frame, "All trials have ended. "+ System.lineSeparator() + "Elapsed time: " + totalTimeElapsed / 1000 + " seconds." + System.lineSeparator() + "Winrate was " + String.format("%.2f", (double) wonRounds / (double) (totalAmountOfTrials - 1)));
 
         //Close program
         System.exit(0);
@@ -324,7 +322,7 @@ public class GameWorld {
             }
         }
 
-        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft) + " started.");
+        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft + 1) + " started.");
         setEnemyAI();
         runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
