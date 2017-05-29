@@ -171,8 +171,6 @@ public class GameWorld {
 
     void runGameLoop() {
 
-
-
         Thread loop = new Thread() {
             @Override
             public void run() {
@@ -232,9 +230,8 @@ public class GameWorld {
         }
         if (bomberManList.get(0).alive) {
             wonRounds++;
-            if(DEBUGPRINTS) System.out.println("You won");
-        }
-        else if (DEBUGPRINTS) System.out.println("You lost");
+            if (DEBUGPRINTS) System.out.println("You won");
+        } else if (DEBUGPRINTS) System.out.println("You lost");
 
         if (DEBUGPRINTS) System.out.println("Amount of elapsed timesteps: " + amountOfRounds);
         long endTime = System.currentTimeMillis();
@@ -291,13 +288,13 @@ public class GameWorld {
 
         JFrame frame = new JFrame();
         //Show message
-        JOptionPane.showMessageDialog(frame, "All trials have ended. "+ System.lineSeparator() + "Elapsed time: " + String.format("%.2f",((double)totalTimeElapsed / 1000 /60)) + " minutes." + System.lineSeparator() + "Winrate was " + String.format("%.2f", (double) wonRounds / (double) (totalAmountOfTrials - 1)));
+        JOptionPane.showMessageDialog(frame, "All trials have ended. " + System.lineSeparator() + "Elapsed time: " + String.format("%.2f", ((double) totalTimeElapsed / 1000 / 60)) + " minutes." + System.lineSeparator() + "Winrate was " + String.format("%.2f", (double) wonRounds / (double) (totalAmountOfTrials-trialsLeft - 1)));
 
         //Close program
         System.exit(0);
     }
 
-    int endGameInt(){
+    int endGameInt() {
         endGame();
         return 0;
     }
@@ -321,25 +318,19 @@ public class GameWorld {
 
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
 
-
-        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft + 1) + " started.");
-
-
-
-        if (usePreviousNetwork)  AI_Remco.readNetworkFromFile("trapping");
-        if (usePreviousNetwork)  AI_Remco.readNetworkFromFile("closingin");
-
-
+        if (usePreviousNetwork) AI_Remco.readNetworkFromFile("trapping");
+        if (usePreviousNetwork) AI_Remco.readNetworkFromFile("closingin");
 
         setEnemyAI();
         runGameLoop();
+        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft + 1) + " started.");
 
         window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed, wonRounds);
 
         AI_Remco.play(3, 0.2);
     }
 
-    void saveNetworks(){
+    void saveNetworks() {
         //Ask user if losing old networks is OK
         int decision = JOptionPane.showConfirmDialog(null, "Do you want to save the trained networks? Old networks will be overwritten.",
                 "Saving networks?", JOptionPane.OK_CANCEL_OPTION);
@@ -351,7 +342,7 @@ public class GameWorld {
         }
     }
 
-    void quitGame(){
+    void quitGame() {
 
         System.exit(0);
     }
