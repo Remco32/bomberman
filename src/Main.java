@@ -23,9 +23,9 @@ public class Main {
         double[] testInput3 = {1, 0}; // XOR
         double[] testInput4 = {1, 1}; // XOR
 
-        //TODO leert niet goed bij >40 hidden nodes
-        NeuralNetRemco NN_Remco = new NeuralNetRemco(input, 30, 1, targetOutput, 0.5);
-        NN_Remco.learn(10000);
+        //TODO leert niet goed bij >30 hidden nodes
+        NeuralNetRemco NN_Remco = new NeuralNetRemco(input, 20, 1, targetOutput, 0.5);
+        NN_Remco.learn(5000);
         System.out.println();
         System.out.println(Arrays.toString(testInput1) + " gives " + Arrays.toString(NN_Remco.getOutputLayer(testInput1)) + " | target is " + Arrays.toString(targetOutput[0]));
         System.out.println(Arrays.toString(testInput3) + " gives " + Arrays.toString(NN_Remco.getOutputLayer(testInput3)) + " | target is " + Arrays.toString(targetOutput[2]));
@@ -41,13 +41,13 @@ public class Main {
         boolean showWindow = true;
         int worldType = 1;
 
-        int amountOfTrials = 10;
-        int amountHiddenNodes = 30;
+        int amountOfTrials = 5000;
+        int amountHiddenNodes = 20;
         int amountHiddenLayers = 1;
         double learningRate = 0.5;
         double randomMoveChance = 0.2;
         int roundTimeInMs = 50; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
-        boolean usePreviousNetwork = false;
+        boolean usePreviousNetwork = true;
         boolean delayStartOfTrial = false; //gives you time to move the gamewindow before it becomes unresponsive
 
 

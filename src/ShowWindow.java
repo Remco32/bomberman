@@ -1,9 +1,13 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
+import static com.sun.java.accessibility.util.AWTEventMonitor.addWindowListener;
 
 /**
  * Created by joseph on 9-2-2017.
@@ -13,11 +17,16 @@ public class ShowWindow {
     GameWorld world;
     GameCanvas gameCanvas;
 
+
+
     ShowWindow(GameWorld world) {
 
         this.world = world;
         frame = new JFrame("Bomberman");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
+
         gameCanvas = new GameCanvas(world);
 
         frame.add(gameCanvas, BorderLayout.CENTER);

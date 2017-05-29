@@ -285,15 +285,7 @@ public class GameWorld {
     void endGame() {
         cleanWorld();
 
-        //Ask user if losing old networks is OK
-        int decision = JOptionPane.showConfirmDialog(null, "Do you want to save the trained networks? Old networks will be overwritten.",
-                "Saving networks?", JOptionPane.OK_CANCEL_OPTION);
-
-        if (decision == OK_OPTION) {
-            //save networks
-            AI_Remco.writeNetworkToFile("trapping");
-            AI_Remco.writeNetworkToFile("closingin");
-        }
+        saveNetworks();
 
         totalTimeElapsed = System.currentTimeMillis() - startTimeTrials;
 
@@ -303,6 +295,11 @@ public class GameWorld {
 
         //Close program
         System.exit(0);
+    }
+
+    int endGameInt(){
+        endGame();
+        return 0;
     }
 
     void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork, boolean delayStartOfTrial) {
@@ -316,23 +313,47 @@ public class GameWorld {
 
         if (DELAY_BEFORE_START) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft + 1) + " started.");
-        setEnemyAI();
-        runGameLoop();
         this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
 
-        if (usePreviousNetwork) AI_Remco.readNetworkFromFile("trapping");
-        if (usePreviousNetwork) AI_Remco.readNetworkFromFile("closingin");
+
+        if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft + 1) + " started.");
+
+
+
+        if (usePreviousNetwork)  AI_Remco.readNetworkFromFile("trapping");
+        if (usePreviousNetwork)  AI_Remco.readNetworkFromFile("closingin");
+
+
+
+        setEnemyAI();
+        runGameLoop();
 
         window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed, wonRounds);
 
         AI_Remco.play(3, 0.2);
+    }
+
+    void saveNetworks(){
+        //Ask user if losing old networks is OK
+        int decision = JOptionPane.showConfirmDialog(null, "Do you want to save the trained networks? Old networks will be overwritten.",
+                "Saving networks?", JOptionPane.OK_CANCEL_OPTION);
+
+        if (decision == OK_OPTION) {
+            //save networks
+            AI_Remco.writeNetworkToFile("trapping");
+            AI_Remco.writeNetworkToFile("closingin");
+        }
+    }
+
+    void quitGame(){
+
+        System.exit(0);
     }
 
 }
