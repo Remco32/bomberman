@@ -54,8 +54,11 @@ public class ShowWindow {
 
         int minutes = (int) (estimatedTimeLeft / 1000 / 60);
         int seconds = (int) (estimatedTimeLeft / 1000 % 60);
+        int hours = minutes/60;
+        minutes = minutes - hours*60;
 
         String timeLeft = "Time left: ~";
+        if(hours > 0) timeLeft = timeLeft.concat(hours + "h");
         if(minutes > 0) timeLeft = timeLeft.concat(minutes + "m");
         if(seconds > 0)  timeLeft = timeLeft.concat(seconds + "s");
         if(seconds == 0 && minutes == 0) timeLeft = timeLeft.concat("unknown");

@@ -41,7 +41,7 @@ public class Main {
         boolean showWindow = true;
         int worldType = 1;
 
-        int amountOfTrials = 5000;
+        int amountOfTrials = 10;
         int amountHiddenNodes = 20;
         int amountHiddenLayers = 1;
         double learningRate = 0.5;
