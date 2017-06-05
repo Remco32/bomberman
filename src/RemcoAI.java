@@ -23,11 +23,9 @@ import java.io.ObjectOutputStream;
 public class RemcoAI {
 
     boolean DEBUGPRINTS = true;
-    boolean DEBUGPRINTS_QLEARNING = false;
+    boolean DEBUGPRINTS_QLEARNING = true;
 
     BomberMan currentEnemyTarget;
-
-    //double MULTIPLIER_QVALUE = 100;
 
     GameWorld world;
     BomberMan man;
@@ -35,8 +33,8 @@ public class RemcoAI {
     Queue<Pair> queue = new LinkedList<>();
 
     //NeuralNetRemco neuralNet;
-    ArrayList<NeuralNetRemco> neuralNetListTrapping= new ArrayList<>();
-    ArrayList<NeuralNetRemco> neuralNetListClosingIn= new ArrayList<>();
+    ArrayList<NeuralNetRemco> neuralNetListTrapping = new ArrayList<>();
+    ArrayList<NeuralNetRemco> neuralNetListClosingIn = new ArrayList<>();
 
     int RANGE = 2; //TODO add value to bomberman, and use that when placing bombs
     int TIMER_BOMB = 5; //TODO obtain value
@@ -65,13 +63,12 @@ public class RemcoAI {
     int UTILITY_STANDING_IN_DANGERZONE = -2;
     int UTILITY_IDLING = -1;
 
-    double DISCOUNT_FACTOR = 0.5;
-    double EPSILON_RANDOMNESS = 0.1;
-    double GAMMA = 0.6;
+    double discountFactor;
 
-    RemcoAI(GameWorld world, BomberMan man, int amountHiddenNodes, int amountHiddenLayers, double learningRate) {
+    RemcoAI(GameWorld world, BomberMan man, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double discountFactor) {
         this.world = world;
         this.man = man;
+        this.discountFactor = discountFactor;
 
         //TODO replace with global var
         int amountOfFeatures = 3;
@@ -895,13 +892,13 @@ public class RemcoAI {
     MoveUtility.Actions giveActionAtIndex(int index) {
         switch (index) {
             case 0:
-                return MoveUtility.Actions.LEFT;
-            case 1:
-                return MoveUtility.Actions.RIGHT;
-            case 2:
                 return MoveUtility.Actions.UP;
-            case 3:
+            case 1:
                 return MoveUtility.Actions.DOWN;
+            case 2:
+                return MoveUtility.Actions.LEFT;
+            case 3:
+                return MoveUtility.Actions.RIGHT;
             case 4:
                 return MoveUtility.Actions.PLACEBOMB;
             case 5:
@@ -1025,6 +1022,9 @@ public class RemcoAI {
             neuralNetList = this.neuralNetListClosingIn;
         }
 
+
+
+
         /** Q-learning starts here **/
 
         /**
@@ -1035,6 +1035,9 @@ public class RemcoAI {
             /** Do a forwardpass **/
             for (NeuralNetRemco neuralNet : neuralNetList) {
                 neuralNet.forwardPass(currentStateVector[0]);
+
+                //increment total trial counter of network
+                neuralNet.totalTrials++;
             }
 
             //System.out.println(Arrays.toString(neuralNet.getOutputLayer()));
@@ -1061,9 +1064,9 @@ public class RemcoAI {
                 int actionIndex = getArrayIndexHighestValue(outputLayer);
 
                 action = giveActionAtIndex(actionIndex);
+                System.out.println();
 
                 //check if action is possible, else take the next highest one
-
                 while (!allPossibleActions.contains(action)) {
                     outputLayer[actionIndex] = 0;
                     actionIndex = getArrayIndexHighestValue(outputLayer);
@@ -1112,7 +1115,7 @@ public class RemcoAI {
                 action = giveActionAtIndex(actionIndex);
 
             }
-            double QTarget = rewardForAction + (GAMMA * outputLayer[actionIndex]);
+            double QTarget = rewardForAction + (discountFactor * outputLayer[actionIndex]);
 
             /** Update the target with our new value **/
 
@@ -1293,6 +1296,9 @@ public class RemcoAI {
                 o.close();
                 f.close();
 
+                if (DEBUGPRINTS) System.out.println("Written network " + strategy + i + " to file.");
+
+
             } catch (FileNotFoundException e) {
                 System.out.println("File not found");
             } catch (IOException e) {
@@ -1319,11 +1325,18 @@ public class RemcoAI {
                 // Read objects
                 NeuralNetRemco loadedNN = (NeuralNetRemco) oi.readObject();
 
+                //clean error list
+                loadedNN.totalError.clear();
+
                 //Overwrite networks
                 neuralNetList.set(i, loadedNN);
 
+
+
                 oi.close();
                 fi.close();
+
+
 
                 if (DEBUGPRINTS) System.out.println("Network " + strategy + i + " loaded.");
 
@@ -1336,7 +1349,6 @@ public class RemcoAI {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-
         }
     }
 

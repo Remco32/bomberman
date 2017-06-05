@@ -11,8 +11,8 @@ import static java.lang.Thread.sleep;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        playGame();
         //testNeuralNet();
+        playGame();
     }
 
     static void testNeuralNet() {
@@ -36,23 +36,31 @@ public class Main {
     }
 
     static void playGame() {
+        /** Game variables **/
         int gridSize = 9;
         int amountOfPlayers = 4;
         boolean showWindow = true;
         int worldType = 1;
+        boolean delayStartOfTrials = false; //gives you time to move the gamewindow before it becomes unresponsive
 
-        int amountOfTrials = 10;
+        /** Training parameters **/
+        int amountOfTrials = 100000;
+        int roundTimeInMs = 50; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
         int amountHiddenNodes = 20;
         int amountHiddenLayers = 1;
-        double learningRate = 0.5;
-        double randomMoveChance = 0.2;
-        int roundTimeInMs = 50; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
-        boolean usePreviousNetwork = true;
-        boolean delayStartOfTrial = false; //gives you time to move the gamewindow before it becomes unresponsive
 
+        /** Learning parameters **/
+        double learningRate = 0.4;
+        double randomMoveChance = 0.5;
+        double discountFactor = 0.2;
+        boolean usePreviousNetwork = false;
+        boolean saveEveryThousandTrials = false;
 
         GameWorld world = new GameWorld(gridSize, amountOfPlayers, showWindow, worldType); // gridsize should be of 2*n +1
-        world.startGame(world, amountOfTrials, amountHiddenNodes, amountHiddenLayers, learningRate, randomMoveChance, roundTimeInMs, usePreviousNetwork, delayStartOfTrial);
+        world.startGame(world, amountOfTrials, amountHiddenNodes, amountHiddenLayers,
+                learningRate, randomMoveChance,
+                roundTimeInMs, usePreviousNetwork, delayStartOfTrials, saveEveryThousandTrials,
+                discountFactor);
     }
 
     private static double[][] CreateRandomWeights(int rows, int columns) {

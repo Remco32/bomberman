@@ -28,8 +28,9 @@ class NeuralNetRemco implements Serializable {
     private int[] amountOfNodesPerLayer;
     private double[][] inputSet;
     private double[][] targetOutputSet;
-    double[] targetOutput;
-    private List<Double> totalError = new ArrayList<>(); //list so we can keep the previous values
+    private double[] targetOutput;
+    List<Double> totalError = new ArrayList<>(); //list so we can keep the previous values
+    int totalTrials;
 
     private double[][] neuronValueArray;
     private double[][] weightValueArray;
@@ -42,6 +43,8 @@ class NeuralNetRemco implements Serializable {
         this.amountHiddenLayers = amountHiddenLayers;
         this.targetOutputSet = targetOutput;
         this.learningRate = learningRate;
+
+        totalTrials = 0;
 
         //set our own targetoutput to the first set
         this.targetOutput = targetOutputSet[0];
@@ -370,6 +373,7 @@ class NeuralNetRemco implements Serializable {
 
     //give actual output
     //by means of an activation function, or other function
+    //TODO outputFunction enumrator
     private double outputNode(double input) {
         //set activation function here
 
@@ -413,8 +417,8 @@ class NeuralNetRemco implements Serializable {
         return weightValueArray;
     }
 
-    void saveNetworkToFile() {
 
-    }
+
+
 }
 

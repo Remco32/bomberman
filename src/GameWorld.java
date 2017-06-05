@@ -16,16 +16,19 @@ public class GameWorld {
     long startTimeTrials = System.currentTimeMillis();
     long totalTimeElapsed;
 
+    boolean saveNetworkEveryThousandTrials;
+
     int wonRounds = 0;
 
     int ROUND_TIME_MILISECONDS = 500;
+    int SAVE_INTERVAL = 1000;
 
     RemcoAI AI_Remco;
 
     int trialsLeft;
     int totalAmountOfTrials;
     boolean agentMadeKill = false;
-    boolean DELAY_BEFORE_START; //enables waiting so debuging is easier
+    boolean delayBeforeStart; //enables waiting so debuging is easier
 
     boolean DEBUGPRINTS = true;
     boolean SHOWROUNDS = true;
@@ -237,6 +240,13 @@ public class GameWorld {
         long endTime = System.currentTimeMillis();
         if (DEBUGPRINTS) System.out.println("Elapsed time: " + (double) (endTime - startTime) / 1000 + " seconds");
 
+        if((trialsLeft - 1) % SAVE_INTERVAL == 0){ //off-by-one
+            if (saveNetworkEveryThousandTrials) {
+                if (DEBUGPRINTS) System.out.println("Saving because interval is trial reached...");
+                saveNetworkNoConfirmation();
+            }
+        }
+
         //restart game if there are still trials left to run
         if (trialsLeft > 1) { //first game isn't counted
             trialsLeft--;
@@ -299,16 +309,18 @@ public class GameWorld {
         return 0;
     }
 
-    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate, double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork, boolean delayStartOfTrial) {
+    void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate,
+                   double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork, boolean delayStartOfTrial, boolean saveNetworkEveryThousandTrials, double discountFactor) {
 
         ROUND_TIME_MILISECONDS = roundTimeInMs;
 
         this.trialsLeft = amountOfTrials;
         this.totalAmountOfTrials = amountOfTrials;
         this.randomMoveChance = randomMoveChance;
-        this.DELAY_BEFORE_START = delayStartOfTrial;
+        this.delayBeforeStart = delayStartOfTrial;
+        this.saveNetworkEveryThousandTrials = saveNetworkEveryThousandTrials;
 
-        if (DELAY_BEFORE_START) {
+        if (delayBeforeStart) {
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
@@ -316,10 +328,11 @@ public class GameWorld {
             }
         }
 
-        this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate);
+        this.AI_Remco = new RemcoAI(world, world.bomberManList.get(0), amountHiddenNodes, amountHiddenLayers, learningRate, discountFactor);
 
         if (usePreviousNetwork) AI_Remco.readNetworkFromFile("trapping");
         if (usePreviousNetwork) AI_Remco.readNetworkFromFile("closingin");
+
 
         setEnemyAI();
         runGameLoop();
@@ -336,10 +349,14 @@ public class GameWorld {
                 "Saving networks?", JOptionPane.OK_CANCEL_OPTION);
 
         if (decision == OK_OPTION) {
-            //save networks
-            AI_Remco.writeNetworkToFile("trapping");
-            AI_Remco.writeNetworkToFile("closingin");
+            saveNetworkNoConfirmation();
         }
+    }
+
+    void saveNetworkNoConfirmation(){
+        //save networks
+        AI_Remco.writeNetworkToFile("trapping");
+        AI_Remco.writeNetworkToFile("closingin");
     }
 
     void quitGame() {
