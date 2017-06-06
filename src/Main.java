@@ -53,8 +53,8 @@ public class Main {
         double learningRate = 0.01;
         double randomMoveChance = 0.2;
         double discountFactor = 0.98;
-        boolean usePreviousNetworks = true;
-        boolean saveEveryThousandTrials = false;
+        boolean usePreviousNetworks = true; //setting this to false will create new networks.
+        boolean saveEveryThousandTrials = false; //Saving will overwrite the old networks.
 
         GameWorld world = new GameWorld(gridSize, amountOfPlayers, showWindow, worldType); // gridsize should be of 2*n +1
         world.startGame(world, amountOfTrials, amountHiddenNodes, amountHiddenLayers,

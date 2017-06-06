@@ -1131,9 +1131,12 @@ public class RemcoAI {
         //targetVector[0][0] = QTarget;
         //neuralNet.changeTargetOutputSet(targetVector);
         /** previous action gebruiken**/
-        neuralNetList.get(actionIndex).getTargetOutput()[0] = QTarget;
+        neuralNetList.get(previousActionIndex).getTargetOutput()[0] = QTarget;
 
-        /** Forward pass op previous state **/
+        /** Forward pass on previous state **/
+        for (NeuralNetRemco neuralNet : neuralNetList) {
+            neuralNet.forwardPass(previousState);
+        }
 
         /** Do the backward pass **/
         neuralNetList.get(actionIndex).backwardsPass();
