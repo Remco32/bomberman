@@ -1329,7 +1329,7 @@ public class RemcoAI {
                 oi.close();
                 fi.close();
 
-                if (DEBUGPRINTS) System.out.println("Network " + strategy + i + " loaded.");
+                if (DEBUGPRINTS) System.out.println("Network " + strategy + i + " loaded. This network trained for " + loadedNN.totalTrials + " trials.");
 
             } catch (FileNotFoundException e) {
                 System.out.println("File not found");

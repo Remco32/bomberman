@@ -45,7 +45,7 @@ public class Main {
 
         /** Training parameters **/
         int amountOfTrials = 100000;
-        int roundTimeInMs = 20; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
+        int roundTimeInMs = 50; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
         int amountHiddenNodes = 20;
         int amountHiddenLayers = 1;
 

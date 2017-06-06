@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import static javax.swing.JOptionPane.OK_OPTION;
 
@@ -190,46 +191,54 @@ public class GameWorld {
         long startTime = System.currentTimeMillis();
         while (PlayerCheck()) {
 
-            if (!(ai == null)) {
-                for (AIHandler temp : ai) temp.CalculateBestMove();
-                for (AIHandler temp : ai) {
-                    temp.MakeMove(); // get the last appended move
+            try {
+
+                if (!(ai == null)) {
+                    for (AIHandler temp : ai) temp.CalculateBestMove();
+                    for (AIHandler temp : ai) {
+                        temp.MakeMove(); // get the last appended move
+                    }
                 }
-            }
 
-            //Make requested move for the agent
-            bomberManList.get(0).move(bomberManList.get(0).nextAction);
+                //Make requested move for the agent
+                bomberManList.get(0).move(bomberManList.get(0).nextAction);
 
-            // update all bombs
-            for (Bomb bomb : activeBombList) {
-                bomb.countdown();
-            }
-            for (Bomb bomb : activeBombList) {
-                if (bomb.exploded) {
-                    explodedBombList.add(bomb);
+                // update all bombs
+                for (Bomb bomb : activeBombList) {
+                    bomb.countdown();
                 }
-            }
-            for (Bomb bomb : explodedBombList) {
-                bomb.cleanupCountdown();
-                activeBombList.remove(bomb);
-            }
+                for (Bomb bomb : activeBombList) {
+                    if (bomb.exploded) {
+                        explodedBombList.add(bomb);
+                    }
+                }
+                for (Bomb bomb : explodedBombList) {
+                    bomb.cleanupCountdown();
+                    activeBombList.remove(bomb);
+                }
 
-            //update bomb cooldown
-            for (BomberMan man : bomberManList) {
-                man.updateBombCooldown();
+                //update bomb cooldown
+                for (BomberMan man : bomberManList) {
+                    man.updateBombCooldown();
+                }
+
+                amountOfRounds++;
+
+                //game timestep
+                if (windowBool) try {
+                    window.repaint();
+                    Thread.sleep(ROUND_TIME_MILISECONDS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                //if(windowBool) window.repaint();
             }
+                catch(ConcurrentModificationException E) {
+                    restartCurrentTrial();
+                }
 
-            amountOfRounds++;
 
-            //game timestep
-            if (windowBool) try {
-                window.repaint();
-                Thread.sleep(ROUND_TIME_MILISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            //if(windowBool) window.repaint();
         }
         if (bomberManList.get(0).alive) {
             wonRounds++;
@@ -261,9 +270,14 @@ public class GameWorld {
     }
 
     Boolean PlayerCheck() {
-        if (!bomberManList.get(0).alive) return false;
-        for (int idx = 1; idx < bomberManList.size(); idx++) {
-            if (bomberManList.get(idx).alive) return true;
+        try {
+            if (!bomberManList.get(0).alive) return false;
+            for (int idx = 1; idx < bomberManList.size(); idx++) {
+                if (bomberManList.get(idx).alive) return true;
+            }
+
+        } catch (IndexOutOfBoundsException E) {
+            restartCurrentTrial();
         }
         return false;
     }
@@ -287,6 +301,13 @@ public class GameWorld {
 
         AI_Remco.play(3, 0.2);
 
+    }
+
+    //Resets the current trial. Useful when an exception occurred crashing the agent.
+    void restartCurrentTrial(){
+        if (DEBUGPRINTS) System.err.println("Exception occurred, restarting this round.");
+        //trialsLeft++;
+        resetGame();
     }
 
     void endGame() {

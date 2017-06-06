@@ -37,6 +37,7 @@ public class WorldPosition {
     void deleteBomb(){this.bomb = null;}
 
     void addBomberman(BomberMan bomberman){
+
         bombermanList.add(bomberman);
     }
     void deleteBomberman(BomberMan bomberman){
