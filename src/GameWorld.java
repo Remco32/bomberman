@@ -328,11 +328,6 @@ public class GameWorld {
         System.exit(0);
     }
 
-    int endGameInt() {
-        endGame();
-        return 0;
-    }
-
     void startGame(GameWorld world, int amountOfTrials, int amountHiddenNodes, int amountHiddenLayers, double learningRate,
                    double randomMoveChance, int roundTimeInMs, boolean usePreviousNetwork, boolean delayStartOfTrial, boolean saveNetworkEveryThousandTrials, double discountFactor) {
 
@@ -364,7 +359,7 @@ public class GameWorld {
 
         window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed, wonRounds);
 
-        AI_Remco.play(3, 0.2);
+        AI_Remco.play(3, randomMoveChance);
     }
 
     void saveNetworks() {

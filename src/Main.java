@@ -41,11 +41,11 @@ public class Main {
         int amountOfPlayers = 4;
         boolean showWindow = true;
         int worldType = 1;
-        boolean delayStartOfTrials = false; //gives you time to move the gamewindow before it becomes unresponsive
+        boolean delayStartOfTrials = true; //gives you time to move the gamewindow before it becomes unresponsive
 
         /** Training parameters **/
         int amountOfTrials = 100000;
-        int roundTimeInMs = 50; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
+        int roundTimeInMs = 500; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
         int amountHiddenNodes = 20;
         int amountHiddenLayers = 1;
 
@@ -54,7 +54,7 @@ public class Main {
         double randomMoveChance = 0.2;
         double discountFactor = 0.2;
         boolean usePreviousNetwork = true;
-        boolean saveEveryThousandTrials = true;
+        boolean saveEveryThousandTrials = false;
 
         GameWorld world = new GameWorld(gridSize, amountOfPlayers, showWindow, worldType); // gridsize should be of 2*n +1
         world.startGame(world, amountOfTrials, amountHiddenNodes, amountHiddenLayers,
