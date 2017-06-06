@@ -161,6 +161,7 @@ public class GameWorld {
 
         //clean arrays
         ai.clear();
+        //TODO Enemies resetten niet als ze nog leven - resetPosition functie maken
         bomberManList.clear(); // remove all bombermen
         activeBombList.clear();
         explodedBombList.clear();

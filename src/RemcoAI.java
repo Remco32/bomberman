@@ -996,14 +996,15 @@ public class RemcoAI {
 
         //TODO replace with global var
         int amountOfFeatures = 3;
-        //TODO replace with multiple networks
-        int amountOfMovementOptions = 6;
+
 
         //variables
         double[] previousState;
         MoveUtility.Actions previousAction;
         MoveUtility.Actions action;
+        int previousActionIndex;
         int rewardForAction;
+        int actionIndex;
 
         double[][] currentStateVector = new double[1][amountOfFeatures * (world.gridSize * world.gridSize)];
         currentStateVector[0] = createInputVector();
@@ -1044,10 +1045,14 @@ public class RemcoAI {
         //generate random number between 0.000 and 1.000
         double random = (double) ThreadLocalRandom.current().nextInt(0 * 1000, 1 * 1000 + 1) / 1000;
         if (random > (1 - randomMoveChance)) { //take random action
-            //Get all possible moves
 
-            int randomActionValue = new Random().nextInt(allPossibleActions.size());
-            action = allPossibleActions.get(randomActionValue);
+            do {
+                //check if action is possible, else take the next highest one
+                actionIndex = new Random().nextInt(6);
+                action = giveActionAtIndex(actionIndex);
+            }
+            while (!allPossibleActions.contains(action));
+
             if (DEBUGPRINTS_QLEARNING) System.out.println("Random action was " + action);
 
         } else { //use highest q-value
@@ -1057,7 +1062,7 @@ public class RemcoAI {
             double[] outputLayer = getQValuesAllNetworks(strategy);
 
             //take node with highest activation
-            int actionIndex = getArrayIndexHighestValue(outputLayer);
+            actionIndex = getArrayIndexHighestValue(outputLayer);
 
             action = giveActionAtIndex(actionIndex);
             System.out.println();
@@ -1079,6 +1084,7 @@ public class RemcoAI {
         //TODO add action to stateVector
         previousState = currentStateVector[0];
         previousAction = action;
+        previousActionIndex = actionIndex;
 
         /** make move **/
 
@@ -1102,12 +1108,12 @@ public class RemcoAI {
         //double[] outputLayer = neuralNet.getOutputLayer();
         double[] outputLayer = getQValuesAllNetworks(strategy);
         //take node with highest activation
-        int actionIndex = getArrayIndexHighestValue(outputLayer);
+        actionIndex = getArrayIndexHighestValue(outputLayer);
         action = giveActionAtIndex(actionIndex);
 
         //check if action is possible, else take the next highest one
         while (!allPossibleActions.contains(action)) {
-            outputLayer[actionIndex] = 0;
+            outputLayer[actionIndex] = 0; //TODO look if this makes sense
             actionIndex = getArrayIndexHighestValue(outputLayer);
             action = giveActionAtIndex(actionIndex);
 
@@ -1118,13 +1124,16 @@ public class RemcoAI {
 
         //get current target
         //double[] targetOutput = neuralNet.getTargetOutput();
-        double targetOutput = neuralNetList.get(actionIndex).getTargetOutput()[0];
+        //double targetOutput = neuralNetList.get(actionIndex).getTargetOutput()[0];
         //change the value
-        targetOutput = QTarget;
+        //targetOutput = QTarget;
         //targetVector[0] = targetOutput;
-        targetVector[0][0] = targetOutput;
+        //targetVector[0][0] = QTarget;
         //neuralNet.changeTargetOutputSet(targetVector);
-        neuralNetList.get(actionIndex).getTargetOutput()[0] = targetOutput;
+        /** previous action gebruiken**/
+        neuralNetList.get(actionIndex).getTargetOutput()[0] = QTarget;
+
+        /** Forward pass op previous state **/
 
         /** Do the backward pass **/
         neuralNetList.get(actionIndex).backwardsPass();
