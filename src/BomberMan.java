@@ -15,7 +15,7 @@ public class BomberMan {
     int bombCooldown; //cooldown time for when new bomb can be placed
     int BOMBCOOLDOWNTIME = 5;
 
-    MoveUtility.Actions nextAction = MoveUtility.Actions.IDLE; //TODO agent its first move will always be idle now
+    MoveUtility.Actions nextAction = MoveUtility.Actions.IDLE; //Has a value to avoid nullpointer exceptions
 
     BomberMan(int x, int y, int id, GameWorld world) {
         this.x_location = x;

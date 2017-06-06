@@ -353,13 +353,15 @@ public class GameWorld {
         if (usePreviousNetwork) AI_Remco.readNetworkFromFile("closingin");
 
 
-        setEnemyAI();
         runGameLoop();
+        setEnemyAI();
+
+        AI_Remco.play(3, randomMoveChance);
         if (SHOWROUNDS) System.out.println("Game " + (totalAmountOfTrials - trialsLeft + 1) + " started.");
 
         window.updateTitle(totalAmountOfTrials - trialsLeft + 1, totalAmountOfTrials, totalTimeElapsed, wonRounds);
 
-        AI_Remco.play(3, randomMoveChance);
+
     }
 
     void saveNetworks() {
