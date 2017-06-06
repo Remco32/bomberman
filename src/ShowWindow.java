@@ -30,6 +30,7 @@ public class ShowWindow {
             @Override
             public void windowClosing(WindowEvent we)
             {
+                world.shuttingDownProgram = true;
                 String ObjButtons[] = {"Yes", "No"};
                 int PromptResult = JOptionPane.showOptionDialog(null,"Are you sure you want to exit?","Trials are still ongoing",JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null,ObjButtons,ObjButtons[1]);
                 if(PromptResult==JOptionPane.YES_OPTION)

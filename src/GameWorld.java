@@ -18,6 +18,7 @@ public class GameWorld {
     long totalTimeElapsed;
 
     boolean saveNetworkEveryThousandTrials;
+    boolean shuttingDownProgram = false;
 
     int wonRounds = 0;
 
@@ -305,9 +306,11 @@ public class GameWorld {
 
     //Resets the current trial. Useful when an exception occurred crashing the agent.
     void restartCurrentTrial(){
-        if (DEBUGPRINTS) System.err.println("Exception occurred, restarting this round.");
-        //trialsLeft++;
-        resetGame();
+        if(!shuttingDownProgram) {
+            if (DEBUGPRINTS) System.err.println("Exception occurred, restarting this round.");
+            //trialsLeft++;
+            resetGame();
+        }
     }
 
     void endGame() {
