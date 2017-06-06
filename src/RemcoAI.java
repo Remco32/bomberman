@@ -108,11 +108,10 @@ public class RemcoAI {
                 playQLearning(randomMoveChance, "closingin");
             }
 
-
             //try to kill enemy
             //trappingStrategy();
             while (world.bomberManList.get(0).alive && world.PlayerCheck() && currentEnemyTarget.alive) {
-                if(DEBUGPRINTS) System.out.println("Switched to trapping strategy");
+                if (DEBUGPRINTS) System.out.println("Switched to trapping strategy");
                 playQLearning(randomMoveChance, "trapping");
             }
 
@@ -1022,91 +1021,46 @@ public class RemcoAI {
             neuralNetList = this.neuralNetListClosingIn;
         }
 
-
-
-
         /** Q-learning starts here **/
 
         /**
-        //Keep making moves until the game ends
-        while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
+         //Keep making moves until the game ends
+         while (world.bomberManList.get(0).alive && world.PlayerCheck()) {
          **/
 
-            /** Do a forwardpass **/
-            for (NeuralNetRemco neuralNet : neuralNetList) {
-                neuralNet.forwardPass(currentStateVector[0]);
+        /** Do a forwardpass **/
+        for (NeuralNetRemco neuralNet : neuralNetList) {
+            neuralNet.forwardPass(currentStateVector[0]);
 
-                //increment total trial counter of network
-                neuralNet.totalTrials++;
-            }
+            //increment total trial counter of network
+            neuralNet.totalTrials++;
+        }
 
-            //System.out.println(Arrays.toString(neuralNet.getOutputLayer()));
+        //System.out.println(Arrays.toString(neuralNet.getOutputLayer()));
 
-            /** pick a random move or highest Q-value **/
-            ArrayList<MoveUtility.Actions> allPossibleActions = giveAllPossibleActions(man.getX_location(), man.getY_location());
+        /** pick a random move or highest Q-value **/
+        ArrayList<MoveUtility.Actions> allPossibleActions = giveAllPossibleActions(man.getX_location(), man.getY_location());
 
-            //generate random number between 0.000 and 1.000
-            double random = (double) ThreadLocalRandom.current().nextInt(0 * 1000, 1 * 1000 + 1) / 1000;
-            if (random > (1 - randomMoveChance)) { //take random action
-                //Get all possible moves
+        //generate random number between 0.000 and 1.000
+        double random = (double) ThreadLocalRandom.current().nextInt(0 * 1000, 1 * 1000 + 1) / 1000;
+        if (random > (1 - randomMoveChance)) { //take random action
+            //Get all possible moves
 
-                int randomActionValue = new Random().nextInt(allPossibleActions.size());
-                action = allPossibleActions.get(randomActionValue);
-                if (DEBUGPRINTS_QLEARNING) System.out.println("Random action was " + action);
+            int randomActionValue = new Random().nextInt(allPossibleActions.size());
+            action = allPossibleActions.get(randomActionValue);
+            if (DEBUGPRINTS_QLEARNING) System.out.println("Random action was " + action);
 
-            } else { //use highest q-value
+        } else { //use highest q-value
 
-                //get the highest Q-value index
-                //double[] outputLayer = neuralNet.getOutputLayer();
-                double[] outputLayer = getQValuesAllNetworks(strategy);
-
-                //take node with highest activation
-                int actionIndex = getArrayIndexHighestValue(outputLayer);
-
-                action = giveActionAtIndex(actionIndex);
-                System.out.println();
-
-                //check if action is possible, else take the next highest one
-                while (!allPossibleActions.contains(action)) {
-                    outputLayer[actionIndex] = 0;
-                    actionIndex = getArrayIndexHighestValue(outputLayer);
-                    action = giveActionAtIndex(actionIndex);
-
-                }
-
-                if (DEBUGPRINTS_QLEARNING) System.out.println("Q-value action was " + action);
-                if (DEBUGPRINTS_QLEARNING) System.out.println("QValue was " + outputLayer[actionIndex]);
-
-            }
-
-            //Save current state and action
-            //TODO add action to stateVector
-            previousState = currentStateVector[0];
-            previousAction = action;
-
-            /** make move **/
-
-            rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), action, strategy);
-
-            man.setNextMove(action);
-
-            if (DEBUGPRINTS_QLEARNING) System.out.println("Reward was " + rewardForAction);
-            if (DEBUGPRINTS_QLEARNING) System.out.println();
-
-            /** Feed forward again **/
-            //get the new state as vector
-            currentStateVector[0] = createInputVector();
-            for (NeuralNetRemco neuralNet : neuralNetList) {
-                neuralNet.forwardPass(currentStateVector[0]);
-            }
-
-            /** Calculate Q-target **/
             //get the highest Q-value index
             //double[] outputLayer = neuralNet.getOutputLayer();
             double[] outputLayer = getQValuesAllNetworks(strategy);
+
             //take node with highest activation
             int actionIndex = getArrayIndexHighestValue(outputLayer);
+
             action = giveActionAtIndex(actionIndex);
+            System.out.println();
 
             //check if action is possible, else take the next highest one
             while (!allPossibleActions.contains(action)) {
@@ -1115,25 +1069,66 @@ public class RemcoAI {
                 action = giveActionAtIndex(actionIndex);
 
             }
-            double QTarget = rewardForAction + (discountFactor * outputLayer[actionIndex]);
 
-            /** Update the target with our new value **/
+            if (DEBUGPRINTS_QLEARNING) System.out.println("Q-value action was " + action);
+            if (DEBUGPRINTS_QLEARNING) System.out.println("QValue was " + outputLayer[actionIndex]);
 
-            //get current target
-            //double[] targetOutput = neuralNet.getTargetOutput();
-            double targetOutput = neuralNetList.get(actionIndex).getTargetOutput()[0];
-            //change the value
-            targetOutput = QTarget;
-            //targetVector[0] = targetOutput;
-            targetVector[0][0] = targetOutput;
-            //neuralNet.changeTargetOutputSet(targetVector);
-            neuralNetList.get(actionIndex).getTargetOutput()[0] = targetOutput;
-
-            /** Do the backward pass **/
-            neuralNetList.get(actionIndex).backwardsPass();
         }
 
+        //Save current state and action
+        //TODO add action to stateVector
+        previousState = currentStateVector[0];
+        previousAction = action;
 
+        /** make move **/
+
+        rewardForAction = rewardFunction(man.getX_location(), man.getY_location(), action, strategy);
+
+        man.setNextMove(action);
+
+        if (DEBUGPRINTS_QLEARNING) System.out.println("Reward was " + rewardForAction);
+        if (DEBUGPRINTS_QLEARNING) System.out.println();
+
+        /** Feed forward again **/
+        //get the new state as vector
+        currentStateVector[0] = createInputVector();
+
+        for (NeuralNetRemco neuralNet : neuralNetList) {
+            neuralNet.forwardPass(currentStateVector[0]);
+        }
+
+        /** Calculate Q-target **/
+        //get the highest Q-value index
+        //double[] outputLayer = neuralNet.getOutputLayer();
+        double[] outputLayer = getQValuesAllNetworks(strategy);
+        //take node with highest activation
+        int actionIndex = getArrayIndexHighestValue(outputLayer);
+        action = giveActionAtIndex(actionIndex);
+
+        //check if action is possible, else take the next highest one
+        while (!allPossibleActions.contains(action)) {
+            outputLayer[actionIndex] = 0;
+            actionIndex = getArrayIndexHighestValue(outputLayer);
+            action = giveActionAtIndex(actionIndex);
+
+        }
+        double QTarget = rewardForAction + (discountFactor * outputLayer[actionIndex]);
+
+        /** Update the target with our new value **/
+
+        //get current target
+        //double[] targetOutput = neuralNet.getTargetOutput();
+        double targetOutput = neuralNetList.get(actionIndex).getTargetOutput()[0];
+        //change the value
+        targetOutput = QTarget;
+        //targetVector[0] = targetOutput;
+        targetVector[0][0] = targetOutput;
+        //neuralNet.changeTargetOutputSet(targetVector);
+        neuralNetList.get(actionIndex).getTargetOutput()[0] = targetOutput;
+
+        /** Do the backward pass **/
+        neuralNetList.get(actionIndex).backwardsPass();
+    }
 
     double[] getQValuesAllNetworks(String strategy) {
         ArrayList<NeuralNetRemco> neuralNetList;
@@ -1208,6 +1203,7 @@ public class RemcoAI {
         //double QValue = // reward_next + discountRate * maxQ(next_state, this_action)
 
         //System.out.println("Input vector made");
+        //System.out.println(amountOfSoftwalls + " softwalls in total.");
 
         return inputVector;
 
@@ -1298,7 +1294,6 @@ public class RemcoAI {
 
                 if (DEBUGPRINTS) System.out.println("Written network " + strategy + i + " to file.");
 
-
             } catch (FileNotFoundException e) {
                 System.out.println("File not found");
             } catch (IOException e) {
@@ -1331,12 +1326,8 @@ public class RemcoAI {
                 //Overwrite networks
                 neuralNetList.set(i, loadedNN);
 
-
-
                 oi.close();
                 fi.close();
-
-
 
                 if (DEBUGPRINTS) System.out.println("Network " + strategy + i + " loaded.");
 

@@ -6,7 +6,9 @@
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Integer.max;
@@ -30,6 +32,7 @@ class NeuralNetRemco implements Serializable {
     private double[][] targetOutputSet;
     private double[] targetOutput;
     List<Double> totalError = new ArrayList<>(); //list so we can keep the previous values
+
     int totalTrials;
 
     private double[][] neuronValueArray;

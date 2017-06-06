@@ -298,7 +298,7 @@ public class GameWorld {
 
         JFrame frame = new JFrame();
         //Show message
-        JOptionPane.showMessageDialog(frame, "All trials have ended. " + System.lineSeparator() + "Elapsed time: " + String.format("%.2f", ((double) totalTimeElapsed / 1000 / 60)) + " minutes." + System.lineSeparator() + "Winrate was " + String.format("%.2f", (double) wonRounds / (double) (totalAmountOfTrials-trialsLeft - 1)));
+        JOptionPane.showMessageDialog(frame, "All trials have ended. " + System.lineSeparator() + "Elapsed time: " + String.format("%.2f", ((double) totalTimeElapsed / 1000 / 60)) + " minutes." + System.lineSeparator() + "Winrate was " + String.format("%.2f", ((double) wonRounds / (double) (totalAmountOfTrials-trialsLeft - 1)) * 100) + "%") ;
 
         //Close program
         System.exit(0);

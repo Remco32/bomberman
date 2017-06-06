@@ -45,16 +45,16 @@ public class Main {
 
         /** Training parameters **/
         int amountOfTrials = 100000;
-        int roundTimeInMs = 50; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
+        int roundTimeInMs = 20; //Setting this lower than 50 will introduce out of bound errors due to arrays being accessed simultaneously. This value probably differs per machine.
         int amountHiddenNodes = 20;
         int amountHiddenLayers = 1;
 
         /** Learning parameters **/
-        double learningRate = 0.4;
-        double randomMoveChance = 0.5;
+        double learningRate = 0.5;
+        double randomMoveChance = 0.2;
         double discountFactor = 0.2;
-        boolean usePreviousNetwork = false;
-        boolean saveEveryThousandTrials = false;
+        boolean usePreviousNetwork = true;
+        boolean saveEveryThousandTrials = true;
 
         GameWorld world = new GameWorld(gridSize, amountOfPlayers, showWindow, worldType); // gridsize should be of 2*n +1
         world.startGame(world, amountOfTrials, amountHiddenNodes, amountHiddenLayers,

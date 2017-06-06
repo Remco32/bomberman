@@ -77,7 +77,7 @@ public class ShowWindow {
         if(seconds > 0)  timeLeft = timeLeft.concat(seconds + "s");
         if(seconds == 0 && minutes == 0) timeLeft = timeLeft.concat("unknown");
 
-        frame.setTitle(timeLeft + " | Current winrate: " + String.format("%.2f", winrate) + " | Trial " + currentTrial + " of " + totalTrials);
+        frame.setTitle(timeLeft + " | Current winrate: " + String.format("%.2f", winrate*100) + "% | Trial " + currentTrial + " of " + totalTrials);
     }
 
 
